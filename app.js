@@ -20,8 +20,7 @@
 import express from 'express';
 import connectDB from './config/mongoConnections.js';
 import dotenv from 'dotenv';
-import authRoutes from './routes/authRoutes.js';
-
+import configRoutesFunction from './routes/index.js';
 
 
 dotenv.config();
@@ -33,7 +32,7 @@ connectDB(); // connect to MongoDB here
 
 
 // Routes
-app.use('/api/auth', authRoutes);
+configRoutesFunction(app);
 
 // routes...
 const PORT = process.env.PORT || 3000;
