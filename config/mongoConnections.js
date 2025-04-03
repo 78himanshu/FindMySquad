@@ -16,21 +16,19 @@
 //   await _connection.close();
 // };
 
-
-import mongoose from 'mongoose';
-import dotenv from 'dotenv';
+import mongoose from "mongoose";
+import dotenv from "dotenv";
 
 dotenv.config();
 
 const connectDB = async () => {
   try {
     await mongoose.connect(process.env.MONGO_URI || 'mongodb+srv://hpaithan:fQoTlFKT0uAueUi3@findmysquad.onaci48.mongodb.net/', {
-      useNewUrlParser: true,
-      useUnifiedTopology: true
+
     });
     console.log('✅ MongoDB connected!');
   } catch (error) {
-    console.error('❌ MongoDB connection failed:', error.message);
+    console.error("❌ MongoDB connection failed:", error.message);
     process.exit(1);
   }
 };

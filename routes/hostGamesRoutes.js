@@ -2,7 +2,7 @@ import express from 'express';
 import {Router} from 'express';
 const router = Router();
 import {hostGameData} from '../data/index.js'
-import { checkString,checkNumber } from '../utils/helper.js';
+import { checkString,checkNumber } from '../utils/Helper.js';
 
 router
     .route('/')
