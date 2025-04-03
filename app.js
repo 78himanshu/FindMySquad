@@ -9,7 +9,8 @@ import router from "./routes/index.js";
 import authRouter from "./routes/authRoutes.js";
 import fs from "fs";
 
-// Initialize environment variables
+import configRoutesFunction from './routes/index.js';
+
 dotenv.config();
 
 // Fix __dirname issue in ES Modules
@@ -57,6 +58,8 @@ app.get("/test-error", (req, res, next) => {
 // Routes (register after view engine setup)
 app.use("/", router);
 app.use("/", authRouter);
+// Routes
+configRoutesFunction(app);
 
 // 404 Handler (must come after routes but before error handler)
 app.use((req, res, next) => {
