@@ -58,8 +58,7 @@ app.use((err, req, res, next) => {
   res.status(500).render("error", { error: err });
 });
 
-// Start server
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  console.log("🚀 Server is running on http://localhost:3000");
-});
+// routes...
+const PORT = process.env.PORT || 8080;
+app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
+
