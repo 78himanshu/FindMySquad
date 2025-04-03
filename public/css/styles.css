@@ -107,3 +107,51 @@
   .container-small {
     padding: 0 20px;
   }
+
+  /* Auth buttons */
+.auth-buttons {
+    display: flex;
+    gap: 1rem;
+  }
+  
+/* User profile - hidden by default */
+.user-profile {
+    display: none;
+    align-items: center;
+    gap: 15px;
+  }
+  
+  /* Auth buttons - shown by default */
+  .auth-buttons {
+    display: flex;
+    gap: 1rem;
+  }
+  
+  /* When user is logged in */
+  .user-logged-in .user-profile {
+    display: flex;
+  }
+  
+  .user-logged-in .auth-buttons {
+    display: none;
+  }
+  
+  /* Profile button styling */
+  .user-profile span {
+    font-weight: 600;
+    color: #333;
+  }
+  
+  .btn-logout {
+    padding: 8px 16px;
+    background: #f44336;
+    color: white;
+    border-radius: 4px;
+    text-decoration: none;
+    border: none;
+    cursor: pointer;
+  }
+  
+  .btn-logout:hover {
+    background: #d32f2f;
+  }

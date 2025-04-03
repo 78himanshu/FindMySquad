@@ -112,4 +112,30 @@ document.addEventListener("DOMContentLoaded", () => {
     document.getElementById("confirmError").textContent = "";
     return true;
   }
+
+// // Handle login form submission
+// document.getElementById('login-form').addEventListener('submit', async (e) => {
+//     e.preventDefault();
+    
+//     const response = await fetch('/login', {
+//       method: 'POST',
+//       headers: {
+//         'Content-Type': 'application/json'
+//       },
+//       body: JSON.stringify({
+//         email: document.getElementById('email').value,
+//         password: document.getElementById('password').value
+//       })
+//     });
+  
+//     const data = await response.json();
+    
+//     // Store token and user data
+//     localStorage.setItem('token', data.token);
+//     localStorage.setItem('user', JSON.stringify(data.user));
+    
+//     // Redirect to home page
+//     window.location.href = '/';
+//   });
+
 });

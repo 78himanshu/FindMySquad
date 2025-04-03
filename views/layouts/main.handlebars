@@ -1,14 +1,23 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>{{title}} FindMySquad</title>
-        <link rel="stylesheet" href="/css/styles.css">
-        <link rel="stylesheet"
-            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    </head>
-    <body>
-        {{{body}}}
-    </body>
+<head>
+  <title>{{title}} - FindMySquad</title>
+  <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+  <header class="navbar">
+    <div class="logo">FindMySquad</div>
+    <nav class="nav-buttons">
+      <button onclick="location.href='/join'">Join</button>
+      <button onclick="location.href='/host'">Host</button>
+      <button onclick="location.href='/book'">Book</button>
+      <button onclick="location.href='/login'">Login</button>
+      <button onclick="location.href='/signup'">Sign Up</button>
+    </nav>
+  </header>
+
+  <main>
+    {{{body}}}
+  </main>
+</body>
 </html>

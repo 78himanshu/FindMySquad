@@ -4,12 +4,10 @@ import { fileURLToPath } from "url";
 import connectDB from "./config/mongoConnections.js";
 import dotenv from "dotenv";
 import exphbs from "express-handlebars";
-import session from "express-session";
-import router from "./routes/index.js";
-import authRouter from "./routes/authRoutes.js";
 import fs from "fs";
+import cookieParser from "cookie-parser";
 
-import configRoutesFunction from './routes/index.js';
+import configRoutesFunction from "./routes/index.js";
 
 dotenv.config();
 
@@ -24,7 +22,7 @@ connectDB();
 
 // Handlebars configuration
 const hbs = exphbs.create({
-  defaultLayout: "main",
+  defaultLayout: false,
   extname: ".handlebars",
   helpers: {
     // Add any custom helpers here if needed
@@ -38,26 +36,13 @@ app.set("views", path.join(__dirname, "views"));
 // Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+// for statis files
 app.use(express.static(path.join(__dirname, "public")));
 
-// Session configuration
-app.use(
-  session({
-    secret: process.env.SESSION_SECRET || "your-secret-key",
-    resave: false,
-    saveUninitialized: true,
-    cookie: { secure: process.env.NODE_ENV === "production" },
-  })
-);
+// always Add this middleware BEFORE your routes
+app.use(cookieParser());
 
-// Debug route to test error handling
-app.get("/test-error", (req, res, next) => {
-  next(new Error("This is a test error"));
-});
-
-// Routes (register after view engine setup)
-app.use("/", router);
-app.use("/", authRouter);
 // Routes
 configRoutesFunction(app);
 
@@ -70,37 +55,9 @@ app.use((req, res, next) => {
   });
 });
 
-// Error handling middleware (must come last)
+// Error handling middleware
 app.use((err, req, res, next) => {
   console.error("SERVER ERROR:", err.stack);
-
-  // If headers already sent, delegate to default handler
-  if (res.headersSent) {
-    return next(err);
-  }
-
-  // For API routes, return JSON
-  if (req.originalUrl.startsWith("/api")) {
-    return res.status(500).json({
-      error:
-        process.env.NODE_ENV === "development" ? err.message : "Server Error",
-    });
-  }
-
-  // Ensure error template exists before rendering
-  const errorTemplatePath = path.join(__dirname, "views/error.handlebars");
-  if (!fs.existsSync(errorTemplatePath)) {
-    return res.status(500).send(`
-      <h1>Server Error</h1>
-      <pre>${process.env.NODE_ENV === "development"
-        ? err.stack
-        : "Something went wrong"
-      }</pre>
-      <p>Error template missing at: ${errorTemplatePath}</p>
-    `);
-  }
-
-  // For regular routes, render error page
   res.status(500).render("error", {
     title: "Error",
     error:
