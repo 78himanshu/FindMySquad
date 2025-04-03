@@ -1,6 +1,6 @@
 import express from "express";
 const router = express.Router();
-import landingRoutes from "./landingRoutes.js";
+// import landingRoutes from "./landingRoutes.js";
 import hostGamesRoutes from "./hostGamesRoutes.js"
 import authRoutes from './authRoutes.js';
 
