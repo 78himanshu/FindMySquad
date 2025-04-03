@@ -13,7 +13,7 @@ const isValidUsername = (username) => {
 const isValidPassword = (password) =>
   /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[\W_]).{8,}$/.test(password);
 
-export const register = async (req, res) => {
+export const signup = async (req, res) => {
   try {
     let { username, email, password } = req.body;
 

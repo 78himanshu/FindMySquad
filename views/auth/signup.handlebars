@@ -1,0 +1,48 @@
+<main class="main"></main>
+    <div class="signup-form" id="signup-form">
+        <h2 class="heading-secondary">CREATE AN ACCOUNT</h2>
+        <link rel="stylesheet" href="/css/auth.css">
+        {{#if errors}}
+        <div class="error-messages">
+            {{#each errors}}
+            <div class="error-message font-italic">{{this}}</div>
+            {{/each}}
+        </div>
+        {{/if}}
+
+        <div class="form-box">
+            <form class="form form--signup" action="/signup" method="POST">
+                <!-- Name Field -->
+                <div class="form__group">
+                    <label class="form__label" for="name">username</label>
+                    <input class="form__input" id="name" name="name" type="text" placeholder="John Doe" required
+                        value="{{name}}">
+                </div>
+                <!-- Email Field -->
+                <div class="form__group">
+                    <label class="form__label" for="email">E-mail</label>
+                    <input class="form__input" id="email" name="email" type="email" placeholder="you@example.com"
+                        required value="{{email}}">
+                </div>
+
+                <!-- Password Field -->
+                <div class="form__group">
+                    <label class="form__label" for="password">Password</label>
+                    <input class="form__input" id="password" name="password" type="password" placeholder="••••••••"
+                        required minlength="8">
+                </div>
+                <!-- Confirm Password Field -->
+                <div class="form__group">
+                    <label class="form__label" for="passwordConfirm">Confirm Password</label>
+                    <input class="form__input" id="passwordConfirm" name="passwordConfirm" type="password"
+                        placeholder="••••••••" required minlength="8">
+                </div>
+                <!-- Submit Button -->
+                <div class="form__group">
+                    <button class="submit-button">Sign Up</button>
+                </div>
+                <p class="switch-link">Already have an account? <a href="/login">Login</a></p>
+            </form>
+        </div>
+    </div>
+</main>
