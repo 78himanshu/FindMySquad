@@ -89,10 +89,9 @@ app.use((err, req, res, next) => {
   if (!fs.existsSync(errorTemplatePath)) {
     return res.status(500).send(`
       <h1>Server Error</h1>
-      <pre>${
-        process.env.NODE_ENV === "development"
-          ? err.stack
-          : "Something went wrong"
+      <pre>${process.env.NODE_ENV === "development"
+        ? err.stack
+        : "Something went wrong"
       }</pre>
       <p>Error template missing at: ${errorTemplatePath}</p>
     `);

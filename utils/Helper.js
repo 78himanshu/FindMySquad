@@ -1,42 +1,18 @@
-import { ObjectId } from "mongodb";
 
-const exportedMethods = {
-  checkId(id, varName) {
-    if (!id) throw `Error: You must provide a ${varName}`;
-    if (typeof id !== "string") throw `Error:${varName} must be a string`;
-    id = id.trim();
-    if (id.length === 0)
-      throw `Error: ${varName} cannot be an empty string or just spaces`;
-    if (!ObjectId.isValid(id)) throw `Error: ${varName} invalid object ID`;
-    return id;
-  },
+export function checkString(x, input, a) {
+  //here if a is 1 we need to return trimmed string back and if nothing is given i.e. the third parameter is not given it will not return
+  if (typeof x !== 'string' || x.trim().length === 0) {
+    throw new Error(`${input} must be a string`)
+  }
+  if (a === 1) {
+    return x.trim();
+  }
+}
 
-  checkString(strVal, varName) {
-    // console.log("==>>")
-    if (!strVal) throw `Error: You must supply a ${varName}!`;
-    if (typeof strVal !== "string") throw `Error: ${varName} must be a string!`;
-    strVal = strVal.trim();
-    if (strVal.length === 0)
-      throw `Error: ${varName} cannot be an empty string or string with just spaces`;
-    if (!isNaN(strVal))
-      throw `Error: ${strVal} is not a valid value for ${varName} as it only contains digits`;
-    return strVal;
-  },
 
-  checkStringArray(arr, varName) {
-    //We will allow an empty array for this,
-    //if it's not empty, we will make sure all tags are strings
-    if (!arr || !Array.isArray(arr))
-      throw `You must provide an array of ${varName}`;
-    for (let i in arr) {
-      if (typeof arr[i] !== "string" || arr[i].trim().length === 0) {
-        throw `One or more elements in ${varName} array is not a string or is an empty string`;
-      }
-      arr[i] = arr[i].trim();
-    }
+export function checkNumber(y, input, z) {
 
-    return arr;
-  },
-};
-
-export default exportedMethods;
+  if (typeof y !== 'number' || isNaN(y) || y < z) {
+    throw new Error(`${input} must be a Number`)
+  }
+}

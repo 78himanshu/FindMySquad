@@ -1,12 +1,18 @@
 import express from "express";
 const router = express.Router();
-import { signup, login } from "../controllers/authController.js";
+import landingRoutes from "./landingRoutes.js";
+import hostGamesRoutes from "./hostGamesRoutes.js"
+import authRoutes from './authRoutes.js';
 
 router.get("/", (req, res) => {
   res.render("index", { title: "FindMySquad" });
 });
 
-router.post("/signup", signup);
-router.post("/login", login);
+const configRoutesFunction = (app) => {
 
-export default router;
+  app.use('/host', hostGamesRoutes);
+  app.use('/api/auth', authRoutes);
+};
+
+
+export default configRoutesFunction;
