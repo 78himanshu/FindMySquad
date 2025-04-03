@@ -21,6 +21,7 @@ import express from 'express';
 import connectDB from './config/mongoConnections.js';
 import dotenv from 'dotenv';
 import authRoutes from './routes/authRoutes.js';
+import userProfileRoutes from './routes/userProfileRoutes.js'; // ⬅️ New import
 
 
 
@@ -36,6 +37,7 @@ connectDB(); // connect to MongoDB here
 
 // Routes
 app.use('/api/auth', authRoutes);
+app.use('/api/profile', userProfileRoutes); // ⬅️ Register profile routes
 
 // routes...
 const PORT = process.env.PORT || 8080;
