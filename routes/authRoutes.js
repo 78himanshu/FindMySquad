@@ -1,70 +1,86 @@
-import express from 'express';
-import { Router } from 'express';
+import { Router } from "express";
 const router = Router();
-import { authUserData } from '../data/index.js'
-import { checkString, checkNumber } from '../utils/helper.js';
+import { authUserData } from "../data/index.js";
+import { checkString } from "../utils/Helper.js";
+import jwt from "jsonwebtoken";
 
 router
-    .route('/signup')
-    .post(async (req, res) => {
-        const x = req.body;
-        // console.log("xx", x)
-
-        if (!x || Object.keys(x).length === 0) {
-            return res.status(400).json({ error: 'There are no fields in the request body' });
-        }
-
-        if (!x.username || !x.email || !x.password) {
-            return res.status(400).json({ error: 'All fields need to have valid values' });
-        }
-
-        console.log("==>>", x.username, x.email, x.password);
-
-        try {
-            checkString(x.username, 'username');
-            checkString(x.email, 'email');
-            checkString(x.password, 'password');
-            console.log(">>>>")
-        } catch (e) {
-            return res.status(400).json({ error: e.toString() });
-        }
-
-        try {
-            const newUser = await authUserData.register(x.username, x.email, x.password);
-            console.log("newUser", newUser);
-            return res.status(200).json(newUser);
-        } catch (e) {
-            return res.status(400).json({ error: e.toString() });
-        }
+  .route("/signup")
+  .get((req, res) => {
+    res.render("auth/signup", {
+      title: "signup",
+      layout: false,
+      error: req.query.error,
     });
+  })
+  .post(async (req, res) => {
+    try {
+      const { username, email, password } = req.body;
+
+      if (!username || !email || !password) {
+        return res.redirect("/signup?error=All fields are required");
+      }
+
+      checkString(username, "username");
+      checkString(email, "email");
+      checkString(password, "password");
+
+      const newUser = await authUserData.signup(username, email, password);
+
+      const token = jwt.sign({ userId: newUser._id }, process.env.JWT_SECRET, {
+        expiresIn: "1h",
+      });
+
+      // Set cookie and redirect
+      res.cookie("token", token, { httpOnly: true });
+      return res.redirect("/"); // Redirect to home after signup
+    } catch (error) {
+      return res.redirect(`/signup?error=${encodeURIComponent(error.message)}`);
+    }
+  });
 
 router
-    .route('/signin')
-    .post(async (req, res) => {
-        const x = req.body;
-
-        if (!x || Object.keys(x).length === 0) {
-            return res.status(400).json({ error: 'There are no fields in the request body' });
-        }
-
-        if (!x.email || !x.password) {
-            return res.status(400).json({ error: 'All fields need to have valid values' });
-        }
-
-        try {
-            checkString(x.email, 'email');
-            checkString(x.password, 'password');
-        } catch (e) {
-            return res.status(400).json({ error: e.toString() });
-        }
-
-        try {
-            const user = await authUserData.login(x.email, x.password);
-            return res.status(200).json(user);
-        } catch (e) {
-            return res.status(400).json({ error: e.message || e.toString() });
-        }
+  .route("/login")
+  .get((req, res) => {
+    res.render("auth/login", {
+      title: "Login",
+      layout: false,
+      error: req.query.error,
     });
+  })
+  .post(async (req, res) => {
+    try {
+      const { email, password } = req.body;
 
+      if (!email || !password) {
+        return res.redirect("/login?error=Email and password are required");
+      }
+
+      checkString(email, "email");
+      checkString(password, "password");
+
+      const user = await authUserData.login(email, password);
+
+      const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, {
+        expiresIn: "1h",
+      });
+
+      res
+        .cookie("token", token, {
+          httpOnly: true,
+          secure: process.env.NODE_ENV === "production",
+          maxAge: 3600000, // 1 hour
+        })
+        .redirect("/");
+    } catch (error) {
+      return res.redirect(`/login?error=${encodeURIComponent(error.message)}`);
+    }
+  });
+
+// Logout route
+// router.get("/logout", (req, res) => {
+//   res.clearCookie("token");
+//   res.redirect("/");
+// });
 
 export default router;

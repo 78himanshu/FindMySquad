@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>{{title}} FindMySquad </title>
+        <link rel="stylesheet" href="/css/styles.css">
+    </head>
+    <body>
+        <nav class="navbar">
+            <div class="logo">FindMySquad</div>
+            <div class="nav-buttons">
+                <button>Join</button>
+                <button>Host</button>
+                <button>Book</button>
+            </div>
+            <div class="auth-buttons">
+                {{#if user}} <!-- If user is logged in -->
+                <button>Welcome, {{user.name}}!</button>
+                <button onclick="logout()">Logout</button>
+                {{else}} <!-- If user is NOT logged in -->
+                <button onclick="window.location='/login'">Login</button>
+                <button onclick="window.location='/signup'">Signup</button>
+                {{/if}}
+            </div>
+        </nav>
+
+        <section class="section_home-faqs">
+            <div
+                class="w-layout-blockcontainer container-small padding-section-small w-container">
+                <div class="image-container">
+                    <img src="/images/pexels-ashleyrae-685382.jpg"
+                        loading="lazy"
+                        alt="Sports enthusiasts playing"
+                        class="responsive-home-image" />
+                </div>
+            </div>
+        </section>
+
+        <footer>
+            <nav>
+                <div class="nav-links-container">
+                    <ul class="nav-links">
+                        {{#each footerLinks}}
+                        <li><a href="{{this.url}}">{{this.name}}</a></li>
+                        {{/each}}
+                    </ul>
+                </div>
+            </nav>
+            <p>Copyright &#169; {{currentYear}} FindMySquad. All Rights
+                Reserved.</p>
+        </footer>
+
+        <script>
+        function logout() {
+            fetch('/logout', { method: 'POST' })
+                .then(() => window.location.reload());
+        }
+    </script>
+    </body>
+</html>
