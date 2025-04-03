@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Error - FindMySquad</title>
-    <style>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Error - FindMySquad</title>
+        <style>
         body {
             font-family: Arial, sans-serif;
             line-height: 1.6;
@@ -40,17 +40,17 @@
             text-decoration: underline;
         }
     </style>
-</head>
-<body>
-    <div class="error-container">
-        <h1>An Error Occurred</h1>
-        {{#if error}}
+    </head>
+    <body>
+        <div class="error-container">
+            <h1>An Error Occurred</h1>
+            {{#if error}}
             <p><strong>Error details:</strong></p>
             <pre>{{error}}</pre>
-        {{else}}
+            {{else}}
             <p>An unknown error occurred.</p>
-        {{/if}}
-        <p><a href="/">Return to Homepage</a></p>
-    </div>
-</body>
+            {{/if}}
+            <p><a href="/">Return to Homepage</a></p>
+        </div>
+    </body>
 </html>
