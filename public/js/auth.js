@@ -113,7 +113,7 @@ document.addEventListener("DOMContentLoaded", () => {
     return true;
   }
 
-// // Handle login form submission
+// // Handle login form submission   
 // document.getElementById('login-form').addEventListener('submit', async (e) => {
 //     e.preventDefault();
     
@@ -135,7 +135,7 @@ document.addEventListener("DOMContentLoaded", () => {
 //     localStorage.setItem('user', JSON.stringify(data.user));
     
 //     // Redirect to home page
-//     window.location.href = '/';
+//     window.location.href = '/';    // check functioning for this 
 //   });
 
 });

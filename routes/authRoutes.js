@@ -15,10 +15,14 @@ router
   })
   .post(async (req, res) => {
     try {
-      const { username, email, password } = req.body;
+      const { username, email, password, confirmPassword } = req.body;
 
       if (!username || !email || !password) {
         return res.redirect("/signup?error=All fields are required");
+      }
+
+      if (password !== confirmPassword) {
+        return res.redirect("/signup?error=Passwords do not match");
       }
 
       checkString(username, "username");
@@ -27,15 +31,15 @@ router
 
       const newUser = await authUserData.signup(username, email, password);
 
-      const token = jwt.sign({ userId: newUser._id }, process.env.JWT_SECRET, {
-        expiresIn: "1h",
-      });
+      //const token = jwt.sign({ userId: newUser._id }, process.env.JWT_SECRET, {
+      //  expiresIn: "1h",
+      //});
 
       // Set cookie and redirect
-      res.cookie("token", token, { httpOnly: true });
-      return res.redirect("/"); // Redirect to home after signup
+      //res.cookie("token", token, { httpOnly: true });
+      return res.redirect("/login"); // Redirect to home after signup
     } catch (error) {
-      return res.redirect(`/signup?error=${encodeURIComponent(error.message)}`);
+      return res.redirect(`/signup?error=${encodeURIComponent(error.message || error)}`);
     }
   });
 
@@ -45,7 +49,7 @@ router
     res.render("auth/login", {
       title: "Login",
       layout: false,
-      error: req.query.error,
+      error: req.query.error
     });
   })
   .post(async (req, res) => {
@@ -59,28 +63,32 @@ router
       checkString(email, "email");
       checkString(password, "password");
 
-      const user = await authUserData.login(email, password);
+      const {token, user} = await authUserData.login(email, password);
 
-      const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, {
-        expiresIn: "1h",
-      });
+      //const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, {
+      //  expiresIn: "1h",
+      //});
 
-      res
-        .cookie("token", token, {
+      res.cookie("token", token, {
           httpOnly: true,
           secure: process.env.NODE_ENV === "production",
           maxAge: 3600000, // 1 hour
-        })
-        .redirect("/");
+        }).redirect("/?success=Logged in successfully");
+
     } catch (error) {
-      return res.redirect(`/login?error=${encodeURIComponent(error.message)}`);
+      console.error("Login error:", error);
+      if (error.message === "EMAIL_NOT_FOUND") {
+        return res.redirect(`/signup?error=${encodeURIComponent("No account found. Please sign up.")}`);
+      }
+    
+      else return res.redirect(`/login?error=${encodeURIComponent(error.message || error)}`);
     }
   });
 
-// Logout route
-// router.get("/logout", (req, res) => {
-//   res.clearCookie("token");
-//   res.redirect("/");
-// });
+// Logout route    // Refer this
+ router.get("/logout", (req, res) => {
+   res.clearCookie("token");
+   res.redirect("/?success=Logged out successfully");  // replace to a / to get to the main screen
+ });
 
 export default router;

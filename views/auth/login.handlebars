@@ -1,15 +1,42 @@
    <main class="main"></main>
+   <link rel="stylesheet" href="/css/modal.css">
+
     <div class="login-form" id="login-form">
         <h2 class="heading-secondary">WELCOME BACK!</h2>
             <link rel="stylesheet" href="/css/login.css">
 
-        {{#if errors}}
+ {{!--       {{#if errors}}
         <div class="error-messages">
             {{#each errors}}
             <div class="error-message font-italic">{{this}}</div>
             {{/each}}
         </div>
+        {{/if}} --}}
+        {{#if error}}
+        <div id="errorModal" class="modal-overlay">
+        <div class="modal-content">
+        <span class="close-button" onclick="closeModal()">&times;</span>
+        <p>{{error}}</p>
+        </div>
+        </div>
         {{/if}}
+        <script>
+  function closeModal() {
+    document.getElementById('errorModal').style.display = 'none';
+  }
+
+  // Optional: Show modal when page loads
+  window.onload = function () {
+    const modal = document.getElementById('errorModal');
+    if (modal) {
+      modal.style.display = 'flex';
+      //setTimeout(() => closeModal(), 1500); // auto-close after 1.5s
+    }
+  }
+</script>
+
+
+
 
         <div class="form-box">
             <form class="form form--login" action="/login" method="POST">
