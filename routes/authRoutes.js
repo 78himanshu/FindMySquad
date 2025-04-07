@@ -18,7 +18,7 @@ router
             return res.status(400).json({ error: 'All fields need to have valid values' });
         }
 
-        console.log("==>>", x.username, x.email, x.password);
+        //console.log("==>>", x.username, x.email, x.password);
 
         try {
             checkString(x.username, 'username');
