@@ -24,8 +24,7 @@ const configRoutesFunction = (app) => {
   app.get("/", (req, res) => {
     res.render("index", {
       title: "FindMySquad",
-      user: req.user || null,
-      success: req.query.success
+      user: req.user || null
     });
   });
 
@@ -37,4 +36,4 @@ const configRoutesFunction = (app) => {
 
 };
 
-export default configRoutesFunction;
+export default configRoutesFunction; 

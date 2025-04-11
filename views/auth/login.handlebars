@@ -1,60 +1,49 @@
-   <main class="main"></main>
-   <link rel="stylesheet" href="/css/modal.css">
+<div class="login-form" id="login-form">
+  <h2 class="heading-secondary">WELCOME BACK!</h2>
 
-    <div class="login-form" id="login-form">
-        <h2 class="heading-secondary">WELCOME BACK!</h2>
-            <link rel="stylesheet" href="/css/login.css">
-
- {{!--       {{#if errors}}
-        <div class="error-messages">
-            {{#each errors}}
-            <div class="error-message font-italic">{{this}}</div>
-            {{/each}}
-        </div>
-        {{/if}} --}}
-        {{#if error}}
-        <div id="errorModal" class="modal-overlay">
-        <div class="modal-content">
+  {{#if error}}
+    <div id="errorModal" class="modal-overlay">
+      <div class="modal-content">
         <span class="close-button" onclick="closeModal()">&times;</span>
         <p>{{error}}</p>
-        </div>
-        </div>
-        {{/if}}
-        <script>
+      </div>
+    </div>
+  {{/if}}
+
+  <div class="form-box">
+    <form class="form form--login" id="loginForm" novalidate>
+      <div class="form__group">
+        <label class="form__label" for="email">E-mail</label>
+        <input class="form__input" id="email" name="email" type="email" placeholder="you@example.com">
+        <div id="emailError" class="form__error"></div>
+      </div>
+
+      <div class="form__group">
+        <label class="form__label" for="password">Password</label>
+        <input class="form__input" id="password" name="password" type="password" placeholder="••••••••">
+        <div id="passwordError" class="form__error"></div>
+      </div>
+
+      <div class="form__group">
+        <button class="submit-button" type="submit">LOG IN</button>
+      </div>
+
+      <p class="switch-link">Don't have an account? <a href="/signup">Sign up</a></p>
+    </form>
+  </div>
+</div>
+
+<script>
   function closeModal() {
     document.getElementById('errorModal').style.display = 'none';
   }
 
-  // Optional: Show modal when page loads
   window.onload = function () {
     const modal = document.getElementById('errorModal');
     if (modal) {
       modal.style.display = 'flex';
-      //setTimeout(() => closeModal(), 1500); // auto-close after 1.5s
     }
   }
 </script>
 
-
-
-
-        <div class="form-box">
-            <form class="form form--login" action="/login" method="POST">
-                <div class="form__group">
-                    <label class="form__label" for="email">E-mail</label>
-                    <input class="form__input" id="email" name="email" type="email" placeholder="you@example.com"
-                        required />
-                </div>
-                <div class="form__group">
-                    <label class="form__label" for="password">Password</label>
-                    <input class="form__input" id="password" name="password" type="password" placeholder="••••••••"
-                        required minlength="8" />
-                </div>
-                <div class="form__group">
-                    <button class="submit-button" type="submit">LOG IN</button>
-                </div>
-                <p class="switch-link">Don't have an account? <a href="/signup">Sign up</a></p>
-            </form>
-        </div>
-    </div>
-</main>
+<script src="/js/auth.js"></script>
