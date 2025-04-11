@@ -1,84 +1,49 @@
-<!DOCTYPE html>
-<html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>{{title}} - FindMySquad</title>
-        <link rel="stylesheet" href="/css/signup.css">
-    </head>
-    <body>
-        <main>
-            <div class="signup-form" id="signup-form">
-                <h2 class="heading-secondary">CREATE AN ACCOUNT</h2>
+<div class="signup-form" id="signup-form">
+  <h2 class="heading-secondary">CREATE AN ACCOUNT</h2>
 
-                {{#if error}}
-                <div class="error-messages">
-                    <div class="error-message">{{error}}</div>
-                </div>
-                {{/if}}
+  <div id="error-messages" class="form__error" style="color: red;"></div>
 
-                {{#if errors}}
-                <div class="error-messages">
-                    {{#each errors}}
-                    <div class="error-message">{{this}}</div>
-                    {{/each}}
-                </div>
-                {{/if}}
+  <div class="form-box">
+    <form class="form form--signup" id="signupForm" novalidate>
+      <!-- Username Field -->
+      <div class="form__group">
+        <label class="form__label" for="username">Username</label>
+        <input class="form__input" id="username" name="username" type="text" placeholder="Enter your username" value="{{username}}">
+        <div id="usernameError" class="form__error"></div>
+      </div>
 
-                <div class="form-box">
-                    <form class="form form--signup" id="signupForm"
-                        action="/signup" method="POST">
-                        <!-- Username Field -->
-                        <div class="form__group">
-                            <label class="form__label"
-                                for="username">Username</label>
-                            <input class="form__input" id="username"
-                                name="username" type="text"
-                                placeholder="Enter your username" required
-                                value="{{username}}">
-                        </div>
+      <!-- Email Field -->
+      <div class="form__group">
+        <label class="form__label" for="email">Email</label>
+        <input class="form__input" id="email" name="email" type="email" placeholder="you@example.com" value="{{email}}">
+        <div id="emailError" class="form__error"></div>
+      </div>
 
-                        <!-- Email Field -->
-                        <div class="form__group">
-                            <label class="form__label" for="email">Email</label>
-                            <input class="form__input" id="email" name="email"
-                                type="email"
-                                placeholder="you@example.com" required
-                                value="{{email}}">
-                        </div>
+      <!-- Password Field -->
+      <div class="form__group">
+        <label class="form__label" for="password">Password</label>
+        <input class="form__input" id="password" name="password" type="password" placeholder="••••••••">
+        <small class="form__hint">
+          Minimum 8 characters with uppercase, lowercase, number, and special character
+        </small>
+        <div id="passwordError" class="form__error"></div>
+      </div>
 
-                        <!-- Password Field -->
-                        <div class="form__group">
-                            <label class="form__label"
-                                for="password">Password</label>
-                            <input class="form__input" id="password"
-                                name="password" type="password"
-                                placeholder="••••••••" required minlength="8">
-                            <small class="form__hint">Minimum 8 characters with
-                                uppercase, lowercase, number, and special
-                                character</small>
-                        </div>
+      <!-- Confirm Password Field -->
+      <div class="form__group">
+        <label class="form__label" for="passwordConfirm">Confirm Password</label>
+        <input class="form__input" id="passwordConfirm" name="passwordConfirm" type="password" placeholder="••••••••">
+        <div id="confirmError" class="form__error"></div>
+      </div>
 
-                        <!-- Confirm Password Field -->
-                        <div class="form__group">
-                            <label class="form__label"
-                                for="passwordConfirm">Confirm Password</label>
-                            <input class="form__input" id="passwordConfirm"
-                                name="passwordConfirm" type="password"
-                                placeholder="••••••••" required minlength="8">
-                        </div>
+      <!-- Submit Button -->
+      <div class="form__group">
+        <button class="submit-button" type="submit">Sign Up</button>
+      </div>
 
-                        <!-- Submit Button -->
-                        <div class="form__group">
-                            <button class="submit-button" type="submit">Sign
-                                Up</button>
-                        </div>
+      <p class="switch-link">Already have an account? <a href="/login">Login</a></p>
+    </form>
+  </div>
+</div>
 
-                        <p class="switch-link">Already have an account? <a
-                                href="/login">Login</a></p>
-                    </form>
-                </div>
-            </div>
-        </main>
-    </body>
-</html>
+<script src="/js/auth.js"></script>

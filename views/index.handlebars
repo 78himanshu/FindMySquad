@@ -15,15 +15,28 @@
                 <button>Book</button>
             </div>
             <div class="auth-buttons">
-                {{#if user}} <!-- If user is logged in -->
-                <button>Welcome, {{user.name}}!</button>
-                <button onclick="logout()">Logout</button>
+                {{#if isLoggedIn}} <!-- If user is logged in -->
+                <button disabled>👋 Welcome, {{username}}!</button>
+                <button onclick="window.location='/logout'">Logout</button>
                 {{else}} <!-- If user is NOT logged in -->
                 <button onclick="window.location='/login'">Login</button>
                 <button onclick="window.location='/signup'">Signup</button>
                 {{/if}}
             </div>
         </nav>
+
+        {{#if success}}
+        <div id="success-popup" class="popup-success">
+        {{success}}
+        </div>
+        <script>
+            setTimeout(() => {
+                const popup = document.getElementById("success-popup");
+                if (popup) popup.style.display = "none";
+                }, 1500);
+        </script>
+        {{/if}}
+
 
         <section class="section_home-faqs">
             <div
