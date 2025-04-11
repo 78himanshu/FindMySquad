@@ -17,35 +17,37 @@ const isValidPassword = (password) =>
 
 export const login = async (email, password) => {
   if (!email || !password) {
-    throw "All fields must be provided";
+    throw new Error("All fields must be provided");
   }
 
-  const trimmedemail = checkString(email, "email", 1);
+  const trimmedemail = checkString(email, "email", 1).toLowerCase();
   const trimmedpassword = checkString(password, "password", 1);
 
   console.log("trimmedemail", trimmedemail);
   const user = await Userlist.findOne({ email: trimmedemail });
   console.log("user", user);
-  if (!user) throw "Invalid credentialssss";
+
+  if (!user) throw new Error("EMAIL_NOT_FOUND");
 
   const isMatch = await bcrypt.compare(trimmedpassword, user.password);
+  if (!isMatch) throw new Error("Wrong Password !");
 
-  if (!isMatch) throw "Invalid credentials";
+  const token = jwt.sign(
+    { userId: user._id, 
+      username: user.username,
+    }, process.env.JWT_SECRET, 
+    {expiresIn: "2h"}
+  );
 
-  const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, {
-    expiresIn: "2h",
-  });
-
-  let loginObject = {
-    token,
+  return {
+  token,
     user: {
       id: user._id,
       username: user.username,
       email: user.email,
     },
   };
-
-  return loginObject;
+};
 
   // res.status(200).json({
   //     message: 'Login successful',
@@ -56,7 +58,6 @@ export const login = async (email, password) => {
   //         email: user.email,
   //     },
   // });
-};
 
 export const signup = async (username, email, password) => {
   if (!username || !email || !password) {
@@ -64,7 +65,7 @@ export const signup = async (username, email, password) => {
   }
 
   const trimmeduserName = checkString(username, "username", 1);
-  const trimmedemail = checkString(email, "email", 1);
+  const trimmedemail = checkString(email, "email", 1).toLowerCase();
   const trimmedpassword = checkString(password, "password", 1);
 
   if (!isValidUsername(trimmeduserName)) {
@@ -77,12 +78,23 @@ export const signup = async (username, email, password) => {
     throw "Password must be at least 8 characters long, include an uppercase letter, a lowercase letter, a number, and a special character";
   }
 
-  const existingUser = await Userlist.findOne({ trimmedemail });
-  if (existingUser) throw "Email already in use";
+  const existingUser = await Userlist.findOne({ email: trimmedemail });
+  if (existingUser) throw new Error("An account with this email address already exists");
 
   const hashedPassword = await bcrypt.hash(trimmedpassword, saltRounds);
-  const newUser = new Userlist({ username, email, password: hashedPassword });
-  await newUser.save();
-  console.log("Register success:", newUser);
+  const newUser = new Userlist({ 
+  username: trimmeduserName,
+  email: trimmedemail, 
+  password: hashedPassword 
+  });
+  try {
+    await newUser.save();
+  } catch (err) {
+    if (err.code === 11000 && err.keyPattern?.username) {
+      throw new Error("Username is already taken");
+    }
+    throw new Error("Signup failed. Please try again.");
+  }
+
   return newUser;
 };

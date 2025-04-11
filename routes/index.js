@@ -36,4 +36,4 @@ const configRoutesFunction = (app) => {
 
 };
 
-export default configRoutesFunction;
+export default configRoutesFunction; 

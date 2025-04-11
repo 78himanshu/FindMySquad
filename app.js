@@ -1,19 +1,24 @@
+let serverBootTime = Date.now();
+import dotenv from "dotenv";
+
+
 import express from "express";
 import path from "path";
 import { fileURLToPath } from "url";
 import connectDB from "./config/mongoConnections.js";
-import dotenv from "dotenv";
 import exphbs from "express-handlebars";
 import fs from "fs";
 import cookieParser from "cookie-parser";
+import jwt from "jsonwebtoken";
 
 import configRoutesFunction from "./routes/index.js";
-
-dotenv.config();
 
 // Fix __dirname issue in ES Modules
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+
+//  Force load .env from correct path
+dotenv.config({ path: path.resolve(__dirname, '.env') });
 
 const app = express();
 
@@ -36,7 +41,6 @@ app.set("views", path.join(__dirname, "views"));
 // Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(express.urlencoded({ extended: true }));
 
 // for statis files
 app.use(express.static(path.join(__dirname, "public")));
@@ -44,6 +48,35 @@ app.use(express.static(path.join(__dirname, "public")));
 // always Add this middleware BEFORE your routes
 app.use(cookieParser());
 
+app.use((req, res, next) => {
+  const token = req.cookies.token;
+
+  if (token) {
+    try {
+      const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+      // Invalidate token if it's older than server boot time
+      if (decoded.iat * 1000 < serverBootTime) {
+        res.clearCookie("token");
+        res.locals.isLoggedIn = false;
+        res.locals.username = null;
+        return next();
+      }
+
+      res.locals.isLoggedIn = true;
+      res.locals.username = decoded.username;
+    } catch (err) {
+      res.locals.isLoggedIn = false;
+      res.locals.username = null;
+      res.clearCookie("token");
+    }
+  } else {
+    res.locals.isLoggedIn = false;
+    res.locals.username = null;
+  }
+
+  next();
+});
 // Routes
 configRoutesFunction(app);
 
