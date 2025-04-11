@@ -1,6 +1,7 @@
 import * as hostGameData from './hostGame.js';
 import * as authUserData from './authUser.js'
+import * as joinGameData from './joinGame.js'
 
 export {
-  hostGameData, authUserData
+  hostGameData, authUserData, joinGameData
 };

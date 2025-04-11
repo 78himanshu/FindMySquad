@@ -3,9 +3,19 @@ import {Router} from 'express';
 const router = Router();
 import {hostGameData} from '../data/index.js'
 import { checkString,checkNumber } from '../utils/Helper.js';
+import { requireAuth } from '../middleware/auth.js';
 
 router
     .route('/')
+    // .get(requireAuth,(req,res)=>{
+    //     const hostID = req.user.userID
+    //     res.render('hostGameForm',{hostID})
+    // })
+    //Need to uncomment after we create the login id part completely 
+    .get((req, res) => {
+        const hostId = '6613814234b35400bb3b4d88';
+        res.render('hostGame/hostGameForm', { hostId });
+      })
     .post(async(req,res) =>{
         const x = req.body;
         if (!x || Object.keys(x).length === 0){
@@ -43,10 +53,16 @@ router
                 x.host,
                 x.location
             )
-            res.status(200).json(newGame);
+            return res.redirect('/host/success');
         } catch (e) {
             res.status(400).json({error: e.message})
         }
     })
 
+router
+    .route('/success')
+    .get((req, res) => {
+        res.render('hostGame/hostGameSuccess');
+    });
+      
     export default router;
