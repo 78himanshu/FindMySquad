@@ -1,15 +1,19 @@
-export const verifyToken = (req, res, next) => {
-    const authHeader = req.headers.authorization;
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      return res.status(401).json({ error: 'Access denied. No token provided.' });
-    }
-  
+ import { verify } from 'jsonwebtoken';
+
+ 
+export default async (req, res, next) => {
     try {
-      const token = authHeader.split(' ')[1];
-      const decoded = jwt.verify(token, process.env.JWT_SECRET);
-      req.userId = decoded.userId;
+      const token = req.cookies.token;
+  
+      if (token) {
+        const decoded = verify(token, process.env.JWT_SECRET);
+        req.user = decoded; // now available as req.user
+      }
+  
       next();
     } catch (err) {
-      return res.status(403).json({ error: 'Invalid or expired token' });
+      console.error("Auth Middleware Error: Invalid or expired token.");
+      res.clearCookie("token"); // optional: clear cookie if token is bad
+      return res.redirect("/login?error=Session expired. Please log in again.");
     }
   };

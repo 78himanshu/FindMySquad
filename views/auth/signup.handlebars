@@ -1,0 +1,49 @@
+<div class="signup-form" id="signup-form">
+  <h2 class="heading-secondary">CREATE AN ACCOUNT</h2>
+
+  <div id="error-messages" class="form__error" style="color: red;"></div>
+
+  <div class="form-box">
+    <form class="form form--signup" id="signupForm" novalidate>
+      <!-- Username Field -->
+      <div class="form__group">
+        <label class="form__label" for="username">Username</label>
+        <input class="form__input" id="username" name="username" type="text" placeholder="Enter your username" value="{{username}}">
+        <div id="usernameError" class="form__error"></div>
+      </div>
+
+      <!-- Email Field -->
+      <div class="form__group">
+        <label class="form__label" for="email">Email</label>
+        <input class="form__input" id="email" name="email" type="email" placeholder="you@example.com" value="{{email}}">
+        <div id="emailError" class="form__error"></div>
+      </div>
+
+      <!-- Password Field -->
+      <div class="form__group">
+        <label class="form__label" for="password">Password</label>
+        <input class="form__input" id="password" name="password" type="password" placeholder="••••••••">
+        <small class="form__hint">
+          Minimum 8 characters with uppercase, lowercase, number, and special character
+        </small>
+        <div id="passwordError" class="form__error"></div>
+      </div>
+
+      <!-- Confirm Password Field -->
+      <div class="form__group">
+        <label class="form__label" for="passwordConfirm">Confirm Password</label>
+        <input class="form__input" id="passwordConfirm" name="passwordConfirm" type="password" placeholder="••••••••">
+        <div id="confirmError" class="form__error"></div>
+      </div>
+
+      <!-- Submit Button -->
+      <div class="form__group">
+        <button class="submit-button" type="submit">Sign Up</button>
+      </div>
+
+      <p class="switch-link">Already have an account? <a href="/login">Login</a></p>
+    </form>
+  </div>
+</div>
+
+<script src="/js/auth.js"></script>

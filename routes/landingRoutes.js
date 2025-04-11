@@ -1,15 +1,22 @@
 import express from "express";
-import path from "path";
-import { fileURLToPath } from "url";
-
 const router = express.Router();
+import { login, signup } from "../data/authUser.js";
 
-// Fix __dirname for ES modules
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
+// Home route with session handling
 router.get("/", (req, res) => {
-    res.sendFile(path.join(__dirname, "../views/index.html"));
+  res.render("index", { 
+    user: req.session.user,
+    //title: "Home",
+    //success : req.query.success
+   });
 });
+
+// // Auth routes
+router.post("/signup", signup);
+router.post("/login", login);
+router.post("/logout", (req, res) => {
+  req.session.destroy();
+  res.redirect("/");
+});        
 
 export default router;
