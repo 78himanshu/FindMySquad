@@ -5,9 +5,14 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>{{title}} FindMySquad </title>
         <link rel="stylesheet" href="/css/styles.css">
+        {{!-- <script src="https://kit.fontawesome.com/cb9a997e82.js" crossorigin="anonymous"></script> --}}
+        <script src="https://kit.fontawesome.com/cb9a997e82.js" crossorigin="anonymous"></script>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-SgOJa3DmI69IUzQ2PVdRZhwQ+dy64/BUtbMJw1MZ8t5HZApcHrRKUc4W0kG879m7" crossorigin="anonymous">
+
+        {{!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" integrity="sha512-SfTiTlX6kk+qitfevl/7LibUOeJWlt9rbyDn92a1DqWOw9vWG2MFoays0sgObmWazO5BQPiFucnnEAjpAB+/Sw==" crossorigin="anonymous" referrerpolicy="no-referrer" /> --}}
     </head>
     <body>
-        <nav class="navbar">
+        {{!-- <nav class="navbar">
             <div class="logo">FindMySquad</div>
             <div class="nav-buttons">
                 <button>Join</button>
@@ -23,7 +28,55 @@
                 <button onclick="window.location='/signup'">Signup</button>
                 {{/if}}
             </div>
-        </nav>
+        </nav> --}}
+
+<nav class="navbar navbar-expand-lg navbar-light bg-light px-4">
+  <div class="container-fluid">
+    <!-- Logo -->
+    <a class="navbar-brand fw-bold" href="#">FindMySquad</a>
+
+    <!-- Toggler (hamburger) -->
+    <button
+      class="navbar-toggler"
+      type="button"
+      data-bs-toggle="collapse"
+      data-bs-target="#navbarContent"
+      aria-controls="navbarContent"
+      aria-expanded="false"
+      aria-label="Toggle navigation"
+    >
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <!-- Collapsible nav content -->
+    <div class="collapse navbar-collapse" id="navbarContent">
+      <!-- Left nav buttons -->
+      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+        <li class="nav-item">
+          <button class="btn btn-outline-primary me-2">Join</button>
+        </li>
+        <li class="nav-item">
+          <button class="btn btn-outline-primary me-2">Host</button>
+        </li>
+        <li class="nav-item">
+          <button class="btn btn-outline-primary">Book</button>
+        </li>
+      </ul>
+
+      <!-- Right auth buttons -->
+      <div class="d-flex gap-2">
+        {{#if isLoggedIn}}
+          <button class="btn btn-secondary" disabled>👋 Welcome, {{username}}!</button>
+          <button class="btn btn-outline-danger" onclick="window.location='/logout'">Logout</button>
+        {{else}}
+          <button class="btn btn-outline-primary" onclick="window.location='/login'">Login</button>
+          <button class="btn btn-primary" onclick="window.location='/signup'">Signup</button>
+        {{/if}}
+      </div>
+    </div>
+  </div>
+</nav>
+
 
         {{#if success}}
         <div id="success-popup" class="popup-success">
@@ -70,5 +123,10 @@
                 .then(() => window.location.reload());
         }
     </script>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/js/bootstrap.bundle.min.js" integrity="sha384-k6d4wzSIapyDyv1kpU366/PK5hCdSbCRGRCMv+eplOQJWyd1fbcAu9OCUj5zNLiq" crossorigin="anonymous"></script>
+
     </body>
 </html>
