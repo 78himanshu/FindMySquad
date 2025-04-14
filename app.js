@@ -10,6 +10,7 @@ import exphbs from "express-handlebars";
 import fs from "fs";
 import cookieParser from "cookie-parser";
 import jwt from "jsonwebtoken";
+import gymBuddyRoutes from './routes/gymBuddyRoutes.js';
 
 import configRoutesFunction from "./routes/index.js";
 
@@ -79,6 +80,7 @@ app.use((req, res, next) => {
 });
 // Routes
 configRoutesFunction(app);
+app.use('/gymBuddy', gymBuddyRoutes);
 
 // 404 Handler (must come after routes but before error handler)
 app.use((req, res, next) => {

@@ -1,0 +1,109 @@
+.gym-hero {
+    background-image: url('/images/pexels-anastasia-shuraeva-4945525.jpg');
+    background-size: cover;
+    background-position: center;
+    min-height: 80vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    border-radius: 12px;
+    margin: 20px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  }
+  
+  .gym-hero .overlay {
+    background: rgba(0, 0, 0, 0.5);
+    padding: 40px;
+    border-radius: 8px;
+    color: #fff;
+    text-align: center;
+    max-width: 600px;
+  }
+  
+  .gym-hero h1 {
+    font-size: 2.5rem;
+    margin-bottom: 15px;
+  }
+  
+  .gym-hero h1 span {
+    color: #00e5ff;
+  }
+  
+  .gym-hero p {
+    font-size: 1.2rem;
+    margin-bottom: 25px;
+  }
+  
+  .gym-hero button {
+    background-color: #00e5ff;
+    border: none;
+    padding: 12px 24px;
+    font-size: 1rem;
+    color: #000;
+    font-weight: bold;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.3s ease;
+  }
+  
+  .gym-hero button:hover {
+    background-color: #00bcd4;
+  }
+  
+  .gym-session-form-container {
+    max-width: 800px;
+    margin: 40px auto;
+    background: #f9f9f9;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  }
+  
+  .gym-session-form-container h1 {
+    text-align: center;
+    margin-bottom: 20px;
+    color: #2c3e50;
+  }
+  
+  .gym-session-form-container form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+  }
+  
+  .gym-session-form-container label {
+    font-weight: bold;
+    color: #333;
+  }
+  
+  .gym-session-form-container input,
+  .gym-session-form-container select,
+  .gym-session-form-container textarea {
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 16px;
+  }
+  
+  .gym-session-form-container button {
+    padding: 12px;
+    font-size: 16px;
+    background: #2ecc71;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background 0.3s;
+  }
+  
+  .gym-session-form-container button:hover {
+    background: #27ae60;
+  }
+  
+  body {
+    background-image: url("/images/pexels-ketut-subiyanto-4853675.jpg");
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+  }

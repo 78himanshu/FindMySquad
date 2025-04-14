@@ -1,0 +1,42 @@
+
+  <main class="gym-session-form-container">
+    <h1>Create a Gym Session</h1>
+    <form action="/gymBuddy/create" method="POST">
+      <label for="title">Session Title:</label>
+      <input type="text" id="title" name="title" required />
+
+      <label for="venue">Venue:</label>
+      <input type="text" id="venue" name="venue" required />
+
+      <label for="description">Description:</label>
+      <textarea id="description" name="description"></textarea>
+
+      <label for="dateTime">Date & Time:</label>
+      <input type="datetime-local" id="dateTime" name="dateTime" required />
+
+      <label for="gymlocation">Gym Location:</label>
+      <input type="text" id="gymlocation" name="gymlocation" required />
+
+      <label for="skillLevel">Skill Level:</label>
+      <select id="skillLevel" name="skillLevel" required>
+        <option value="">--Select--</option>
+        <option value="Beginner">Beginner</option>
+        <option value="Intermediate">Intermediate</option>
+        <option value="Advanced">Advanced</option>
+      </select>
+
+      <label for="workoutType">Workout Type:</label>
+      <select id="workoutType" name="workoutType" required>
+        <option value="">--Select--</option>
+        <option value="Cardio">Cardio</option>
+        <option value="Weight Training">Weight Training</option>
+        <option value="Yoga">Yoga</option>
+        <option value="Other">Other</option>
+      </select>
+
+      <label for="hostedBy">Hosted By (User ID):</label>
+      <input type="text" id="hostedBy" name="hostedBy" required />
+
+      <button type="submit">Create Session</button>
+    </form>
+  </main>
