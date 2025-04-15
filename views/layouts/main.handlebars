@@ -6,19 +6,20 @@
   {{{head}}}
 </head>
 <body>
-<header class="navbar">
-  <div class="logo">FindMySquad</div>
-  <nav class="nav-buttons">
-    {{#if isLoggedIn}}
-      <span>Hi, {{username}}</span>
-      <button onclick="location.href='/logout'">Logout</button>
-    {{else}}
-      <button onclick="location.href='/login'">Login</button>
-      <button onclick="location.href='/signup'">Sign Up</button>
-    {{/if}}
-  </nav>
-</header>
-
+  <header class="navbar">
+    <div class="logo">FindMySquad</div>
+    <nav class="nav-buttons">
+      {{#if isLoggedIn}}
+        <span>Hi, {{username}}</span>
+        <!-- Added Profile Button -->
+        <button onclick="location.href='/userProfile/view'">Profile</button>
+        <button onclick="location.href='/logout'">Logout</button>
+      {{else}}
+        <button onclick="location.href='/login'">Login</button>
+        <button onclick="location.href='/signup'">Sign Up</button>
+      {{/if}}
+    </nav>
+  </header>
 
   <main>
     {{{body}}}

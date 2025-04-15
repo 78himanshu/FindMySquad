@@ -2,6 +2,8 @@ import express from "express";
 const router = express.Router();
 import hostGamesRoutes from "./hostGamesRoutes.js";
 import authRoutes from "./authRoutes.js";
+import userProfileRoutes from "./userProfileRoutes.js";  // <-- ADD THIS
+
 import jwt from "jsonwebtoken";
 import User from "../models/User.js"; 
 
@@ -33,6 +35,9 @@ const configRoutesFunction = (app) => {
 
   // Host games routes
   app.use("/host", hostGamesRoutes);
+
+  app.use("/userProfile", userProfileRoutes);  // <-- ADD THIS LINE
+
 
 };
 

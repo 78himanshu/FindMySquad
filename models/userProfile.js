@@ -3,7 +3,7 @@ import mongoose from 'mongoose';
 const userProfileSchema = new mongoose.Schema({
   userId: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'User',
+    ref: 'Userlist',
     required: true,
     unique: true
   },
@@ -38,10 +38,10 @@ const userProfileSchema = new mongoose.Schema({
   karmaPoints: { type: Number, default: 0 },
   achievements: [String],
   averageRating: { type: Number, default: 0 },
-  followers: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
+  followers: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Userlist' }],
   following: [
     {
-      userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }
+      userId: { type: mongoose.Schema.Types.ObjectId, ref: 'Userlist' }
     }
   ],
   createdAt: { type: Date, default: Date.now }

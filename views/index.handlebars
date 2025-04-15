@@ -18,6 +18,8 @@
                 {{#if isLoggedIn}} <!-- If user is logged in -->
                 <button disabled>👋 Welcome, {{username}}!</button>
                 <button onclick="window.location='/logout'">Logout</button>
+                        <button onclick="location.href='/userProfile/view'">Profile</button>
+
                 {{else}} <!-- If user is NOT logged in -->
                 <button onclick="window.location='/login'">Login</button>
                 <button onclick="window.location='/signup'">Signup</button>
