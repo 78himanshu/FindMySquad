@@ -1,0 +1,19 @@
+<h1>{{game.title}}</h1>
+
+<p>Sport: {{game.sport}}</p>
+<p>Venue: {{game.venue}}</p>
+<p>Location: {{game.location}}</p>
+<p>Date & Time: {{game.dateTime}}</p>
+<p>Description: {{game.description}}</p>
+<p>Players: {{game.playersGoing}} / {{game.playersRequired}}</p>
+
+{{#if userLoggedIn}}
+  <form method="POST" action="/join">
+    <input type="hidden" name="gameId" value="{{game._id}}">
+    <button type="submit">Join Game</button>
+  </form>
+{{else}}
+  <a href="/login">
+    <button>Login to Join Game</button>
+  </a>
+{{/if}}

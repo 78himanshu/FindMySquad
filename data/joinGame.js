@@ -1,4 +1,4 @@
-import { Game } from "../models/hostGame.js";
+import Game from "../models/hostGame.js";
 import { ObjectId } from 'mongodb';
 
 export const joinGame = async (gameId,userId) =>{

@@ -3,7 +3,7 @@ import {Router} from 'express';
 const router = Router();
 import {hostGameData} from '../data/index.js'
 import { checkString,checkNumber } from '../utils/helper.js';
-import { requireAuth } from '../middleware/auth.js';
+import requireAuth  from '../middleware/auth.js';
 
 router
     .route('/')
@@ -15,9 +15,11 @@ router
     .get((req, res) => {
         const hostId = '6613814234b35400bb3b4d88';
         res.render('hostGame/hostGameForm', { hostId });
-      })
+    })
     .post(async(req,res) =>{
         const x = req.body;
+        x.playersRequired = Number(x.playersRequired);
+        x.costPerHead = Number(x.costPerHead);
         if (!x || Object.keys(x).length === 0){
             return res
             .status(400)
@@ -64,5 +66,14 @@ router
     .get((req, res) => {
         res.render('hostGame/hostGameSuccess');
     });
+    
+router
+    .route('/form')
+    .get((req, res) => {
+      const hostId = '6613814234b35400bb3b4d88'; // temp static
+      res.render('hostGame/hostGameForm', { hostId });
+    });
       
     export default router;
+
+//Need to check the values entered are correct or not, like date is from today etc not a

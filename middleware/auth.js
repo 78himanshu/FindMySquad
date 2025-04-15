@@ -1,4 +1,4 @@
- import { verify } from 'jsonwebtoken';
+ import verify from 'jsonwebtoken';
 
  
 export default async (req, res, next) => {

@@ -1,0 +1,30 @@
+<h1>Recommended</h1>
+
+{{#each recommendedGames}}
+  <div>
+    <h2>{{this.title}} ({{this.sport}})</h2>
+    <p>Venue: {{this.venue}}, {{this.location}}</p>
+    <a href="/join/{{this._id}}">
+      <button>View Details</button>
+    </a>
+  </div>
+{{/each}}
+
+<h1>All Games</h1>
+
+<form method="GET" action="/join/filter">
+  City: <input type="text" name="city">
+  Sport: <input type="text" name="sport">
+  Min Players: <input type="number" name="minPlayers">
+  <button type="submit">Apply Filter</button>
+</form>
+
+{{#each allGames}}
+  <div>
+    <h2>{{this.title}} ({{this.sport}})</h2>
+    <p>Venue: {{this.venue}}, {{this.location}}</p>
+    <a href="/join/{{this._id}}">
+      <button>View Details</button>
+    </a>
+  </div>
+{{/each}}
