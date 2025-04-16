@@ -9,13 +9,14 @@ router
   .get((req, res) => {
     res.render("auth/signup", {
       title: "Sign Up",
-      layout: "main", 
+      layout: "main",
       error: req.query.error,
       username: req.query.username || "",
       email: req.query.email || "",
       head: `
         <link rel="stylesheet" href="/css/signup.css">
         <link rel="stylesheet" href="/css/modal.css">
+        <link rel="stylesheet" href="/css/styles.css">
       `
     });
   })
@@ -35,23 +36,32 @@ router
       checkString(email, "email");
       checkString(password, "password");
 
+
       const newUser = await authUserData.signup(username, email, password);
 
-      const token = jwt.sign(
-        { userId: newUser._id, username: newUser.username },
-        process.env.JWT_SECRET,
-        { expiresIn: "1h" }
-      );
+      // console.log("newUser", newUser)
 
-      res.cookie("token", token, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        maxAge: 3600000,
-      });
+      // console.log("==>>", newUser)
 
-      return res.status(200).json({ message: "Signup successful" });
+      // if(!newUser){
+      //   return
+      // }
+
+      // const token = jwt.sign(
+      //   { userId: newUser._id, username: newUser.username },
+      //   process.env.JWT_SECRET,
+      //   { expiresIn: "1h" }
+      // );
+
+      // res.cookie("token", token, {
+      //   httpOnly: true,
+      //   secure: process.env.NODE_ENV === "production",
+      //   maxAge: 3600000,
+      // });
+
+      return res.status(200).json({ message: "Signup successful", newUser });
     } catch (error) {
-      return res.status(400).json({ error: error.message || "Signup failed" });
+      return res.status(400).json({ error: error.message || "Signup faileddd" });
     }
   });
 
@@ -64,6 +74,8 @@ router
       error: req.query.error,
       head: `
         <link rel="stylesheet" href="/css/login.css">
+        <link rel="stylesheet" href="/css/styles.css">
+
       `
     });
   })
@@ -86,9 +98,16 @@ router
         maxAge: 3600000,
       });
 
-      res.status(200).json({ message: "Login successful" });
+      res.status(200).json({
+        message: "Login successful", token,
+        user: {
+          id: user._id,
+          username: user.username,
+          email: user.email,
+        },
+      });
     } catch (error) {
-      console.error("Login error:", error);
+      // console.error("Login error:", error);
       return res.status(400).json({ error: error.message || "Login failed" });
     }
   });

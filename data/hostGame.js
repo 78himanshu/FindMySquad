@@ -47,3 +47,11 @@ export const createGame = async (
     const savedGame = await newGame.save();
     return savedGame;
 }
+
+export const getAllGames = async (filters = {}) => {
+    return await Game.find(filters);
+};
+
+export const getGameById = async (gameId) => {
+    return await Game.findById(gameId);
+ }

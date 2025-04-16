@@ -1,6 +1,7 @@
 import express from "express";
 const router = express.Router();
 import hostGamesRoutes from "./hostGamesRoutes.js";
+import joinGameRoutes from "./joinGameRoutes.js"
 import authRoutes from "./authRoutes.js";
 import userProfileRoutes from "./userProfileRoutes.js";  // <-- ADD THIS
 
@@ -38,6 +39,8 @@ const configRoutesFunction = (app) => {
 
   app.use("/profile", userProfileRoutes);  
 
+  //Join game routes
+  app.use('/join', joinGameRoutes);
 
 };
 

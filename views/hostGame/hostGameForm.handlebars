@@ -1,0 +1,25 @@
+<h1>Host Game</h1>
+
+<form action="/host" method="POST">
+  <input type="text" name="title" placeholder="Title" required /><br/>
+  <input type="text" name="sport" placeholder="Sport" required /><br/>
+  <input type="text" name="venue" placeholder="Venue" required /><br/>
+  <input type="number" name="playersRequired" placeholder="Players Required" required /><br/>
+  <input type="datetime-local" name="dateTime" required /><br/>
+  <input type="text" name="description" placeholder="Description" /><br/>
+  <input type="number" name="costPerHead" placeholder="Cost per Head" required /><br/>
+  
+  <select name="skillLevel" required>
+    <option value="">Select Skill Level</option>
+    <option value="Beginner">Beginner</option>
+    <option value="Intermediate">Intermediate</option>
+    <option value="Advanced">Advanced</option>
+  </select><br/>
+
+  <input type="hidden" name="host" value="{{hostId}}" />
+    {{!-- need to update this after the user profile is done by session --}}
+
+  <input type="text" name="location" placeholder="City" required /><br/>
+
+  <button type="submit">Host Game</button>
+</form>

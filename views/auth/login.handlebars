@@ -1,49 +1,51 @@
-<div class="login-form" id="login-form">
-  <h2 class="heading-secondary">WELCOME BACK!</h2>
+<main class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-md-6 col-lg-5">
+      <div class="card shadow-sm p-4">
+        <h2 class="text-center mb-4">Welcome Back!</h2>
 
-  {{#if error}}
-    <div id="errorModal" class="modal-overlay">
-      <div class="modal-content">
-        <span class="close-button" onclick="closeModal()">&times;</span>
-        <p>{{error}}</p>
+        <form id="loginForm" novalidate>
+          <!-- Email -->
+          <div class="mb-3">
+            <label for="email" class="form-label">E-mail</label>
+            <input
+              type="email"
+              class="form-control"
+              id="email"
+              name="email"
+              placeholder="you@example.com"
+            />
+            <div id="emailError" class="form-text text-danger"></div>
+          </div>
+
+          <!-- Password -->
+          <div class="mb-4">
+            <label for="password" class="form-label">Password</label>
+            <input
+              type="password"
+              class="form-control"
+              id="password"
+              name="password"
+              placeholder="••••••••"
+            />
+            <div id="passwordError" class="form-text text-danger"></div>
+          </div>
+
+          <!-- Submit -->
+          <div class="d-grid mb-3">
+            <button type="submit" class="btn btn-primary submit-button">Log In</button>
+          </div>
+
+          <p class="text-center">
+            Don't have an account? <a href="/signup">Sign up</a>
+          </p>
+        </form>
       </div>
     </div>
-  {{/if}}
-
-  <div class="form-box">
-    <form class="form form--login" id="loginForm" novalidate>
-      <div class="form__group">
-        <label class="form__label" for="email">E-mail</label>
-        <input class="form__input" id="email" name="email" type="email" placeholder="you@example.com">
-        <div id="emailError" class="form__error"></div>
-      </div>
-
-      <div class="form__group">
-        <label class="form__label" for="password">Password</label>
-        <input class="form__input" id="password" name="password" type="password" placeholder="••••••••">
-        <div id="passwordError" class="form__error"></div>
-      </div>
-
-      <div class="form__group">
-        <button class="submit-button" type="submit">LOG IN</button>
-      </div>
-
-      <p class="switch-link">Don't have an account? <a href="/signup">Sign up</a></p>
-    </form>
   </div>
-</div>
 
-<script>
-  function closeModal() {
-    document.getElementById('errorModal').style.display = 'none';
-  }
-
-  window.onload = function () {
-    const modal = document.getElementById('errorModal');
-    if (modal) {
-      modal.style.display = 'flex';
-    }
-  }
-</script>
+  <!-- Toast container -->
+ <div id="toast-container" class="position-fixed bottom-0 end-0 p-3"></div>
+</main>
 
 <script src="/js/auth.js"></script>
