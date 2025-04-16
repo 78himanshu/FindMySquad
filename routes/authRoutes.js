@@ -20,6 +20,38 @@ router
       `
     });
   })
+  .route('/signup')
+  .post(async (req, res) => {
+    const x = req.body;
+    // console.log("xx", x)
+
+    if (!x || Object.keys(x).length === 0) {
+      return res.status(400).json({ error: 'There are no fields in the request body' });
+    }
+
+    if (!x.username || !x.email || !x.password) {
+      return res.status(400).json({ error: 'All fields need to have valid values' });
+    }
+
+    //console.log("==>>", x.username, x.email, x.password);
+
+    try {
+      checkString(x.username, 'username');
+      checkString(x.email, 'email');
+      checkString(x.password, 'password');
+      console.log(">>>>")
+    } catch (e) {
+      return res.status(400).json({ error: e.toString() });
+    }
+
+    try {
+      const newUser = await authUserData.register(x.username, x.email, x.password);
+      console.log("newUser", newUser);
+      return res.status(200).json(newUser);
+    } catch (e) {
+      return res.status(400).json({ error: e.toString() });
+    }
+  })
   .post(async (req, res) => {
     try {
       const { username, email, password, confirmPassword } = req.body;
