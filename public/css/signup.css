@@ -84,7 +84,7 @@
 }
 
 
-/* #toast-container {
+#toast-container {
   position: fixed;
   bottom: 1.5rem;
   right: 0%;
@@ -144,4 +144,4 @@
     transform: translateY(0);
     opacity: 1;
   }
-} */
+}
