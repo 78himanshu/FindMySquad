@@ -20,7 +20,6 @@ router
       `
     });
   })
-  .route('/signup')
   .post(async (req, res) => {
     const x = req.body;
     // console.log("xx", x)
