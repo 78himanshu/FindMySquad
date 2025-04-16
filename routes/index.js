@@ -36,7 +36,7 @@ const configRoutesFunction = (app) => {
   // Host games routes
   app.use("/host", hostGamesRoutes);
 
-  app.use("/userProfile", userProfileRoutes);  // <-- ADD THIS LINE
+  app.use("/profile", userProfileRoutes);  
 
 
 };
