@@ -1,186 +1,314 @@
 /* public/css/styles.css*/
 
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html,
+body {
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  font-size: 16px;
+  color: #222;
+  background-color: #fff;
+  line-height: 1.5;
+  scroll-behavior: smooth;
+}
+
 .navbar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 15px 50px;
-    background: rgba(255, 255, 255, 0.9);
-    backdrop-filter: blur(10px);
-    box-shadow: 
-    0 4px 6px rgba(0, 0, 0, 0.1), 
-    0 8px 12px rgba(0, 0, 0, 0.05); 
-    border-bottom: 1px solid rgba(0, 0, 0, 0.08);
-    position: sticky;
-    top: 0;
-    z-index: 100;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 50px;
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(10px);
+  box-shadow:
+    0 4px 6px rgba(0, 0, 0, 0.1),
+    0 8px 12px rgba(0, 0, 0, 0.05);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+  position: sticky;
+  top: 0;
+  z-index: 100;
 }
 
 .logo {
-    font-size: 24px;
-    font-weight: 700;
-    color: #2c3e50;
-    letter-spacing: 0.5px;
-    text-shadow: 0 1px 1px rgba(0, 0, 0, 0.05);
+  font-size: 24px;
+  font-weight: 700;
+  color: #2c3e50;
+  letter-spacing: 0.5px;
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.05);
 }
 
 .nav-buttons {
-    display: flex;
-    gap: 20px;
+  display: flex;
+  gap: 20px;
 }
 
 .nav-buttons button {
-    background: transparent;
-    border: none;
-    font-size: 15px;
-    font-weight: 600;
-    cursor: pointer;
-    color: #34495e;
-    padding: 8px 12px;
-    border-radius: 6px;
-    transition: all 0.2s ease;
+  background: transparent;
+  border: none;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  color: #34495e;
+  padding: 8px 12px;
+  border-radius: 6px;
+  transition: all 0.2s ease;
 }
 
 .nav-buttons button:hover {
-    color: #3498db;
-    background: rgba(52, 152, 219, 0.1);
-    transform: translateY(-1px);
+  color: #3498db;
+  background: rgba(52, 152, 219, 0.1);
+  transform: translateY(-1px);
 }
 
 .auth-buttons {
-    display: flex;
-    gap: 12px;
+  display: flex;
+  gap: 12px;
 }
 
 .auth-buttons button {
-    padding: 8px 18px;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-    font-weight: 600;
-    transition: all 0.2s ease;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  padding: 8px 18px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
 .auth-buttons button:first-child {
-    background: rgba(52, 152, 219, 0.1);
-    color: #3498db;
+  background: rgba(52, 152, 219, 0.1);
+  color: #3498db;
 }
 
 .auth-buttons button:last-child {
-    background: rgba(46, 204, 113, 0.1);
-    color: #2ecc71;
+  background: rgba(46, 204, 113, 0.1);
+  color: #2ecc71;
 }
 
 .auth-buttons button:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 .auth-buttons button:active,
 .nav-buttons button:active {
-    transform: translateY(1px);
-    box-shadow: none;
+  transform: translateY(1px);
+  box-shadow: none;
 }
 
 .image-container {
-    width: 100%;
-    max-width: 800px; /* Adjust this to match your desired maximum size */
-    margin-right: auto; /* Pushes container to the left */
-    margin-left: 0;     /* Ensures no extra left margin */
-    border-radius: 8px; /* adds rounded corners like many modern sites */
-    overflow: hidden; /* Ensures the image stays within the rounded corners */
-  }
-  
-  .responsive-home-image {
-    width: 100%;
-    height: auto;
-    display: block;
-    object-fit: cover; /* Ensures the image covers the space without distortion */
-    aspect-ratio: 16/9; /* Adjust this ratio to match PLAYO's image proportions */
-  }
-  
-  .section_home-faqs {
-    padding: 40px 0;
-  }
-  
-  .container-small {
-    padding: 0 20px;
-  }
+  width: 100%;
+  max-width: 800px;
+  /* Adjust this to match your desired maximum size */
+  margin-right: auto;
+  /* Pushes container to the left */
+  margin-left: 0;
+  /* Ensures no extra left margin */
+  border-radius: 8px;
+  /* adds rounded corners like many modern sites */
+  overflow: hidden;
+  /* Ensures the image stays within the rounded corners */
+}
 
-  /* Auth buttons */
+.responsive-home-image {
+  width: 100%;
+  height: auto;
+  display: block;
+  object-fit: cover;
+  /* Ensures the image covers the space without distortion */
+  aspect-ratio: 16/9;
+  /* Adjust this ratio to match PLAYO's image proportions */
+}
+
+.section_home-faqs {
+  padding: 40px 0;
+}
+
+.container-small {
+  padding: 0 20px;
+}
+
+/* Auth buttons */
 .auth-buttons {
-    display: flex;
-    gap: 1rem;
-  }
-  
+  display: flex;
+  gap: 1rem;
+}
+
 /* User profile - hidden by default */
 .user-profile {
-    display: none;
-    align-items: center;
-    gap: 15px;
-  }
-  
-  /* Auth buttons - shown by default */
-  .auth-buttons {
-    display: flex;
-    gap: 1rem;
-  }
-  
-  /* When user is logged in */
-  .user-logged-in .user-profile {
-    display: flex;
-  }
-  
-  .user-logged-in .auth-buttons {
-    display: none;
-  }
-  
-  /* Profile button styling */
-  .user-profile span {
-    font-weight: 600;
-    color: #333;
-  }
-  
-  .btn-logout {
-    padding: 8px 16px;
-    background: #f44336;
-    color: white;
-    border-radius: 4px;
-    text-decoration: none;
-    border: none;
-    cursor: pointer;
-  }
-  
-  .btn-logout:hover {
-    background: #d32f2f;
-  }
+  display: none;
+  align-items: center;
+  gap: 15px;
+}
+
+/* Auth buttons - shown by default */
+.auth-buttons {
+  display: flex;
+  gap: 1rem;
+}
+
+/* When user is logged in */
+.user-logged-in .user-profile {
+  display: flex;
+}
+
+.user-logged-in .auth-buttons {
+  display: none;
+}
+
+/* Profile button styling */
+.user-profile span {
+  font-weight: 600;
+  color: #333;
+}
+
+.btn-logout {
+  padding: 8px 16px;
+  background: #f44336;
+  color: white;
+  border-radius: 4px;
+  text-decoration: none;
+  border: none;
+  cursor: pointer;
+}
+
+.btn-logout:hover {
+  background: #d32f2f;
+}
 
 
-  .popup-success {
-    position: fixed;
-    top: 20px;
-    left: 50%;
-    transform: translateX(-50%);
-    background-color: #d4edda;
-    color: #155724;
-    padding: 12px 24px;
-    border: 1px solid #c3e6cb;
-    border-radius: 8px;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-    z-index: 9999;
-    font-weight: 500;
-    animation: slideDown 0.3s ease-out;
+
+.popup-success {
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #d4edda;
+  color: #155724;
+  padding: 12px 24px;
+  border: 1px solid #c3e6cb;
+  border-radius: 8px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  z-index: 9999;
+  font-weight: 500;
+  animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -20px);
   }
-  
-  @keyframes slideDown {
-    from {
-      opacity: 0;
-      transform: translate(-50%, -20px);
-    }
-    to {
-      opacity: 1;
-      transform: translate(-50%, 0);
-    }
+
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0);
   }
-  
+}
+
+
+/* error tost code  */
+#toast-container {
+  position: fixed;
+  bottom: 1.5rem;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+
+.toast {
+  min-width: 280px;
+  padding: 1rem 1.5rem;
+  border-radius: 8px;
+  color: #fff;
+  font-weight: 500;
+  box-shadow: 0 10px 15px rgba(0, 0, 0, 0.2);
+  animation: slideUpFade 0.4s ease forwards;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  position: relative;
+  opacity: 0;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.toast.fade-out {
+  opacity: 0 !important;
+  transform: translateY(20px);
+}
+
+.toast--success {
+  background: linear-gradient(to right, #00b09b, #96c93d);
+}
+
+.toast--error {
+  background: linear-gradient(to right, #e52d27, #b31217);
+}
+
+.toast--info {
+  background: linear-gradient(to right, #2193b0, #6dd5ed);
+}
+
+.toast__close {
+  cursor: pointer;
+  font-weight: bold;
+  background: none;
+  border: none;
+  color: white;
+  font-size: 1.1rem;
+  line-height: 1;
+}
+
+@keyframes slideUpFade {
+  0% {
+    transform: translateY(30px);
+    opacity: 0;
+  }
+
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+*/
+
+/* Wrap input and button */
+.form__input-container {
+  position: relative;
+}
+
+/* Eye icon button */
+
+
+/* Eye icon */
+.eye-icon::before {
+  content: "\f06e";
+  /* Font Awesome eye-slash */
+  font-family: "Font Awesome 5 Free";
+  font-weight: 900;
+}
+
+.eye-icon[data-state="visible"]::before {
+  content: "\f06e";
+  /* 👁‍🗨 eye-slash */
+}
+
+.eye-icon[data-state="hidden"]::before {
+  content: "\f06e";
+  /* 👁‍🗨 eye-slash */
+}
+
+.eye-icon[data-state="visible"]::before {
+  content: "\f06f";
+  /* 👁 eye */
+}

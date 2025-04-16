@@ -19,22 +19,31 @@
         <div id="emailError" class="form__error"></div>
       </div>
 
-      <!-- Password Field -->
-      <div class="form__group">
-        <label class="form__label" for="password">Password</label>
-        <input class="form__input" id="password" name="password" type="password" placeholder="••••••••">
-        <small class="form__hint">
-          Minimum 8 characters with uppercase, lowercase, number, and special character
-        </small>
-        <div id="passwordError" class="form__error"></div>
-      </div>
+     <!-- Password Field -->
+<div class="form__group password-wrapper">
+  <label class="form__label" for="password">Password</label>
+  <div class="form__input-container">
+    <input class="form__input" id="password" name="password" type="password" placeholder="••••••••">
+    <button type="button" class="toggle-password" aria-label="Toggle Password Visibility">
+      <i class="eye-icon" data-state="hidden"></i>
+    </button>
+  </div>
+  <div id="passwordStrength" style="font-size: 0.85rem; margin-top: 4px;"></div>
+  <div id="passwordError" class="form__error"></div>
+</div>
 
-      <!-- Confirm Password Field -->
-      <div class="form__group">
-        <label class="form__label" for="passwordConfirm">Confirm Password</label>
-        <input class="form__input" id="passwordConfirm" name="passwordConfirm" type="password" placeholder="••••••••">
-        <div id="confirmError" class="form__error"></div>
-      </div>
+<!-- Confirm Password Field -->
+<div class="form__group password-wrapper">
+  <label class="form__label" for="passwordConfirm">Confirm Password</label>
+  <div class="form__input-container">
+    <input class="form__input" id="passwordConfirm" name="passwordConfirm" type="password" placeholder="••••••••">
+    <button type="button" class="toggle-password" aria-label="Toggle Password Visibility">
+      <i class="eye-icon" data-state="hidden"></i>
+    </button>
+  </div>
+  <div id="confirmError" class="form__error"></div>
+</div>
+
 
       <!-- Submit Button -->
       <div class="form__group">
@@ -44,6 +53,71 @@
       <p class="switch-link">Already have an account? <a href="/login">Login</a></p>
     </form>
   </div>
-</div>
+</div> 
+
+ <div id="toast-container"></div>
+
+{{!-- <div class="row justify-content-center">
+    <div class="col-lg-6 col-md-8">
+      <div class="card shadow-sm p-4">
+        <h2 class="text-center mb-4">Create an Account</h2>
+
+        <form id="signupForm" novalidate>
+          <!-- Username -->
+          <div class="mb-3">
+            <label for="username" class="form-label">Username</label>
+            <input type="text" id="username" name="username" class="form-control" placeholder="Enter your username">
+            <div id="usernameError" class="form-text text-danger"></div>
+          </div>
+
+          <!-- Email -->
+          <div class="mb-3">
+            <label for="email" class="form-label">Email</label>
+            <input type="email" id="email" name="email" class="form-control" placeholder="you@example.com">
+            <div id="emailError" class="form-text text-danger"></div>
+          </div>
+
+          <!-- Password -->
+          <div class="mb-3">
+            <label for="password" class="form-label">Password</label>
+            <div class="input-group">
+              <input type="password" id="password" name="password" class="form-control" placeholder="••••••••">
+              <button type="button" class="btn btn-outline-secondary toggle-password">
+                <i class="eye-icon" data-state="hidden"></i>
+              </button>
+            </div>
+            <div id="passwordStrength" class="form-text mt-1"></div>
+            <div id="passwordError" class="form-text text-danger"></div>
+          </div>
+
+          <!-- Confirm Password -->
+          <div class="mb-4">
+            <label for="passwordConfirm" class="form-label">Confirm Password</label>
+            <div class="input-group">
+              <input type="password" id="passwordConfirm" name="passwordConfirm" class="form-control" placeholder="••••••••">
+              <button type="button" class="btn btn-outline-secondary toggle-password">
+                <i class="eye-icon" data-state="hidden"></i>
+              </button>
+            </div>
+            <div id="confirmError" class="form-text text-danger"></div>
+          </div>
+
+          <!-- Submit -->
+          <div class="d-grid mb-3">
+            <button type="submit" class="btn btn-primary submit-button">Sign Up</button>
+          </div>
+
+          <p class="text-center">
+            Already have an account? <a href="/login">Login</a>
+          </p>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Container -->
+  <div id="toast-container" class="position-fixed bottom-0 end-0 p-3"></div> --}}
+
+
 
 <script src="/js/auth.js"></script>
