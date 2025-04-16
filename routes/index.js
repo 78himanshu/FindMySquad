@@ -40,8 +40,7 @@ const configRoutesFunction = (app) => {
   //Join game routes
   app.use('/join', joinGameRoutes);
 
-
-  app.use("/userProfile", userProfileRoutes);  // <-- ADD THIS LINE
+  app.use("/profile", userProfileRoutes);
 
 
 };
