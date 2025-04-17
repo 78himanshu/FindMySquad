@@ -12,6 +12,7 @@
    <nav class="nav-buttons">
     {{#if isLoggedIn}}
       <span>Hi, {{username}}</span>
+        <button onclick="location.href='/userProfile/view'">Profile</button>
       <button onclick="location.href='/logout'">Logout</button>
     {{else}}
       <button onclick="location.href='/login'">Login</button>
