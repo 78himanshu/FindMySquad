@@ -1,30 +1,35 @@
-<h1>Recommended</h1>
+<main class="games-section">
+  {{#if userLoggedIn}}
+    <section>
+      <h2>Recommended Games</h2>
+      {{#if recommendedGames.length}}
+        {{#each recommendedGames}}
+          <div class="game-card">
+            <a href="/join/{{this._id}}">
+              <h3>{{this.title}}</h3>
+              <p>Sport: {{this.sport}}</p>
+              <p>Location: {{this.location}}</p>
+              <p>Date: {{this.dateTime}}</p>
+            </a>
+          </div>
+        {{/each}}
+      {{else}}
+        <p>Check out all games below!</p>
+      {{/if}}
+    </section>
+  {{/if}}
 
-{{#each recommendedGames}}
-  <div>
-    <h2>{{this.title}} ({{this.sport}})</h2>
-    <p>Venue: {{this.venue}}, {{this.location}}</p>
-    <a href="/join/{{this._id}}">
-      <button>View Details</button>
-    </a>
-  </div>
-{{/each}}
-
-<h1>All Games</h1>
-
-<form method="GET" action="/join/filter">
-  City: <input type="text" name="city">
-  Sport: <input type="text" name="sport">
-  Min Players: <input type="number" name="minPlayers">
-  <button type="submit">Apply Filter</button>
-</form>
-
-{{#each allGames}}
-  <div>
-    <h2>{{this.title}} ({{this.sport}})</h2>
-    <p>Venue: {{this.venue}}, {{this.location}}</p>
-    <a href="/join/{{this._id}}">
-      <button>View Details</button>
-    </a>
-  </div>
-{{/each}}
+  <section>
+    <h2>All Games</h2>
+    {{#each allGames}}
+      <div class="game-card">
+        <a href="/join/{{this._id}}">
+          <h3>{{this.title}}</h3>
+          <p>Sport: {{this.sport}}</p>
+          <p>Location: {{this.location}}</p>
+          <p>Date: {{this.dateTime}}</p>
+        </a>
+      </div>
+    {{/each}}
+  </section>
+</main>
