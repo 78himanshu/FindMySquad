@@ -157,7 +157,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         showToast("Login successful! Redirecting...", "success");
         setTimeout(() => {
-          window.location.href = "/";
+          window.location.href = `profile${data.nextPage}` || "/";
         }, 1500);
       } catch (error) {
         showToast(error.message || "Something went wrong", "error");

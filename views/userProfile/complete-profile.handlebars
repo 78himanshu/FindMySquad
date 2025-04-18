@@ -1,0 +1,137 @@
+<h2 class="text-center mb-4">Complete Your Profile</h2>
+
+
+<form id="profileForm">
+    <!-- First & Last Name -->
+
+    <div class="row mb-3 g-3">
+        <div class="col-md-4">
+            <label for="firstName" class="form-label">First Name</label>
+            <input type="text" name="firstName" id="firstName" class="form-control" placeholder="First Name" required>
+        </div>
+        <div class="col-md-4">
+            <label for="lastName" class="form-label">Last Name</label>
+            <input type="text" name="lastName" id="lastName" class="form-control" placeholder="Last Name" required>
+
+        </div>
+        <div class="col-md-4">
+            <label for="gender" class="form-label">Gender</label>
+            <select class="form-select" name="gender" id="gender" required>
+                <option value="">Select Gender</option>
+                <option value="Male">Male</option>
+                <option value="Female">Female</option>
+                <option value="Other">Other</option>
+            </select>
+        </div>
+    </div>
+
+    <!-- Profile Pic Radio -->
+    <label>Select a Profile Pic</label>
+    <div class="d-flex gap-3">
+        <label>
+            <input type="radio" name="profilePic" value="/images/profile1.PNG" hidden>
+            <img src="/images/profile1.PNG" class="img-thumbnail profile-option" width="60">
+        </label>
+        <label>
+            <input type="radio" name="profilePic" value="/images/profile2.jpg" hidden>
+            <img src="/images/profile2.jpg" class="img-thumbnail profile-option" width="60">
+        </label>
+        <label>
+            <input type="radio" name="profilePic" value="/images/profile3.jpg" hidden>
+            <img src="/images/profile3.jpg" class="img-thumbnail profile-option" width="60">
+        </label>
+        <label>
+            <input type="radio" name="profilePic" value="/images/profile4.jpg" hidden>
+            <img src="/images/profile4.jpg" class="img-thumbnail profile-option" width="60">
+        </label>
+    </div>
+
+
+    <!-- Bio -->
+    <textarea name="bio" id="bio" class="form-control mt-3" placeholder="Tell us about yourself..."></textarea>
+
+    <!-- Sports Checkboxes -->
+    <label class="mt-4">Select Sports:</label>
+    <div class="row row-cols-2 row-cols-md-4 g-2 mt-2" id="sportsList">
+        {{#each sportsList}}
+        <div class="col text-center">
+            <label class="btn btn-outline-success w-100">
+                <input type="checkbox" name="sportsInterests" value="{{this}}" class="d-none"> {{this}}
+            </label>
+        </div>
+        {{/each}}
+    </div>
+
+    <div class="mt-5">
+        <label class="form-label d-block mb-2">Select Workout Type:</label>
+
+        <div class="btn-group d-flex flex-wrap gap-2" role="group" aria-label="Workout Type">
+            {{#each workoutTypes}}
+            <input type="radio" class="btn-check" name="gymPreferences[workoutType]" id="workout-{{@index}}"
+                value="{{this}}" autocomplete="off">
+            <label class="btn btn-outline-success flex-grow-1 text-center" for="workout-{{@index}}">{{this}}</label>
+            {{/each}}
+        </div>
+    </div>
+
+
+    <div class="mt-5">
+        <label class="form-label d-block mb-2">Select Your Gaming Interests:</label>
+        <div class="btn-group d-flex flex-wrap gap-2" role="group" aria-label="Workout Type">
+            {{#each gamingOptions}}
+            <input type="radio" class="btn-check" name="gymPreferences[workoutType]" id="workout-{{@index}}"
+                value="{{this}}" autocomplete="off">
+            <label class="btn btn-outline-success flex-grow-1 text-center" for="workout-{{@index}}">{{this}}</label>
+            {{/each}}
+        </div>
+
+    </div>
+
+
+    <button type="submit" class="btn btn-primary mt-4">Save Profile</button>
+</form>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const profilePics = document.querySelectorAll('input[name="profilePic"]');
+        const profileImages = document.querySelectorAll('.profile-option');
+
+        profilePics.forEach((radio, index) => {
+            radio.addEventListener('change', () => {
+                profileImages.forEach((img) => img.classList.remove('selected'));
+                profileImages[index].classList.add('selected');
+            });
+        });
+    });
+
+
+    const selectedRadio = document.querySelector('input[name="profilePic"]:checked');
+    if (selectedRadio) {
+        selectedRadio.nextElementSibling.classList.add('selected');
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        const sportLabels = document.querySelectorAll('#sportsList label');
+
+        sportLabels.forEach((label) => {
+            const checkbox = label.querySelector('input[type="checkbox"]');
+
+            label.addEventListener('click', (e) => {
+                // prevent double toggle when clicking the label text
+                e.preventDefault();
+
+                // toggle the checkbox checked state
+                checkbox.checked = !checkbox.checked;
+
+                // toggle Bootstrap "active" class
+                label.classList.toggle('active', checkbox.checked);
+            });
+        });
+    });
+
+
+</script>
+
+
+{{!--
+<script src="/js/main"></script> --}}

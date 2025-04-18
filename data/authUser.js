@@ -33,31 +33,33 @@ export const login = async (email, password) => {
   if (!isMatch) throw new Error("Wrong Password !");
 
   const token = jwt.sign(
-    { userId: user._id, 
+    {
+      userId: user._id,
       username: user.username,
-    }, process.env.JWT_SECRET, 
-    {expiresIn: "2h"}
+    }, process.env.JWT_SECRET,
+    { expiresIn: "2h" }
   );
 
   return {
-  token,
+    token,
     user: {
       id: user._id,
       username: user.username,
       email: user.email,
+      "profileCompleted": user.profileCompleted
     },
   };
 };
 
-  // res.status(200).json({
-  //     message: 'Login successful',
-  //     token,
-  //     user: {
-  //         id: user._id,
-  //         username: user.username,
-  //         email: user.email,
-  //     },
-  // });
+// res.status(200).json({
+//     message: 'Login successful',
+//     token,
+//     user: {
+//         id: user._id,
+//         username: user.username,
+//         email: user.email,
+//     },
+// });
 
 export const signup = async (username, email, password) => {
   if (!username || !email || !password) {
@@ -79,13 +81,14 @@ export const signup = async (username, email, password) => {
   }
 
   const existingUser = await Userlist.findOne({ email: trimmedemail });
+  console.log("existingUser", existingUser)
   if (existingUser) throw new Error("An account with this email address already exists");
 
   const hashedPassword = await bcrypt.hash(trimmedpassword, saltRounds);
-  const newUser = new Userlist({ 
-  username: trimmeduserName,
-  email: trimmedemail, 
-  password: hashedPassword 
+  const newUser = new Userlist({
+    username: trimmeduserName,
+    email: trimmedemail,
+    password: hashedPassword
   });
   try {
     await newUser.save();
@@ -95,6 +98,8 @@ export const signup = async (username, email, password) => {
     }
     throw new Error("Signup failed. Please try again.");
   }
+
+  console.log("newUser", newUser)
 
   return newUser;
 };

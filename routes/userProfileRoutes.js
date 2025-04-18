@@ -168,4 +168,54 @@ router
     }
   });
 
+router
+  .route("/addprofile")
+  .get((req, res) => {
+    // console.log("req", req)
+    res.render("userProfile/complete-profile", {
+      title: "Complete Profile",
+      layout: "main",
+      error: req.query.error,
+      username: req.username || null || "",
+      email: req.query.email || "",
+      head: `
+        <link rel="stylesheet" href="/css/signup.css">
+        <link rel="stylesheet" href="/css/modal.css">
+        <link rel="stylesheet" href="/css/styles.css">
+      `,
+      layout: "main",
+      sportsList: ['Soccer', 'Basketball', 'Baseball', 'Tennis', 'Swimming', 'Running', 'Cycling', 'Hiking', 'Golf', 'Volleyball'],
+      workoutTypes: [
+        'Cardio',
+        'Weight Training',
+        'CrossFit',
+        'Yoga',
+        'HIIT',
+        'Pilates',
+        'Zumba',
+        'Bodyweight'
+      ],
+      gamingOptions: [
+        'FPS (e.g., Call of Duty)',
+        'Battle Royale (e.g., Fortnite)',
+        'MOBA (e.g., Dota 2)',
+        'Sports (e.g., FIFA)',
+        'Racing (e.g., Forza)',
+        'Simulation (e.g., Sims)',
+        'RPG (e.g., Elden Ring)',
+        'MMORPG',
+        'Strategy',
+        'Puzzle'
+      ],
+      // firstName: user.firstName || '',
+      // lastName: user.lastName || '',
+      // gender: user.gender || '',
+      // bio: user.bio || '',
+      // selectedPic: user.profilePic || '',
+      // selectedSports: user.sportsInterests || [],
+
+
+    });
+  })
+
 export default router;

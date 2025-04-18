@@ -24,6 +24,7 @@
     "express-handlebars": "^8.0.1",
     "express-session": "^1.18.1",
     "fs": "^0.0.1-security",
+    "hbs": "^4.2.0",
     "jsonwebtoken": "^9.0.2",
     "moment": "^2.30.1",
     "mongodb": "^6.15.0",

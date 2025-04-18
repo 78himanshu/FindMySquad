@@ -312,3 +312,41 @@ body {
   content: "\f06f";
   /* 👁 eye */
 }
+
+
+
+.sport-button {
+  display: inline-block;
+  padding: 8px 14px;
+  border: 1px solid #333;
+  margin: 6px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.sport-button input[type="checkbox"] {
+  display: none;
+}
+
+.img-col {
+  width: 100px;
+}
+
+.profile-option {
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: 2px solid transparent;
+  box-shadow: none;
+}
+
+.profile-option.selected {
+  border: 2px solid #9beaa8;
+  /* Bootstrap primary */
+  box-shadow: 0 0 10px rgba(124, 236, 133, 0.6);
+}
+
+.btn-outline-primary.active {
+  background-color: #0d6efd;
+  color: white;
+  border-color: #0d6efd;
+}

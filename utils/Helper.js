@@ -1,4 +1,3 @@
-
 export function checkString(x, input, a) {
   //here if a is 1 we need to return trimmed string back and if nothing is given i.e. the third parameter is not given it will not return
   if (typeof x !== 'string' || x.trim().length === 0) {

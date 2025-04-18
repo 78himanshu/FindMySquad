@@ -1,134 +1,160 @@
 <!DOCTYPE html>
 <html lang="en" class="scroll-smooth">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>{{title}} FindMySquad </title>
-        <link rel="stylesheet" href="/css/styles.css">
-        {{!-- <script src="https://kit.fontawesome.com/cb9a997e82.js" crossorigin="anonymous"></script> --}}
-        {{!-- <script src="https://kit.fontawesome.com/cb9a997e82.js" crossorigin="anonymous"></script> --}}
-  {{!-- <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-SgOJa3DmI69IUzQ2PVdRZhwQ+dy64/BUtbMJw1MZ8t5HZApcHrRKUc4W0kG879m7" crossorigin="anonymous"> --}}
 
-        {{!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" integrity="sha512-SfTiTlX6kk+qitfevl/7LibUOeJWlt9rbyDn92a1DqWOw9vWG2MFoays0sgObmWazO5BQPiFucnnEAjpAB+/Sw==" crossorigin="anonymous" referrerpolicy="no-referrer" /> --}}
-    </head>
-    <body>
-        <nav class="navbar">
-            <div class="logo">FindMySquad</div>
-            <div class="nav-buttons">
-                <a href="/join"><button>Join</button></a>
-                <a href="/host"><button>Host</button></a>
-                <button>Book</button>
-            </div>
-            <div class="auth-buttons">
-                {{#if isLoggedIn}} <!-- If user is logged in -->
-                <button disabled>👋 Welcome, {{username}}!</button>
-                <button onclick="window.location='/logout'">Logout</button>
-                        <button onclick="location.href='/profile/view'">Profile</button>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{title}} FindMySquad </title>
+  <link rel="stylesheet" href="/css/styles.css">
+  <script src="https://kit.fontawesome.com/cb9a997e82.js" crossorigin="anonymous"></script>
+  <script src="https://kit.fontawesome.com/cb9a997e82.js" crossorigin="anonymous"></script>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-SgOJa3DmI69IUzQ2PVdRZhwQ+dy64/BUtbMJw1MZ8t5HZApcHrRKUc4W0kG879m7" crossorigin="anonymous">
 
-                {{else}} <!-- If user is NOT logged in -->
-                <button onclick="window.location='/login'">Login</button>
-                <button onclick="window.location='/signup'">Signup</button>
-                {{/if}}
-            </div>
-        </nav>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"
+    integrity="sha512-SfTiTlX6kk+qitfevl/7LibUOeJWlt9rbyDn92a1DqWOw9vWG2MFoays0sgObmWazO5BQPiFucnnEAjpAB+/Sw=="
+    crossorigin="anonymous" referrerpolicy="no-referrer" />
+</head>
 
-{{!-- <nav class="navbar navbar-expand-lg navbar-light bg-light px-4">
-  <div class="container-fluid">
-    <!-- Logo -->
-    <a class="navbar-brand fw-bold" href="#">FindMySquad</a>
+<body>
+  {{!-- <nav class="navbar">
+    <div class="logo">FindMySquad</div>
+    <div class="nav-buttons">
+      <a href="/join"><button>Join</button></a>
+      <a href="/host"><button>Host</button></a>
+      <button>Book</button>
+    </div>
+    <div class="auth-buttons">
+      {{#if isLoggedIn}} <!-- If user is logged in -->
+      <button disabled>👋 Welcome, {{username}}!</button>
+      <button onclick="window.location='/logout'">Logout</button>
+      <button onclick="location.href='/profile/view'">Profile</button>
 
-    <!-- Toggler (hamburger) -->
-    <button
-      class="navbar-toggler"
-      type="button"
-      data-bs-toggle="collapse"
-      data-bs-target="#navbarContent"
-      aria-controls="navbarContent"
-      aria-expanded="false"
-      aria-label="Toggle navigation"
-    >
-      <span class="navbar-toggler-icon"></span>
-    </button>
+      {{else}} <!-- If user is NOT logged in -->
+      <button onclick="window.location='/login'">Login</button>
+      <button onclick="window.location='/signup'">Signup</button>
+      {{/if}}
+    </div>
+  </nav> --}}
 
-    <!-- Collapsible nav content -->
-    <div class="collapse navbar-collapse" id="navbarContent">
-      <!-- Left nav buttons -->
-      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-        <li class="nav-item">
-          <button class="btn btn-outline-primary me-2">Join</button>
-        </li>
-        <li class="nav-item">
-          <button class="btn btn-outline-primary me-2">Host</button>
-        </li>
-        <li class="nav-item">
-          <button class="btn btn-outline-primary">Book</button>
-        </li>
-      </ul>
+  <nav class="navbar navbar-expand-lg navbar-light bg-light px-4">
+    <div class="container-fluid">
+      <!-- Logo -->
+      <a class="navbar-brand fw-bold" href="/">FindMySquad</a>
 
-      <!-- Right auth buttons -->
-      <div class="d-flex gap-2">
-        {{#if isLoggedIn}}
+      <!-- Toggler (hamburger) -->
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent"
+        aria-controls="navbarContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <!-- Collapsible nav content -->
+      <div class="collapse navbar-collapse" id="navbarContent">
+        <!-- Left nav buttons -->
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+          <li class="nav-item">
+            <button class="btn btn-outline-primary me-2">Join</button>
+          </li>
+          <li class="nav-item">
+            <button class="btn btn-outline-primary me-2">Host</button>
+          </li>
+          <li class="nav-item">
+            <button class="btn btn-outline-primary">Book</button>
+          </li>
+        </ul>
+
+        <!-- Right auth buttons -->
+        <div class="d-flex gap-2">
+          {{#if isLoggedIn}}
           <button class="btn btn-secondary" disabled>👋 Welcome, {{username}}!</button>
           <button class="btn btn-outline-danger" onclick="window.location='/logout'">Logout</button>
-        {{else}}
+          {{else}}
           <button class="btn btn-outline-primary" onclick="window.location='/login'">Login</button>
           <button class="btn btn-primary" onclick="window.location='/signup'">Signup</button>
-        {{/if}}
+          {{/if}}
+        </div>
       </div>
     </div>
+  </nav>
+
+
+  {{#if success}}
+  <div id="success-popup" class="popup-success">
+    {{success}}
   </div>
-</nav> --}}
+  <script>
+    setTimeout(() => {
+      const popup = document.getElementById("success-popup");
+      if (popup) popup.style.display = "none";
+    }, 1500);
+  </script>
+  {{/if}}
 
 
-        {{#if success}}
-        <div id="success-popup" class="popup-success">
-        {{success}}
-        </div>
-        <script>
-            setTimeout(() => {
-                const popup = document.getElementById("success-popup");
-                if (popup) popup.style.display = "none";
-                }, 1500);
-        </script>
-        {{/if}}
+  <section class="section_home-faqs">
+    <div class="w-layout-blockcontainer container-small padding-section-small w-container">
+      <div class="image-container">
+        <img src="/images/pexels-ashleyrae-685382.jpg" loading="lazy" alt="Sports enthusiasts playing"
+          class="responsive-home-image" />
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <nav>
+      <div class="nav-links-container">
+        <ul class="nav-links">
+          {{#each footerLinks}}
+          <li><a href="{{this.url}}">{{this.name}}</a></li>
+          {{/each}}
+        </ul>
+      </div>
+    </nav>
+    <p>Copyright &#169; {{currentYear}} FindMySquad. All Rights
+      Reserved.</p>
+  </footer>
+
+  <script>
+    function logout() {
+      fetch('/logout', { method: 'POST' })
+        .then(() => window.location.reload());
+    }
+  </script>
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-k6d4wzSIapyDyv1kpU366/PK5hCdSbCRGRCMv+eplOQJWyd1fbcAu9OCUj5zNLiq"
+    crossorigin="anonymous"></script>
 
 
-        <section class="section_home-faqs">
-            <div
-                class="w-layout-blockcontainer container-small padding-section-small w-container">
-                <div class="image-container">
-                    <img src="/images/pexels-ashleyrae-685382.jpg"
-                        loading="lazy"
-                        alt="Sports enthusiasts playing"
-                        class="responsive-home-image" />
-                </div>
-            </div>
-        </section>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      if ('geolocation' in navigator) {
+        navigator.geolocation.getCurrentPosition(
+          async (position) => {
+            const { latitude, longitude } = position.coords;
 
-        <footer>
-            <nav>
-                <div class="nav-links-container">
-                    <ul class="nav-links">
-                        {{#each footerLinks}}
-                        <li><a href="{{this.url}}">{{this.name}}</a></li>
-                        {{/each}}
-                    </ul>
-                </div>
-            </nav>
-            <p>Copyright &#169; {{currentYear}} FindMySquad. All Rights
-                Reserved.</p>
-        </footer>
+            // You can auto-fill hidden fields or display the coordinates
 
-        <script>
-        function logout() {
-            fetch('/logout', { method: 'POST' })
-                .then(() => window.location.reload());
-        }
-    </script>
 
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+            console.log('Location:', latitude, longitude);
 
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/js/bootstrap.bundle.min.js" integrity="sha384-k6d4wzSIapyDyv1kpU366/PK5hCdSbCRGRCMv+eplOQJWyd1fbcAu9OCUj5zNLiq" crossorigin="anonymous"></script>
+            // OPTIONAL: Use a reverse geocoding API to get the city/address
+            // let locationResponse = await fetch(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${latitude}&longitude=${longitude}&localityLanguage=en`);
+            // let locationData = await locationResponse.json();
+            // console.log("City:", locationData.city);
+          },
+          (error) => {
+            console.warn('Geolocation error:', error.message);
+          }
+        );
+      } else {
+        alert('Geolocation is not supported by your browser.');
+      }
+    })
+  </script>
 
-    </body>
+</body>
+
 </html>

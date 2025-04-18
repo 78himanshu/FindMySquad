@@ -28,6 +28,8 @@ router
         return res.status(400).json({ error: "All fields are required" });
       }
 
+      console.log("==>>>>", username, email, password, confirmPassword)
+
       if (password !== confirmPassword) {
         return res.status(400).json({ error: "Passwords do not match" });
       }
@@ -39,7 +41,7 @@ router
 
       const newUser = await authUserData.signup(username, email, password);
 
-      // console.log("newUser", newUser)
+      console.log("newUser", newUser)
 
       // console.log("==>>", newUser)
 
@@ -61,7 +63,7 @@ router
 
       return res.status(200).json({ message: "Signup successful", newUser });
     } catch (error) {
-      return res.status(400).json({ error: error.message || "Signup faileddd" });
+      return res.status(400).json({ error: error.message || "Signup failed" });
     }
   });
 
@@ -98,13 +100,17 @@ router
         maxAge: 3600000,
       });
 
+      const nextPage = user.profileCompleted ? "/" : "/addprofile";
+
       res.status(200).json({
         message: "Login successful", token,
         user: {
           id: user._id,
           username: user.username,
           email: user.email,
+          "profileCompleted": user.profileCompleted
         },
+        nextPage
       });
     } catch (error) {
       // console.error("Login error:", error);
