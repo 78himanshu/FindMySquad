@@ -7,7 +7,10 @@ export default async (req, res, next) => {
   
       if (token) {
         const decoded = verify(token, process.env.JWT_SECRET);
-        req.user = decoded; // now available as req.user
+        req.user = {
+          username: decoded.username,
+          userId: decoded._id || decoded.userId
+        };
       }
   
       next();

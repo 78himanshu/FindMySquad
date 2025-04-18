@@ -1,42 +1,61 @@
 
   <main class="gym-session-form-container">
+    {{#if error}}
+      <div class="error-msg">{{error}}</div>
+    {{/if}}
     <h1>Create a Gym Session</h1>
     <form action="/gymBuddy/create" method="POST">
-      <label for="title">Session Title:</label>
+      <label for="title">Workout Title:</label>
       <input type="text" id="title" name="title" required />
 
-      <label for="venue">Venue:</label>
-      <input type="text" id="venue" name="venue" required />
+      <label for="gym">Gym:</label>
+      <input type="text" id="gym" name="gym" required />
 
       <label for="description">Description:</label>
       <textarea id="description" name="description"></textarea>
 
-      <label for="dateTime">Date & Time:</label>
+      <label for="dateTime">Date and Time:</label>
       <input type="datetime-local" id="dateTime" name="dateTime" required />
 
       <label for="gymlocation">Gym Location:</label>
       <input type="text" id="gymlocation" name="gymlocation" required />
 
-      <label for="skillLevel">Skill Level:</label>
-      <select id="skillLevel" name="skillLevel" required>
-        <option value="">--Select--</option>
-        <option value="Beginner">Beginner</option>
-        <option value="Intermediate">Intermediate</option>
-        <option value="Advanced">Advanced</option>
+      <label for="experience">Experience:</label>
+      <select id="experience" name="experience" required>
+        <option value="">--Select experience--</option>
+        <option value="newcomer">Newcomer</option>
+        <option value="1+ year">1+ Year</option>
+        <option value="3+ year">3+ Years</option>
+        <option value="5+ year">5+ Years</option>
+        <option value="10+ year">10+ Years</option>
       </select>
 
       <label for="workoutType">Workout Type:</label>
       <select id="workoutType" name="workoutType" required>
         <option value="">--Select--</option>
         <option value="Cardio">Cardio</option>
-        <option value="Weight Training">Weight Training</option>
+        <option value="Body Building">Body Building</option>
+        <option value="Power Lifting">Power Lifting</option>
+        <option value="Calisthenics">Calisthenics</option>
         <option value="Yoga">Yoga</option>
         <option value="Other">Other</option>
       </select>
 
-      <label for="hostedBy">Hosted By (User ID):</label>
-      <input type="text" id="hostedBy" name="hostedBy" required />
+      <label for="maxMembers">How many members do you want?</label>
+      <select id="maxMembers" name="maxMembers" required>
+        <option value="">--Select--</option>
+        <option value="1">Buddy (1)</option>
+        <option value="2">Trio (2)</option>
+        <option value="3">Gang (3)</option>
+        <option value="4">Group (4)</option>
+      </select>
 
+
+      <label for="hostedByDisplay">Hosted By:</label>
+      <input type="text" id="hostedByDisplay" value="{{user.username}}" readonly style="color: gray; background-color: #f0f0f0;"/>
+      <!-- This is the actual value submitted to the backend -->
+      <input type="hidden" id="hostedBy" name="hostedBy" value="{{user.userId}}" />
       <button type="submit">Create Session</button>
     </form>
   </main>
+  <script src="/js/createSession.js"></script>

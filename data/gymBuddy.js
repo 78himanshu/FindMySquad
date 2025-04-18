@@ -1,25 +1,28 @@
 import Gym from "../models/Gym.js";
 import { ObjectId } from "mongodb";
 import { checkString } from "../utils/Helper.js";
+import "../models/User.js"
 
 export const createGymSession = async (
   title,
-  venue,
+  gym,
   description,
   dateTime,
   gymlocation,
-  skillLevel,
+  experience,
   workoutType,
-  hostedBy
+  hostedBy,
+  maxMembers
 ) => {
   if (
     !title ||
-    !venue ||
+    !gym ||
     !dateTime ||
     !gymlocation ||
-    !skillLevel ||
+    !experience ||
     !workoutType ||
-    !hostedBy
+    !hostedBy ||
+    !maxMembers
   ) {
     throw "All required fields must be provided.";
   }
@@ -27,9 +30,9 @@ export const createGymSession = async (
   if (!ObjectId.isValid(hostedBy)) throw "Invalid hostedBy ID";
 
   const trimmedTitle = checkString(title, "Title", 1);
-  const trimmedVenue = checkString(venue, "Venue", 1);
+  const trimmedGym = checkString(gym, "Gym", 1);
   const trimmedLocation = checkString(gymlocation, "Gym Location", 1);
-  const trimmedSkill = checkString(skillLevel, "Skill Level", 1);
+  const trimmedExperience = checkString(experience, "Experience", 1);
   const trimmedWorkout = checkString(workoutType, "Workout Type", 1);
   const trimmedDescription = description
     ? checkString(description, "Description", 1)
@@ -37,15 +40,16 @@ export const createGymSession = async (
 
   const newSession = new Gym({
     title: trimmedTitle,
-    venue: trimmedVenue,
+    gym: trimmedGym,
     description: trimmedDescription,
     dateTime: new Date(dateTime),
     gymlocation: trimmedLocation,
-    skillLevel: trimmedSkill,
+    experience: trimmedExperience,
     workoutType: trimmedWorkout,
     hostedBy,
+    maxMembers: parseInt(maxMembers),
+    currentMembers: 0
   });
-
   const saved = await newSession.save();
   return saved;
 };
@@ -55,12 +59,13 @@ export const updateGymSession = async (sessionId, updates) => {
 
   const allowedFields = [
     "title",
-    "venue",
+    "gym",
     "description",
     "dateTime",
     "gymlocation",
-    "skillLevel",
+    "experience",
     "workoutType",
+    "maxMembers",
   ];
 
   const updateData = {};
@@ -98,4 +103,8 @@ export const deleteGymSession = async (sessionId) => {
   const deleted = await Gym.findByIdAndDelete(sessionId);
   if (!deleted) throw "Gym session not found or already deleted";
   return deleted;
+};
+
+export const getAllGymSessions = async () => {
+  return await Gym.find({}).populate("hostedBy", "username");
 };

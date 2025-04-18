@@ -31,7 +31,7 @@ const hbs = exphbs.create({
   defaultLayout: false,
   extname: ".handlebars",
   helpers: {
-    // Add any custom helpers here if needed
+    eq: (a, b) => a === b
   },
 });
 
@@ -66,6 +66,7 @@ app.use((req, res, next) => {
 
       res.locals.isLoggedIn = true;
       res.locals.username = decoded.username;
+      req.user = decoded;
     } catch (err) {
       res.locals.isLoggedIn = false;
       res.locals.username = null;
