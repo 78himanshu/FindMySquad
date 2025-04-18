@@ -1,0 +1,35 @@
+<main class="games-section">
+  {{#if userLoggedIn}}
+    <section>
+      <h2>Recommended Games</h2>
+      {{#if recommendedGames.length}}
+        {{#each recommendedGames}}
+          <div class="game-card">
+            <a href="/join/{{this._id}}">
+              <h3>{{this.title}}</h3>
+              <p>Sport: {{this.sport}}</p>
+              <p>Location: {{this.location}}</p>
+              <p>Date: {{this.dateTime}}</p>
+            </a>
+          </div>
+        {{/each}}
+      {{else}}
+        <p>Check out all games below!</p>
+      {{/if}}
+    </section>
+  {{/if}}
+
+  <section>
+    <h2>All Games</h2>
+    {{#each allGames}}
+      <div class="game-card">
+        <a href="/join/{{this._id}}">
+          <h3>{{this.title}}</h3>
+          <p>Sport: {{this.sport}}</p>
+          <p>Location: {{this.location}}</p>
+          <p>Date: {{this.dateTime}}</p>
+        </a>
+      </div>
+    {{/each}}
+  </section>
+</main>

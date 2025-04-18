@@ -1,0 +1,68 @@
+{{!-- This view is rendered using your main layout --}}
+<div class="edit-profile-container">
+  <h2>Edit Your Profile</h2>
+  <form id="editProfileForm" action="userProfile/edit" method="POST">
+    <div class="form-group">
+      <label for="firstName">First Name</label>
+      <input 
+        type="text" 
+        id="firstName" 
+        name="profile[firstName]" 
+        value="{{firstName}}" 
+        required>
+    </div>
+    <div class="form-group">
+      <label for="lastName">Last Name</label>
+      <input 
+        type="text" 
+        id="lastName" 
+        name="profile[lastName]" 
+        value="{{lastName}}" 
+        required>
+    </div>
+    <div class="form-group">
+      <label for="bio">Bio</label>
+      <textarea 
+        id="bio" 
+        name="profile[bio]">{{bio}}</textarea>
+    </div>
+    <div class="form-group">
+      <label for="avatar">Avatar URL</label>
+      <input 
+        type="text" 
+        id="avatar" 
+        name="profile[avatar]" 
+        value="{{avatar}}">
+    </div>
+    <div class="form-group">
+      <label for="city">City</label>
+      <input 
+        type="text" 
+        id="city" 
+        name="profile[city]" 
+        value="{{city}}" 
+        required>
+    </div>
+    <div class="form-group">
+      <label for="state">State</label>
+      <input 
+        type="text" 
+        id="state" 
+        name="profile[state]" 
+        value="{{state}}" 
+        required>
+    </div>
+    <div class="form-group">
+      <label for="zipCode">Zip Code</label>
+      <input 
+        type="text" 
+        id="zipCode" 
+        name="profile[zipCode]" 
+        value="{{zipCode}}" 
+        required>
+    </div>
+    <button type="submit" class="submit-button">Save Changes</button>
+  </form>
+</div>
+
+<script src="/js/userProfile.js"></script>

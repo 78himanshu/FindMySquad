@@ -1,6 +1,6 @@
 import Userlist from "../models/User.js";
 import { ObjectId } from "mongodb";
-import { checkNumber, checkString } from "../utils/Helper.js";
+import { checkNumber, checkString } from "../utils/helper.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 

@@ -1,7 +1,7 @@
 import { Router } from "express";
 const router = Router();
 import { authUserData } from "../data/index.js";
-import { checkString } from "../utils/Helper.js";
+import { checkString } from "../utils/helper.js";
 import jwt from "jsonwebtoken";
 
 router
@@ -9,15 +9,47 @@ router
   .get((req, res) => {
     res.render("auth/signup", {
       title: "Sign Up",
-      layout: "main", 
+      layout: "main",
       error: req.query.error,
       username: req.query.username || "",
       email: req.query.email || "",
       head: `
         <link rel="stylesheet" href="/css/signup.css">
         <link rel="stylesheet" href="/css/modal.css">
+        <link rel="stylesheet" href="/css/styles.css">
       `
     });
+  })
+  .post(async (req, res) => {
+    const x = req.body;
+    // console.log("xx", x)
+
+    if (!x || Object.keys(x).length === 0) {
+      return res.status(400).json({ error: 'There are no fields in the request body' });
+    }
+
+    if (!x.username || !x.email || !x.password) {
+      return res.status(400).json({ error: 'All fields need to have valid values' });
+    }
+
+    //console.log("==>>", x.username, x.email, x.password);
+
+    try {
+      checkString(x.username, 'username');
+      checkString(x.email, 'email');
+      checkString(x.password, 'password');
+      console.log(">>>>")
+    } catch (e) {
+      return res.status(400).json({ error: e.toString() });
+    }
+
+    try {
+      const newUser = await authUserData.register(x.username, x.email, x.password);
+      console.log("newUser", newUser);
+      return res.status(200).json(newUser);
+    } catch (e) {
+      return res.status(400).json({ error: e.toString() });
+    }
   })
   .post(async (req, res) => {
     try {
@@ -35,23 +67,32 @@ router
       checkString(email, "email");
       checkString(password, "password");
 
+
       const newUser = await authUserData.signup(username, email, password);
 
-      const token = jwt.sign(
-        { userId: newUser._id, username: newUser.username },
-        process.env.JWT_SECRET,
-        { expiresIn: "1h" }
-      );
+      // console.log("newUser", newUser)
 
-      res.cookie("token", token, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        maxAge: 3600000,
-      });
+      // console.log("==>>", newUser)
 
-      return res.status(200).json({ message: "Signup successful" });
+      // if(!newUser){
+      //   return
+      // }
+
+      // const token = jwt.sign(
+      //   { userId: newUser._id, username: newUser.username },
+      //   process.env.JWT_SECRET,
+      //   { expiresIn: "1h" }
+      // );
+
+      // res.cookie("token", token, {
+      //   httpOnly: true,
+      //   secure: process.env.NODE_ENV === "production",
+      //   maxAge: 3600000,
+      // });
+
+      return res.status(200).json({ message: "Signup successful", newUser });
     } catch (error) {
-      return res.status(400).json({ error: error.message || "Signup failed" });
+      return res.status(400).json({ error: error.message || "Signup faileddd" });
     }
   });
 
@@ -64,6 +105,8 @@ router
       error: req.query.error,
       head: `
         <link rel="stylesheet" href="/css/login.css">
+        <link rel="stylesheet" href="/css/styles.css">
+
       `
     });
   })
@@ -84,11 +127,19 @@ router
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
         maxAge: 3600000,
+        sameSite: "lax"
       });
 
-      res.status(200).json({ message: "Login successful" });
+      res.status(200).json({
+        message: "Login successful", token,
+        user: {
+          id: user._id,
+          username: user.username,
+          email: user.email,
+        },
+      });
     } catch (error) {
-      console.error("Login error:", error);
+      // console.error("Login error:", error);
       return res.status(400).json({ error: error.message || "Login failed" });
     }
   });

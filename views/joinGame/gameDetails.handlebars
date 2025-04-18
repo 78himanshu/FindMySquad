@@ -1,0 +1,25 @@
+<main class="game-detail-container">
+  <h1>{{game.title}}</h1>
+
+  <div class="game-info">
+    <p><strong>Sport:</strong> {{game.sport}}</p>
+    <p><strong>Venue:</strong> {{game.venue}}</p>
+    <p><strong>Location:</strong> {{game.location}}</p>
+    <p><strong>Date & Time:</strong> {{game.dateTime}}</p>
+    <p><strong>Description:</strong> {{game.description}}</p>
+    <p><strong>Players:</strong> {{game.playersGoing}} / {{game.playersRequired}}</p>
+  </div>
+
+  <div class="action-btn">
+    {{#if userLoggedIn}}
+      <form method="POST" action="/join">
+        <input type="hidden" name="gameId" value="{{game._id}}">
+        <button type="submit">Join Game</button>
+      </form>
+    {{else}}
+      <a href="/login">
+        <button>Login to Join</button>
+      </a>
+    {{/if}}
+  </div>
+</main>
