@@ -17,29 +17,12 @@
 // }
 
 
-// document.addEventListener('DOMContentLoaded', () => {
-//     if ('geolocation' in navigator) {
-//         navigator.geolocation.getCurrentPosition(
-//             async (position) => {
-//                 const { latitude, longitude } = position.coords;
+// public/js/validateProfileForm.js
 
-//                 // You can auto-fill hidden fields or display the coordinates
-//                 document.getElementById('latitude').value = latitude;
-//                 document.getElementById('longitude').value = longitude;
 
-//                 console.log('Location:', latitude, longitude);
 
-//                 // OPTIONAL: Use a reverse geocoding API to get the city/address
-//                 // let locationResponse = await fetch(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${latitude}&longitude=${longitude}&localityLanguage=en`);
-//                 // let locationData = await locationResponse.json();
-//                 // console.log("City:", locationData.city);
-//             },
-//             (error) => {
-//                 console.warn('Geolocation error:', error.message);
-//             }
-//         );
-//     } else {
-//         alert('Geolocation is not supported by your browser.');
-//     }
-// })
+
+
+
+
 

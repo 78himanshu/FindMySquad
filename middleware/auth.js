@@ -51,6 +51,7 @@ export default async (req, res, next) => {
     // You might check for the token in either cookies or the Authorization header.
     // Below, we'll first check cookies, then header if no token is found.
     let token = req.cookies.token;
+    console.log("token", token);
     if (!token && req.headers.authorization && req.headers.authorization.startsWith('Bearer ')) {
       token = req.headers.authorization.split(' ')[1];
     }

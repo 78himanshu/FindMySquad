@@ -7,16 +7,16 @@
     <div class="row mb-3 g-3">
         <div class="col-md-4">
             <label for="firstName" class="form-label">First Name</label>
-            <input type="text" name="firstName" id="firstName" class="form-control" placeholder="First Name" required>
+            <input type="text" name="firstName" id="firstName" class="form-control" placeholder="First Name">
         </div>
         <div class="col-md-4">
             <label for="lastName" class="form-label">Last Name</label>
-            <input type="text" name="lastName" id="lastName" class="form-control" placeholder="Last Name" required>
+            <input type="text" name="lastName" id="lastName" class="form-control" placeholder="Last Name">
 
         </div>
         <div class="col-md-4">
             <label for="gender" class="form-label">Gender</label>
-            <select class="form-select" name="gender" id="gender" required>
+            <select class="form-select" name="gender" id="gender">
                 <option value="">Select Gender</option>
                 <option value="Male">Male</option>
                 <option value="Female">Female</option>
@@ -63,33 +63,53 @@
     </div>
 
     <div class="mt-5">
-        <label class="form-label d-block mb-2">Select Workout Type:</label>
+        <label class="form-label d-block mb-2">Select Workout Types:</label>
 
-        <div class="btn-group d-flex flex-wrap gap-2" role="group" aria-label="Workout Type">
+        <div class="row row-cols-2 row-cols-md-4 g-2 mt-2" id="workoutList">
             {{#each workoutTypes}}
-            <input type="radio" class="btn-check" name="gymPreferences[workoutType]" id="workout-{{@index}}"
-                value="{{this}}" autocomplete="off">
-            <label class="btn btn-outline-success flex-grow-1 text-center" for="workout-{{@index}}">{{this}}</label>
+            <div class="col text-center">
+                <label class="btn btn-outline-success w-100">
+                    <input type="checkbox" name="workoutTypes" value="{{this}}" class="d-none"> {{this}}
+                </label>
+            </div>
             {{/each}}
         </div>
     </div>
+
 
 
     <div class="mt-5">
         <label class="form-label d-block mb-2">Select Your Gaming Interests:</label>
-        <div class="btn-group d-flex flex-wrap gap-2" role="group" aria-label="Workout Type">
+
+        <div class="row row-cols-2 row-cols-md-4 g-2 mt-2" id="gamingList">
             {{#each gamingOptions}}
-            <input type="radio" class="btn-check" name="gymPreferences[workoutType]" id="workout-{{@index}}"
-                value="{{this}}" autocomplete="off">
-            <label class="btn btn-outline-success flex-grow-1 text-center" for="workout-{{@index}}">{{this}}</label>
+            <div class="col text-center">
+                <label class="btn btn-outline-success w-100">
+                    <input type="checkbox" name="gamingOptions" value="{{this}}" class="d-none"> {{this}}
+                </label>
+            </div>
             {{/each}}
         </div>
-
     </div>
+
 
 
     <button type="submit" class="btn btn-primary mt-4">Save Profile</button>
 </form>
+
+
+<!-- Toast Container -->
+<div class="position-fixed bottom-0 end-0 p-3" style="z-index: 9999">
+    <div id="toastMsg" class="toast align-items-center text-white bg-danger border-0" role="alert" aria-live="assertive"
+        aria-atomic="true">
+        <div class="d-flex">
+            <div class="toast-body" id="toastBody">This is a message</div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"
+                aria-label="Close"></button>
+        </div>
+    </div>
+</div>
+
 
 <script>
     document.addEventListener('DOMContentLoaded', () => {
@@ -111,27 +131,108 @@
     }
 
     document.addEventListener('DOMContentLoaded', () => {
-        const sportLabels = document.querySelectorAll('#sportsList label');
+        const toggleLabels = document.querySelectorAll('label.btn input[type="checkbox"]');
 
-        sportLabels.forEach((label) => {
-            const checkbox = label.querySelector('input[type="checkbox"]');
+        toggleLabels.forEach((input) => {
+            const label = input.closest('label');
 
             label.addEventListener('click', (e) => {
-                // prevent double toggle when clicking the label text
                 e.preventDefault();
-
-                // toggle the checkbox checked state
-                checkbox.checked = !checkbox.checked;
-
-                // toggle Bootstrap "active" class
-                label.classList.toggle('active', checkbox.checked);
+                input.checked = !input.checked;
+                label.classList.toggle('active', input.checked);
             });
+
+            if (input.checked) {
+                label.classList.add('active');
+            }
         });
     });
 
+    function showToast(message, isSuccess = false) {
+        const toast = document.getElementById('toastMsg');
+        const toastBody = document.getElementById('toastBody');
+
+        // Set message and color
+        toastBody.textContent = message;
+        toast.classList.remove('bg-danger', 'bg-success');
+        toast.classList.add(isSuccess ? 'bg-success' : 'bg-danger');
+
+        // Show toast
+        const toastBootstrap = bootstrap.Toast.getOrCreateInstance(toast);
+        toastBootstrap.show();
+    }
+
+
+
+    const form = document.getElementById('profileForm');
+
+    form.onsubmit = async function (e) {
+        e.preventDefault();
+
+        // Clear any previous error
+        const existingError = document.getElementById('formError');
+        if (existingError) existingError.remove();
+
+        const showError = (msg) => {
+            const errorDiv = document.createElement('div');
+            errorDiv.id = 'formError';
+            errorDiv.className = 'alert alert-danger mt-3';
+            errorDiv.textContent = msg;
+            form.prepend(errorDiv);
+        };
+
+        // Gather form data
+        const firstName = form.firstName.value.trim();
+        const lastName = form.lastName.value.trim();
+        const gender = form.gender.value;
+        const profilePic = form.querySelector('input[name="profilePic"]:checked');
+        const sports = Array.from(form.querySelectorAll('input[name="sportsInterests"]:checked')).map(i => i.value);
+        const workouts = Array.from(form.querySelectorAll('input[name="workoutTypes"]:checked')).map(i => i.value);
+        const games = Array.from(form.querySelectorAll('input[name="gamingOptions"]:checked')).map(i => i.value);
+        const bio = form.bio.value.trim();
+
+        // Validate required fields
+        if (!firstName || !lastName) return showToast('First and Last name are required.');
+        if (!gender) return showToast('Please select a gender.');
+        if (!profilePic) return showToast('Please select a profile picture.');
+        if (sports.length === 0) return showToast('Please select at least one sport.');
+        if (workouts.length === 0) return showToast('Please select at least one workout type.');
+        if (games.length === 0) return showToast('Please select at least one gaming interest.');
+
+        // Prepare and send the data
+        const profileData = {
+            firstName,
+            lastName,
+            gender,
+            profilePic: profilePic.value,
+            bio,
+            sportsInterests: sports,
+            gymPreferences: workouts,
+            gamingInterests: games
+        };
+
+        try {
+            const res = await fetch('/profile', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(profileData)
+            });
+
+            const result = await res.json();
+            if (res.ok) {
+                showToast('Profile saved successfully!', true);
+                setTimeout(() => window.location.href = '/', 1500);
+            } else {
+                showToast(result.error || 'Something went wrong.', false);
+            }
+
+        } catch (err) {
+            console.error(err);
+            showError('Server error occurred.');
+        }
+    };
 
 </script>
 
 
-{{!--
-<script src="/js/main"></script> --}}
+<script src="/js/main"></script>

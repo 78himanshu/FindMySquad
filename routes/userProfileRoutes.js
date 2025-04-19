@@ -73,6 +73,8 @@ import express from 'express';
 import { Router } from 'express';
 import { userProfileData } from '../data/index.js';
 import verifyToken from '../middleware/auth.js';
+import { checkString } from "../utils/helper.js";
+
 
 const router = Router();
 
@@ -91,7 +93,32 @@ router
   })
   .post(verifyToken, async (req, res) => {
     try {
-      const profile = await userProfileData.createProfile(req.userId, req.body);
+      const { firstName, lastName, gender, profilePic, sportsInterests, gymPreferences, gamingInterests } = req.body;
+
+      console.log(">>>", req.body);
+
+      if (!firstName || !lastName || !gender || !profilePic || !sportsInterests || !gymPreferences || !gamingInterests) {
+        return res.status(400).json({ error: "All fields are requiredddd" });
+      }
+
+      checkString(firstName, "firstName");
+      checkString(lastName, "lastName");
+      checkString(gender, "gender");
+      sportsInterests.forEach((interest) => checkString(interest, "sportsInterests"));
+      gymPreferences.forEach((preference) => checkString(preference, "gymPreferences"));
+      gamingInterests.forEach((interest) => checkString(interest, "gamingInterests"));
+
+      let profileData = {
+        firstName,
+        lastName,
+        gender,
+        sportsInterests,
+        gymPreferences,
+        gamingInterests
+      }
+
+      const profile = await userProfileData.createProfile(req.userId, profileData);
+
       res.status(201).json(profile);
     } catch (e) {
       res.status(400).json({ error: e.toString() });

@@ -8,32 +8,18 @@ const userProfileSchema = new mongoose.Schema({
     unique: true
   },
   profile: {
-    firstName: { type: String, required: true },
-    lastName: { type: String, required: true },
+    firstName: { type: String },
+    lastName: { type: String },
     bio: String,
     avatar: String,
-    city: { type: String, required: true },
-    state: { type: String, required: true },
-    zipCode: { type: String, required: true }
+    city: { type: String },
+    state: { type: String },
+    zipCode: { type: String }
   },
-  sportsInterests: [
-    {
-      sport: { type: String },
-      skillLevel: { type: String }
-    }
-  ],
-  gymPreferences: {
-    gymLocation: String,
-    workoutTypes: [String],
-    frequency: String,
-    skillLevel: String
-  },
+  sportsInterests: [String],
+  gymPreferences: [String],
   gamingInterests: [
-    {
-      game: String,
-      platform: String,
-      skillLevel: String
-    }
+    String
   ],
   karmaPoints: { type: Number, default: 0 },
   achievements: [String],

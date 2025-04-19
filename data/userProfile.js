@@ -1,5 +1,7 @@
 import UserProfile from '../models/userProfile.js';
 import { checkString } from '../utils/helper.js';
+import Userlist from "../models/User.js";
+
 
 export const createProfile = async (userId, data) => {
   const existing = await UserProfile.findOne({ userId });
@@ -7,6 +9,10 @@ export const createProfile = async (userId, data) => {
 
   const newProfile = new UserProfile({ userId, ...data });
   await newProfile.save();
+  if (newProfile) {
+    // Update profileCompleted in userList
+    await Userlist.updateOne({ _id: userId }, { $set: { profileCompleted: true } });
+  }
   return newProfile;
 };
 
