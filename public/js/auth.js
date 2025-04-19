@@ -22,12 +22,10 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
-
   // ------------------ SIGNUP ------------------ //
   if (signupForm) {
     signupForm.addEventListener("submit", async (e) => {
       e.preventDefault();
-
 
       // console.log("first")
       // Clear previous errors
@@ -85,60 +83,49 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-
   // ------------------ LOGIN ------------------ //
   if (loginForm) {
     loginForm.addEventListener("submit", async (e) => {
       e.preventDefault();
 
-
-
       const emailInput = document.getElementById("email");
       const passwordInput = document.getElementById("password");
+      const redirectInput = document.getElementById("redirectInput");
 
       const email = emailInput.value.trim();
       const password = passwordInput.value;
+      const redirect = redirectInput?.value || "/";
 
       // Field error clear
-      document.querySelectorAll(".form__error").forEach((el) => (el.textContent = ""));
+      document
+        .querySelectorAll(".form__error")
+        .forEach((el) => (el.textContent = ""));
 
       // Client-side validation
       let isValid = true;
 
       if (!email) {
-        // const emailError = document.getElementById("emailError");
-        // if (emailError) emailError.textContent = "Email is required";
         showToast("Email is required", "error");
         isValid = false;
         return false;
       }
 
       if (!password) {
-        // const passwordError = document.getElementById("passwordError");
-        // if (passwordError) passwordError.textContent = "Password is required";
         showToast("Password is required", "error");
         isValid = false;
         return false;
       }
 
-
-
       const submitButton = loginForm.querySelector(".submit-button");
       submitButton.disabled = true;
       submitButton.textContent = "Signing In...";
-
-      // if (!isValid) {
-      //   submitButton.disabled = false;
-      //   submitButton.textContent = "LOG IN";
-      //   return;
-      // }
 
       try {
         const response = await fetch("/login", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           credentials: "include",
-          body: JSON.stringify({ email, password }),
+          body: JSON.stringify({ email, password, redirect }),
         });
 
         const data = await response.json();
@@ -156,9 +143,11 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         showToast("Login successful! Redirecting...", "success");
+
         setTimeout(() => {
-          window.location.href = "/";
-        }, 1500);
+          // Go to the page user originally intended to visit
+          window.location.href = data.redirect || "/";
+        }, 1000);
       } catch (error) {
         showToast(error.message || "Something went wrong", "error");
       } finally {
@@ -168,10 +157,9 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-
   // ------------------ VALIDATION ------------------ //
   function validateSignupForm() {
-    console.log("entered")
+    console.log("entered");
     let isValid = true;
 
     const username = document.getElementById("username").value.trim();
@@ -179,14 +167,17 @@ document.addEventListener("DOMContentLoaded", () => {
     const password = passwordInput.value;
     const confirmPassword = confirmInput.value;
 
-    console.log("username", username)
+    console.log("username", username);
 
     // Username
     if (!/^[a-zA-Z0-9]{3,20}$/.test(username)) {
       // document.getElementById("usernameError").textContent =
       //   "Username must be 3–20 characters (letters and numbers only)";
       // isValid = false;
-      showToast("Username must be 3–20 characters (letters and numbers only)", "error");
+      showToast(
+        "Username must be 3–20 characters (letters and numbers only)",
+        "error"
+      );
       return false;
     }
 
@@ -214,19 +205,22 @@ document.addEventListener("DOMContentLoaded", () => {
     const passwordStrength = document.getElementById("passwordStrength");
     if (passwordStrength) {
       if (strengthCount <= 2) passwordStrength.textContent = "Strength: Weak";
-      else if (strengthCount <= 4) passwordStrength.textContent = "Strength: Medium";
+      else if (strengthCount <= 4)
+        passwordStrength.textContent = "Strength: Medium";
       else passwordStrength.textContent = "Strength: Strong";
     }
 
     if (!Object.values(requirements).every(Boolean)) {
-      showToast("Password must be 8+ characters, including uppercase, lowercase, number, and special characte", "error");
+      showToast(
+        "Password must be 8+ characters, including uppercase, lowercase, number, and special characte",
+        "error"
+      );
 
       // document.getElementById("passwordError").textContent =
       //   "Password must be 8+ characters, including uppercase, lowercase, number, and special character";
       isValid = false;
 
       return false;
-
     }
 
     // Confirm Password
@@ -261,7 +255,6 @@ function showToast(message, type = "info", duration = 10000) {
   // Add toast to DOM
   container.appendChild(toast);
 
-
   // Force a repaint to trigger animation
   // requestAnimationFrame(() => {
   //   toast.style.opacity = "1";
@@ -280,6 +273,3 @@ function showToast(message, type = "info", duration = 10000) {
     setTimeout(() => toast.remove(), 300);
   });
 }
-
-
-

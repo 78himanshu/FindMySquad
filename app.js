@@ -1,7 +1,6 @@
 let serverBootTime = Date.now();
 import dotenv from "dotenv";
 
-
 import express from "express";
 import path from "path";
 import { fileURLToPath } from "url";
@@ -18,7 +17,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 //  Force load .env from correct path
-dotenv.config({ path: path.resolve(__dirname, '.env') });
+dotenv.config({ path: path.resolve(__dirname, ".env") });
 
 const app = express();
 
@@ -63,6 +62,7 @@ app.use((req, res, next) => {
         return next();
       }
 
+      req.user = decoded; // ✅ this line is the key
       res.locals.isLoggedIn = true;
       res.locals.username = decoded.username;
     } catch (err) {
@@ -100,8 +100,6 @@ app.use((err, req, res, next) => {
         : "Something went wrong",
   });
 });
-
-
 
 // Start server
 const PORT = process.env.PORT || 8080;
