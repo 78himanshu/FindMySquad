@@ -89,8 +89,14 @@ router
       //   secure: process.env.NODE_ENV === "production",
       //   maxAge: 3600000,
       // });
-
-      return res.status(200).json({ message: "Signup successful", newUser });
+      const redirectTo = req.body.redirect || '/';
+      res.cookie("token", token, {
+        httpOnly: true,
+        secure: false,
+        maxAge: 3600000,
+        sameSite: "lax"
+      });
+      return res.redirect(redirectTo);
     } catch (error) {
       return res.status(400).json({ error: error.message || "Signup faileddd" });
     }
@@ -103,6 +109,7 @@ router
       title: "Login",
       layout: "main",
       error: req.query.error,
+      redirect: req.query.redirect || '/',
       head: `
         <link rel="stylesheet" href="/css/login.css">
         <link rel="stylesheet" href="/css/styles.css">
@@ -130,8 +137,12 @@ router
         sameSite: "lax"
       });
 
+      const redirectTo = req.body.redirect || '/';
+      //return res.status(200).json({ redirectTo });
       res.status(200).json({
-        message: "Login successful", token,
+        message: "Login successful",
+        token,
+        redirectTo,
         user: {
           id: user._id,
           username: user.username,

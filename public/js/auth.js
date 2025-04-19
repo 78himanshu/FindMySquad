@@ -91,7 +91,8 @@ document.addEventListener("DOMContentLoaded", () => {
     loginForm.addEventListener("submit", async (e) => {
       e.preventDefault();
 
-
+      const urlParams = new URLSearchParams(window.location.search);
+      const redirectPath = urlParams.get('redirect') || '/';
 
       const emailInput = document.getElementById("email");
       const passwordInput = document.getElementById("password");
@@ -138,7 +139,7 @@ document.addEventListener("DOMContentLoaded", () => {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           credentials: "include",
-          body: JSON.stringify({ email, password }),
+          body: JSON.stringify({ email, password, redirect: redirectPath }),
         });
 
         const data = await response.json();
@@ -157,7 +158,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         showToast("Login successful! Redirecting...", "success");
         setTimeout(() => {
-          window.location.href = "/";
+          window.location.href = data.redirectTo || '/';
         }, 1500);
       } catch (error) {
         showToast(error.message || "Something went wrong", "error");

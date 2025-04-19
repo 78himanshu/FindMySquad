@@ -11,14 +11,13 @@
   </div>
 
   <div class="action-btn">
-    {{#if userLoggedIn}}
+    {{#if isLoggedIn}}
       <form method="POST" action="/join">
         <input type="hidden" name="gameId" value="{{game._id}}">
         <button type="submit">Join Game</button>
       </form>
     {{else}}
-      <a href="/login">
-        <button>Login to Join</button>
+      <a href="/auth/login?redirect=/join/{{game._id}}" class="btn btn-secondary">Login to Join</a>
       </a>
     {{/if}}
   </div>

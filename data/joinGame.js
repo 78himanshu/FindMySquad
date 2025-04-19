@@ -11,7 +11,7 @@ export const joinGame = async (gameId,userId) =>{
         throw new Error('Game doesnt exist, Please try another game');
     } 
 
-    if (game.players.includes(userId)) {
+    if (game.players.some(id => id.toString() === userId.toString())) {
         throw new Error('User has already joined this game');
     }
 

@@ -27,7 +27,7 @@ router
             res.render('joinGame/joinGameForm',{
                 recommendedGames: plainRecommendation,
                 allGames: plainAllGames,
-                userLoggedIn: !!userId,
+                isLoggedIn: !!userId,
                 userId
             })
 
@@ -37,8 +37,12 @@ router
     })
     .post('/', auth, async (req, res) => {   // post http://localhost:8080/join  join the  games
         const { gameId } = req.body;
-        const userId = '6613814234b35400bb3b4d89';
+        const userId = req.user?.userId || req.userId;
         // const userId = req.user.userId;
+
+        if (!userId || !gameId) {
+            return res.status(400).send("Invalid request");
+        }
 
         try {
             await joinGameData.joinGame(gameId, userId);
@@ -71,21 +75,27 @@ router.
             res.status(500).send(e.message)
         }
     })
-
+router.
+    get('/success', (req,res) =>{
+        res.render('joinGame/joinGameSuccess',{
+                title: "Successfully Joined",
+                message: "You have successfully joined the game!"
+        })
+    })
 router.
     get('/:id', async (req, res) => { //http://localhost:8080/join/67f970e5d5c97b58736c31be
-        try {
+        try{
             const gameId = req.params.id;
             const game = await hostGameData.getGameById(gameId);
-
             if (!game) return res.status(404).send('Game not found');
-
-            res.render('joinGame/gameDetails', { 
-                game: game.toObject(), 
-                userLoggedIn: !!req.user
-            });
-
-        } catch (error) {
+            const userId = req.user?.userId || req.userId || null;
+            const isLoggedIn = !!userId;
+            res.render('joinGame/gameDetails', {
+                game: game.toObject(),
+                isLoggedIn,
+                userId
+              });
+        } catch (e) {
             res.status(500).send(e.message)
         }
     })

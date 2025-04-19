@@ -30,7 +30,6 @@ export default async (req, res, next) => {
     let token = req.cookies.token;
     if (!token && req.headers.authorization && req.headers.authorization.startsWith('Bearer ')) {
       token = req.headers.authorization.split(' ')[1];
-      return res.redirect('/login?error=Please login first');
     }
 
     if (token) {
@@ -42,6 +41,6 @@ export default async (req, res, next) => {
   } catch (err) {
     console.error("Auth Middleware Error: Invalid or expired token.", err);
     res.clearCookie("token");
-    return res.redirect("/login?error=Session expired. Please log in again.");
+    return res.redirect(`/auth/login?redirect=${encodeURIComponent(req.originalUrl)}`);
   }
 };
