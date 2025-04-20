@@ -6,56 +6,64 @@
     <h1>Create a Gym Session</h1>
     <form action="/gymBuddy/create" method="POST">
       <label for="title">Workout Title:</label>
-      <input type="text" id="title" name="title" required />
+      <input type="text" id="title" name="title" value="{{title}}" required />
 
       <label for="gym">Gym:</label>
-      <input type="text" id="gym" name="gym" required />
+      <input type="text" id="gym" name="gym" value="{{gym}}" required />
 
       <label for="description">Description:</label>
-      <textarea id="description" name="description"></textarea>
+      <textarea id="description" name="description">{{description}}</textarea>
 
       <label for="dateTime">Date and Time:</label>
-      <input type="datetime-local" id="dateTime" name="dateTime" required />
+      <input type="datetime-local" id="dateTime" name="dateTime" value="{{dateTime}}" required />
 
       <label for="gymlocation">Gym Location:</label>
-      <input type="text" id="gymlocation" name="gymlocation" required />
+      <input type="text" id="gymlocation" name="gymlocation" value="{{gymlocation}}" required />
 
       <label for="experience">Experience:</label>
-      <select id="experience" name="experience" required>
+      <select name="experience" id="experience" required>
         <option value="">--Select experience--</option>
-        <option value="newcomer">Newcomer</option>
-        <option value="1+ year">1+ Year</option>
-        <option value="3+ year">3+ Years</option>
-        <option value="5+ year">5+ Years</option>
-        <option value="10+ year">10+ Years</option>
+        <option value="newcomer" {{#if (eq experience "newcomer")}}selected{{/if}}>Newcomer</option>
+        <option value="1+ year" {{#if (eq experience "1+ year")}}selected{{/if}}>1+ Year</option>
+        <option value="3+ year" {{#if (eq experience "3+ year")}}selected{{/if}}>3+ Years</option>
+        <option value="5+ year" {{#if (eq experience "5+ year")}}selected{{/if}}>5+ Years</option>
+        <option value="10+ year" {{#if (eq experience "10+ year")}}selected{{/if}}>10+ Years</option>
       </select>
+
 
       <label for="workoutType">Workout Type:</label>
       <select id="workoutType" name="workoutType" required>
         <option value="">--Select--</option>
-        <option value="Cardio">Cardio</option>
-        <option value="Body Building">Body Building</option>
-        <option value="Power Lifting">Power Lifting</option>
-        <option value="Calisthenics">Calisthenics</option>
-        <option value="Yoga">Yoga</option>
-        <option value="Other">Other</option>
+        <option value="Cardio" {{#if (eq workoutType "Cardio")}}selected{{/if}}>Cardio</option>
+        <option value="Body Building" {{#if (eq workoutType "Body Building")}}selected{{/if}}>Body Building</option>
+        <option value="Power Lifting" {{#if (eq workoutType "Power Lifting")}}selected{{/if}}>Power Lifting</option>
+        <option value="Calisthenics" {{#if (eq workoutType "Calisthenics")}}selected{{/if}}>Calisthenics</option>
+        <option value="Yoga" {{#if (eq workoutType "Yoga")}}selected{{/if}}>Yoga</option>
+        <option value="Other" {{#if (eq workoutType "Other")}}selected{{/if}}>Other</option>
       </select>
 
       <label for="maxMembers">How many members do you want?</label>
-      <select id="maxMembers" name="maxMembers" required>
+      <select id="maxMembers" name="maxMembers" required {{#if isEditMode}}disabled{{/if}}>
         <option value="">--Select--</option>
-        <option value="1">Buddy (1)</option>
-        <option value="2">Trio (2)</option>
-        <option value="3">Gang (3)</option>
-        <option value="4">Group (4)</option>
+        <option value="1" {{#if (eq maxMembers "1")}}selected{{/if}}>Buddy (1)</option>
+        <option value="2" {{#if (eq maxMembers "2")}}selected{{/if}}>Trio (2)</option>
+        <option value="3" {{#if (eq maxMembers "3")}}selected{{/if}}>Gang (3)</option>
+        <option value="4" {{#if (eq maxMembers "4")}}selected{{/if}}>Group (4)</option>
       </select>
 
+      {{#if isEditMode}}
+        <input type="hidden" name="maxMembers" value="{{maxMembers}}" />
+      {{/if}}
 
       <label for="hostedByDisplay">Hosted By:</label>
       <input type="text" id="hostedByDisplay" value="{{user.username}}" readonly style="color: gray; background-color: #f0f0f0;"/>
       <!-- This is the actual value submitted to the backend -->
       <input type="hidden" id="hostedBy" name="hostedBy" value="{{user.userId}}" />
-      <button type="submit">Create Session</button>
+      {{#if isEditMode}}
+        <button type="submit">Update Session</button>
+      {{else}}
+        <button type="submit">Create Session</button>
+      {{/if}}
     </form>
   </main>
   <script src="/js/createSession.js"></script>

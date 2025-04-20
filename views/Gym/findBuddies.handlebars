@@ -40,9 +40,9 @@
   </form>
 
   <!-- Loop through all sessions -->
-  <div class="session-grid-wrapper">
+  <div class="session-container">
     {{#each sessions}}
-      <div class="session-grid">
+      <div class="session-card">
         <h3>{{this.title}}</h3>
         <p><strong>Gym:</strong> {{this.gym}}</p>
         <p><strong>Date:</strong> {{this.formattedDateTime}}</p>
@@ -109,19 +109,19 @@
   <!-- Modal JS -->
   <script>
     function openModal(id) {
-      document.getElementById(`modal-${id}`).style.display = "block";
-    }
+  document.getElementById(`modal-${id}`).style.display = "flex";
+}
 
-    function closeModal(id) {
-      document.getElementById(`modal-${id}`).style.display = "none";
-    }
+function closeModal(id) {
+  document.getElementById(`modal-${id}`).style.display = "none";
+}
 
-    window.onclick = function (event) {
-      document.querySelectorAll('.modal').forEach(modal => {
-        if (event.target === modal) {
-          modal.style.display = "none";
-        }
-      });
+window.onclick = function (event) {
+  document.querySelectorAll('.modal').forEach(modal => {
+    if (event.target === modal) {
+      modal.style.display = "none";
     }
+  });
+};
   </script>
 </main>

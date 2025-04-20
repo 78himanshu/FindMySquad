@@ -31,7 +31,8 @@ const hbs = exphbs.create({
   defaultLayout: false,
   extname: ".handlebars",
   helpers: {
-    eq: (a, b) => a === b
+    eq: (a, b) => a === b,
+    json: (context) => JSON.stringify(context)
   },
 });
 

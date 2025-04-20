@@ -162,7 +162,9 @@ router.get("/find", async (req, res) => {
    if (workoutType && workoutType !== "") {
      queryFilters.workoutType = workoutType;
    }
-  
+
+  const now = new Date();
+  queryFilters.dateTime = { $gte: now };
   let rawSessions = [];
     rawSessions = await Gym.find(queryFilters).populate({
       path: 'hostedBy',
@@ -282,5 +284,84 @@ router.post("/leave/:id", requireAuth, async (req, res) => {
   } catch (e) {
     return res.redirect(`/gymBuddy/find?error=${encodeURIComponent(e.message || e)}`);
   }
+});
+
+router.get("/mySessions", requireAuth, async (req, res) => {
+  try {
+    const userId = req.user.userId;
+
+    const allSessions = await Gym.find({ dateTime: { $gte: new Date() } })
+      .populate({
+        path: 'hostedBy',
+        model: 'Userlist',
+        select: 'username'
+      })
+      .populate({
+        path: 'members',
+        model: 'Userlist',
+        select: 'username'
+      });
+
+    const hostedSessions = [];
+    const joinedSessions = [];
+
+    allSessions.forEach(session => {
+      const sessionObj = session.toObject();
+      sessionObj.formattedDateTime = format(new Date(session.dateTime), "eee MMM dd, yyyy h:mm a");
+      sessionObj.currentMembers = session.members.length;
+      sessionObj.maxMembers = session.maxMembers;
+      sessionObj.members = session.members.map(member => ({ username: member.username }));
+
+      const isHost = session.hostedBy._id.toString() === userId;
+      const isJoined = session.members.some(m => m._id.toString() === userId);
+
+      if (isHost) {
+        hostedSessions.push(sessionObj);
+      } else if (isJoined) {
+        joinedSessions.push(sessionObj);
+      }
+    });
+
+    res.render("Gym/mySessions", {
+      title: "My Sessions",
+      layout: "main",
+      head: `<link rel="stylesheet" href="/css/gym.css">`,
+      username: req.user.username,
+      hostedSessions,
+      joinedSessions,
+      isLoggedIn: true
+    });
+  } catch (e) {
+    console.error(e);
+    res.status(500).render("error", { message: "Failed to load your sessions" });
+  }
+});
+
+router.get('/edit/:id', requireAuth, async (req, res) => {
+  const session = await Gym.findById(req.params.id).populate('hostedBy', 'username').lean();
+  if (!session) return res.redirect('/gymBuddy/mySessions');
+
+  const sessionDate = new Date(session.dateTime); // UTC time from DB
+  const now = new Date(); // Current time in server environment
+  const diffHrs = (sessionDate.getTime() - now.getTime()) / (1000 * 60 * 60);
+
+
+  if (session.hostedBy.toString() !== req.user.userId && diffHrs < 6) {
+    return res.redirect('/gymBuddy/mySessions?error=Unauthorized or time-restricted');
+  }
+
+  res.render("Gym/createSession", {
+    layout: "main",
+    title: "Edit Gym Session",
+    head: `<link rel="stylesheet" href="/css/gym.css">`,
+    isEditMode: true,
+    ...session, // spread all fields
+    dateTime: format(new Date(session.dateTime), "yyyy-MM-dd'T'HH:mm"),
+    maxMembers: session.maxMembers?.toString(),
+    user: {
+      userId: session.hostedBy._id.toString(),
+      username: session.hostedBy.username
+    }    
+  });
 });
 
