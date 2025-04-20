@@ -142,6 +142,7 @@ document.addEventListener("DOMContentLoaded", () => {
         });
 
         const data = await response.json();
+        console.log("data", data);
 
         if (!response.ok) {
           if (data.errors) {
@@ -157,7 +158,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
         showToast("Login successful! Redirecting...", "success");
         setTimeout(() => {
-          window.location.href = `profile${data.nextPage}` || "/";
+          if (data.user.profileCompleted) {
+            window.location.href = "/";
+          } else {
+            window.location.href = "/profile/addprofile";
+          }
         }, 1500);
       } catch (error) {
         showToast(error.message || "Something went wrong", "error");

@@ -100,7 +100,7 @@ router
         maxAge: 3600000,
       });
 
-      const nextPage = user.profileCompleted ? "/" : "/addprofile";
+      // const nextPage = user.profileCompleted ? "./" : "/addprofile";
 
       res.status(200).json({
         message: "Login successful", token,
@@ -110,7 +110,7 @@ router
           email: user.email,
           "profileCompleted": user.profileCompleted
         },
-        nextPage
+        // nextPage
       });
     } catch (error) {
       // console.error("Login error:", error);
