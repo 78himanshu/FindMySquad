@@ -93,7 +93,7 @@ router
   })
   .post(verifyToken, async (req, res) => {
     try {
-      const { firstName, lastName, gender, profilePic, sportsInterests, gymPreferences, gamingInterests } = req.body;
+      const { firstName, lastName, bio, gender, profilePic, sportsInterests, gymPreferences, gamingInterests, location } = req.body;
 
       console.log(">>>", req.body);
 
@@ -104,14 +104,19 @@ router
       checkString(firstName, "firstName");
       checkString(lastName, "lastName");
       checkString(gender, "gender");
+      checkString(profilePic, "profilePic");
       sportsInterests.forEach((interest) => checkString(interest, "sportsInterests"));
       gymPreferences.forEach((preference) => checkString(preference, "gymPreferences"));
       gamingInterests.forEach((interest) => checkString(interest, "gamingInterests"));
 
       let profileData = {
-        firstName,
-        lastName,
-        gender,
+        profile: {
+          firstName,
+          lastName,
+          gender,
+          bio,
+          avatar: profilePic,
+        },
         sportsInterests,
         gymPreferences,
         gamingInterests
@@ -197,7 +202,7 @@ router
 
 router
   .route("/addprofile")
-  .get((req, res) => {
+  .get(verifyToken, async (req, res) => {
     // console.log("req", req)
     res.render("userProfile/complete-profile", {
       title: "Complete Profile",

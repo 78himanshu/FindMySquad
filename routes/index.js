@@ -25,6 +25,7 @@ const configRoutesFunction = (app) => {
 
   // Base route - simplified since we're using middleware
   app.get("/", (req, res) => {
+    console.log("req,", req.user);
     res.render("index", {
       title: "FindMySquad",
       user: req.user || null,

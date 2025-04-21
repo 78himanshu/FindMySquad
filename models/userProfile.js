@@ -1,3 +1,4 @@
+import { strings } from '@material/snackbar';
 import mongoose from 'mongoose';
 
 const userProfileSchema = new mongoose.Schema({
@@ -12,15 +13,21 @@ const userProfileSchema = new mongoose.Schema({
     lastName: { type: String },
     bio: String,
     avatar: String,
-    city: { type: String },
-    state: { type: String },
-    zipCode: { type: String }
+    gender: String,
   },
   sportsInterests: [String],
   gymPreferences: [String],
   gamingInterests: [
     String
   ],
+  location: {
+    latitude: { type: Number, default: "" },
+    longitude: { type: Number, default: "" },
+    city: { type: String, default: "" },
+    state: { type: String, default: "" },
+    zipCode: { type: String, default: "" }
+    , default: {}
+  },
   karmaPoints: { type: Number, default: 0 },
   achievements: [String],
   averageRating: { type: Number, default: 0 },

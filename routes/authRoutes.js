@@ -99,6 +99,11 @@ router
         secure: process.env.NODE_ENV === "production",
         maxAge: 3600000,
       });
+      res.cookie("user", JSON.stringify(user), {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        maxAge: 3600000,
+      });
 
       // const nextPage = user.profileCompleted ? "./" : "/addprofile";
 
@@ -108,7 +113,8 @@ router
           id: user._id,
           username: user.username,
           email: user.email,
-          "profileCompleted": user.profileCompleted
+          "profileCompleted": user.profileCompleted,
+          profilepic: user.profilePic || "/images/default-avatar.png",
         },
         // nextPage
       });

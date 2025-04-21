@@ -6,6 +6,9 @@ import Userlist from "../models/User.js";
 export const createProfile = async (userId, data) => {
   const existing = await UserProfile.findOne({ userId });
   if (existing) throw 'Profile already exists';
+  // add add profile data validation here 
+
+
 
   const newProfile = new UserProfile({ userId, ...data });
   await newProfile.save();

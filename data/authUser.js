@@ -1,6 +1,7 @@
 import Userlist from "../models/User.js";
 import { ObjectId } from "mongodb";
 import { checkNumber, checkString } from "../utils/helper.js";
+import UserProfile from '../models/userProfile.js'; // adjust path as needed
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 
@@ -23,7 +24,7 @@ export const login = async (email, password) => {
   const trimmedemail = checkString(email, "email", 1).toLowerCase();
   const trimmedpassword = checkString(password, "password", 1);
 
-  console.log("trimmedemail", trimmedemail);
+  // console.log("trimmedemail", trimmedemail);
   const user = await Userlist.findOne({ email: trimmedemail });
   console.log("user", user);
 
@@ -32,10 +33,16 @@ export const login = async (email, password) => {
   const isMatch = await bcrypt.compare(trimmedpassword, user.password);
   if (!isMatch) throw new Error("Wrong Password !");
 
+  const userProfile = await UserProfile.findOne({ userId: user._id });
+  console.log("userProfile", userProfile)
+
+  const profilePic = userProfile?.avatar || "/images/default-avatar.png";
+
   const token = jwt.sign(
     {
       userId: user._id,
       username: user.username,
+      profilePic,
     }, process.env.JWT_SECRET,
     { expiresIn: "2h" }
   );
@@ -46,7 +53,8 @@ export const login = async (email, password) => {
       id: user._id,
       username: user.username,
       email: user.email,
-      "profileCompleted": user.profileCompleted
+      "profileCompleted": user.profileCompleted,
+      profilePic
     },
   };
 };

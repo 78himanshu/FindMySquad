@@ -25,25 +25,25 @@ import jwt from 'jsonwebtoken';
 
 import User from '../models/User.js';
 
-export const ensureProfileComplete = async (req, res, next) => {
-  try {
-    const userId = req.user?._id || req.session?.user?._id;
+// export const ensureProfileComplete = async (req, res, next) => {
+//   try {
+//     const userId = req.user?._id || req.session?.user?._id;
 
-    if (!userId) {
-      return res.redirect('/login');
-    }
+//     if (!userId) {
+//       return res.redirect('/login');
+//     }
 
-    const user = await User.findById(userId);
-    if (!user || !user.profileCompleted) {
-      return res.redirect('/addprofile'); // 👈 redirect to your profile route
-    }
+//     const user = await User.findById(userId);
+//     if (!user || !user.profileCompleted) {
+//       return res.redirect('/addprofile'); // 👈 redirect to your profile route
+//     }
 
-    next();
-  } catch (err) {
-    console.error("Error in ensureProfileComplete:", err);
-    return res.status(500).send("Internal Server Error");
-  }
-};
+//     next();
+//   } catch (err) {
+//     console.error("Error in ensureProfileComplete:", err);
+//     return res.status(500).send("Internal Server Error");
+//   }
+// };
 
 
 export default async (req, res, next) => {
@@ -61,10 +61,24 @@ export default async (req, res, next) => {
       req.user = decoded;         // available as req.user (if needed)
       req.userId = decoded.userId;  // assign userId for later use
     }
+
+    // ✅ Pass user info to Handlebars
+    const userCookie = req.cookies.user;
+    if (userCookie) {
+      const userData = JSON.parse(userCookie);
+      res.locals.isLoggedIn = true;
+      res.locals.username = userData.username || '';
+      res.locals.profilePic = userData.profilePic || '/images/default-avatar.png';
+    } else {
+      res.locals.isLoggedIn = false;
+    }
+
+
     next();
   } catch (err) {
-    console.error("Auth Middleware Error: Invalid or expired token.", err);
+    console.error("Auth Middleware Error:", err);
     res.clearCookie("token");
+    res.clearCookie("user");
     return res.redirect("/login?error=Session expired. Please log in again.");
   }
 };
