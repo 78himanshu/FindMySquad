@@ -68,3 +68,17 @@ export const getAllGames = async (filters = {}) => {
 export const getGameById = async (gameId) => {
   return await Game.findById(gameId);
 };
+
+export const getGamesByIds = async (ids) => {
+  if (!Array.isArray(ids)) throw new Error("ids must be an array");
+  const validIds = ids
+    .filter((id) => ObjectId.isValid(id))
+    .map((id) => new ObjectId(id));
+  return await Game.find({ _id: { $in: validIds } });
+};
+
+export const getRecentGames = async () => {
+  return Game.find({ startTime: { $gte: new Date() } }) // upcoming only
+    .sort({ startTime: 1 })
+    .limit(4);
+};

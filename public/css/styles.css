@@ -312,3 +312,27 @@ body {
   content: "\f06f";
   /* 👁 eye */
 }
+
+/* Discover games */
+.discover-games-section {
+  margin: 2rem;
+}
+
+.discover-card h4 {
+  margin-bottom: 0.5rem;
+}
+
+.discover-cards {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.discover-card {
+  border: 1px solid #ccc;
+  padding: 1rem;
+  border-radius: 8px;
+  width: 300px;
+  background-color: #f9f9f9;
+}

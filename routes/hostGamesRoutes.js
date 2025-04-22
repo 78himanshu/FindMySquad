@@ -113,4 +113,16 @@ router.route("/success").get((req, res) => {
     head: `<link rel="stylesheet" href="/css/hostGame.css">`,
   });
 });
+
+router.route("/form").get(requireAuth, (req, res) => {
+  const hostId = req.user.userID;
+  res.render("hostGame/hostGameForm", {
+    hostId,
+    title: "Host a Game",
+    layout: "main",
+    head: `
+        <link rel="stylesheet" href="/css/hostGame.css">
+      `,
+  });
+});
 export default router;
