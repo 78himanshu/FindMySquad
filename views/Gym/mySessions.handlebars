@@ -1,0 +1,50 @@
+<div class="session-container">
+  {{#each hostedSessions}}
+    <div class="session-card hosted">
+      <span class="badge hosted">HOSTED</span>
+      <h4>{{this.title}}</h4>
+      <p><strong>Date:</strong> {{this.formattedDateTime}}</p>
+      <p><strong>Location:</strong> {{this.gym}}</p>
+      <button onclick="toggleDetails('{{@index}}')">View Details</button>
+      <div class="session-details" id="details-{{@index}}" style="display: none;">
+        <p>{{this.description}}</p>
+        <a href="/gymBuddy/edit/{{this._id}}">✏️ Edit</a>
+        <button onclick="deleteSession('{{this._id}}')">🗑️ Delete</button>
+      </div>
+    </div>
+  {{/each}}
+
+  {{#each joinedSessions}}
+    <div class="session-card joined">
+      <span class="badge joined">JOINED</span>
+      <h4>{{this.title}}</h4>
+      <p><strong>Date:</strong> {{this.formattedDateTime}}</p>
+      <p><strong>Location:</strong> {{this.gym}}</p>
+      <p><strong>Host:</strong> {{this.hostedBy.username}}</p>
+      <button onclick="toggleDetails('joined-{{@index}}')">View Details</button>
+      <div class="session-details" id="details-joined-{{@index}}" style="display: none;">
+        <p>{{this.description}}</p>
+        <button onclick="leaveSession('{{this._id}}')">🚪 Leave Session</button>
+      </div>
+    </div>
+  {{/each}}
+</div>
+
+<script>
+  function toggleDetails(id, isHost) {
+    const el = document.getElementById("details-" + id);
+    el.style.display = el.style.display === "none" ? "block" : "none";
+  }
+
+  function deleteSession(id) {
+    if (confirm("Delete this session?")) {
+      fetch(`/gymBuddy/delete/${id}`, { method: 'DELETE' })
+        .then(res => res.ok ? location.reload() : alert("Failed to delete"));
+    }
+  }
+
+  function leaveSession(id) {
+    fetch(`/gymBuddy/leave/${id}`, { method: 'POST' })
+      .then(res => res.ok ? location.reload() : alert("Failed to leave session"));
+  }
+</script>

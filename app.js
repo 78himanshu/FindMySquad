@@ -9,6 +9,8 @@ import exphbs from "express-handlebars";
 import fs from "fs";
 import cookieParser from "cookie-parser";
 import jwt from "jsonwebtoken";
+import gymBuddyRoutes from './routes/gymBuddyRoutes.js';
+
 import configRoutesFunction from "./routes/index.js";
 import "./utils/handlebarsHelper.js";
 
@@ -29,6 +31,8 @@ const hbs = exphbs.create({
   defaultLayout: false,
   extname: ".handlebars",
   helpers: {
+    eq: (a, b) => a === b,
+    json: (context) => JSON.stringify(context),
     formatDate: (datetime) => {
       if (!datetime) return "";
       return new Date(datetime).toLocaleDateString("en-US", {
@@ -83,6 +87,7 @@ app.use((req, res, next) => {
       req.user = decoded; // ✅ this line is the key
       res.locals.isLoggedIn = true;
       res.locals.username = decoded.username;
+      req.user = decoded;
     } catch (err) {
       res.locals.isLoggedIn = false;
       res.locals.username = null;
@@ -97,6 +102,7 @@ app.use((req, res, next) => {
 });
 // Routes
 configRoutesFunction(app);
+app.use('/gymBuddy', gymBuddyRoutes);
 
 // 404 Handler (must come after routes but before error handler)
 app.use((req, res, next) => {
