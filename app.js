@@ -1,5 +1,6 @@
 let serverBootTime = Date.now();
 import dotenv from "dotenv";
+
 import express from "express";
 import path from "path";
 import { fileURLToPath } from "url";
@@ -8,15 +9,17 @@ import exphbs from "express-handlebars";
 import fs from "fs";
 import cookieParser from "cookie-parser";
 import jwt from "jsonwebtoken";
+import gymBuddyRoutes from './routes/gymBuddyRoutes.js';
 
 import configRoutesFunction from "./routes/index.js";
+import "./utils/handlebarsHelper.js";
 
 // Fix __dirname issue in ES Modules
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 //  Force load .env from correct path
-dotenv.config({ path: path.resolve(__dirname, '.env') });
+dotenv.config({ path: path.resolve(__dirname, ".env") });
 
 const app = express();
 
@@ -38,7 +41,27 @@ const hbs = exphbs.create({
   defaultLayout: false,
   extname: ".handlebars",
   helpers: {
-    eq: (a, b) => a === b,   // <— register `eq`
+    eq: (a, b) => a === b,
+    json: (context) => JSON.stringify(context),
+    formatDate: (datetime) => {
+      if (!datetime) return "";
+      return new Date(datetime).toLocaleDateString("en-US", {
+        weekday: "short",
+        year: "numeric",
+        month: "short",
+        day: "numeric",
+      });
+    },
+    formatTime: (datetime) => {
+      if (!datetime) return "";
+      return new Date(datetime).toLocaleTimeString("en-US", {
+        hour: "2-digit",
+        minute: "2-digit",
+      });
+    },
+    json: (context) => {
+      return JSON.stringify(context, null, 2);
+    },
   },
 });
 
@@ -78,8 +101,10 @@ app.use((req, res, next) => {
         return next();
       }
 
+      req.user = decoded; // ✅ this line is the key
       res.locals.isLoggedIn = true;
       res.locals.username = decoded.username;
+      req.user = decoded;
     } catch (err) {
       res.locals.isLoggedIn = false;
       res.locals.username = null;
@@ -94,6 +119,7 @@ app.use((req, res, next) => {
 });
 // Routes
 configRoutesFunction(app);
+app.use('/gymBuddy', gymBuddyRoutes);
 
 // 404 Handler (must come after routes but before error handler)
 app.use((req, res, next) => {
@@ -115,8 +141,6 @@ app.use((err, req, res, next) => {
         : "Something went wrong",
   });
 });
-
-
 
 // Start server
 const PORT = process.env.PORT || 8080;

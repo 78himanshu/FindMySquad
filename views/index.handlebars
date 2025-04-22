@@ -100,6 +100,25 @@
     </div>
   </section>
 
+
+        <section class="discover-games-section">
+          <h2>Discover Games</h2>
+          <pre>{{{json recentGames}}}</pre>
+          <div class="discover-cards">
+            <p>Total recent games: {{recentGames.length}}</p>
+            {{#each recentGames}}   
+              <div class="discover-card">
+                <h4>{{this.title}}</h4>
+                <p><strong>{{formatDate this.startTime}}</strong> | {{formatTime this.startTime}} - {{formatTime this.endTime}}</p>
+                <p>{{this.location}}</p>
+                <a href="/join/{{this._id}}" class="btn btn-primary">Join</a>
+              </div>
+            {{/each}}
+          </div>
+        </section>
+
+
+
   <footer>
     <nav>
       <div class="nav-links-container">

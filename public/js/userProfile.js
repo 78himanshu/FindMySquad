@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 // document.addEventListener('DOMContentLoaded', () => {
 //     console.log("User Profile Loaded");
   
@@ -206,4 +207,11 @@ document.addEventListener("DOMContentLoaded", () => {
       toast.remove();
     };
   }
+=======
+document.addEventListener('DOMContentLoaded', () => {
+    console.log("User Profile Loaded");
+  
+    // Future actions like edit profile functionality etc can go here.
+  });
+>>>>>>> Join_Game
   

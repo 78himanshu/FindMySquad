@@ -68,36 +68,11 @@
 
 // export default router;
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-import express from 'express';
-import { Router } from 'express';
-import { userProfileData } from '../data/index.js';
-import verifyToken from '../middleware/auth.js';
+import express from "express";
+import { Router } from "express";
+import { userProfileData } from "../data/index.js";
+import verifyToken from "../middleware/auth.js";
 import { checkString } from "../utils/helper.js";
-
 
 const router = Router();
 
@@ -105,7 +80,7 @@ const router = Router();
 // API Routes - For frontend AJAX / Postman use
 // -----------------------------------------
 router
-  .route('/')
+  .route("/")
   .get(verifyToken, async (req, res) => {
     try {
       const profile = await userProfileData.getProfile(req.userId);
@@ -116,11 +91,29 @@ router
   })
   .post(verifyToken, async (req, res) => {
     try {
-      const { firstName, lastName, bio, gender, profilePic, sportsInterests, gymPreferences, gamingInterests, location } = req.body;
+      const {
+        firstName,
+        lastName,
+        bio,
+        gender,
+        profilePic,
+        sportsInterests,
+        gymPreferences,
+        gamingInterests,
+        location,
+      } = req.body;
 
       console.log(">>>", req.body);
 
-      if (!firstName || !lastName || !gender || !profilePic || !sportsInterests || !gymPreferences || !gamingInterests) {
+      if (
+        !firstName ||
+        !lastName ||
+        !gender ||
+        !profilePic ||
+        !sportsInterests ||
+        !gymPreferences ||
+        !gamingInterests
+      ) {
         return res.status(400).json({ error: "All fields are requiredddd" });
       }
 
@@ -128,9 +121,15 @@ router
       checkString(lastName, "lastName");
       checkString(gender, "gender");
       checkString(profilePic, "profilePic");
-      sportsInterests.forEach((interest) => checkString(interest, "sportsInterests"));
-      gymPreferences.forEach((preference) => checkString(preference, "gymPreferences"));
-      gamingInterests.forEach((interest) => checkString(interest, "gamingInterests"));
+      sportsInterests.forEach((interest) =>
+        checkString(interest, "sportsInterests")
+      );
+      gymPreferences.forEach((preference) =>
+        checkString(preference, "gymPreferences")
+      );
+      gamingInterests.forEach((interest) =>
+        checkString(interest, "gamingInterests")
+      );
 
       let profileData = {
         profile: {
@@ -142,10 +141,13 @@ router
         },
         sportsInterests,
         gymPreferences,
-        gamingInterests
-      }
+        gamingInterests,
+      };
 
-      const profile = await userProfileData.createProfile(req.userId, profileData);
+      const profile = await userProfileData.createProfile(
+        req.userId,
+        profileData
+      );
 
       res.status(201).json(profile);
     } catch (e) {
@@ -163,7 +165,7 @@ router
   .delete(verifyToken, async (req, res) => {
     try {
       await userProfileData.deleteProfile(req.userId);
-      res.status(200).json({ message: 'Profile deleted successfully' });
+      res.status(200).json({ message: "Profile deleted successfully" });
     } catch (e) {
       res.status(400).json({ error: e.toString() });
     }
@@ -172,44 +174,42 @@ router
 // -----------------------------------------
 // View Route - Render UserProfile Frontend Page
 // -----------------------------------------
-router
-  .route('/view')
-  .get(verifyToken, async (req, res) => {
-    try {
-      const profile = await userProfileData.getProfile(req.userId);
-      console.log("profile",profile)
-      res.render('userProfile/view', {
-        title: "Your Profile",
-        layout: "main",
-        firstName: profile.profile.firstName,
-        lastName: profile.profile.lastName,
-        email: profile.userId.email,
-        userId: profile.userId._id,
-        bio: profile.profile.bio,
-        sportsInterests: profile.sportsInterests,
-        username: profile.userId.username,
-        karmaPoints: profile.karmaPoints,
-        gymPreferences: profile.gymPreferences,
-        gamingInterests: profile.gamingInterests,
-        Followers: profile.Followers,
-        Following: profile.Following,
-        avatar: profile.profile.avatar || "/images/default-avatar.png",
-        head: `<link rel="stylesheet" href="/css/userProfile.css">`
-      });
-    } catch (e) {
-      res.status(404).render('error', { error: e.toString() });
-    }
-  });
+router.route("/view").get(verifyToken, async (req, res) => {
+  try {
+    const profile = await userProfileData.getProfile(req.userId);
+    console.log("profile", profile);
+    res.render("userProfile/view", {
+      title: "Your Profile",
+      layout: "main",
+      firstName: profile.profile.firstName,
+      lastName: profile.profile.lastName,
+      email: profile.userId.email,
+      userId: profile.userId._id,
+      bio: profile.profile.bio,
+      sportsInterests: profile.sportsInterests,
+      username: profile.userId.username,
+      karmaPoints: profile.karmaPoints,
+      gymPreferences: profile.gymPreferences,
+      gamingInterests: profile.gamingInterests,
+      Followers: profile.Followers,
+      Following: profile.Following,
+      avatar: profile.profile.avatar || "/images/default-avatar.png",
+      head: `<link rel="stylesheet" href="/css/userProfile.css">`,
+    });
+  } catch (e) {
+    res.status(404).render("error", { error: e.toString() });
+  }
+});
 
 // -----------------------------------------
 // Edit Profile Routes - Render Edit Form & Process Updates
 // -----------------------------------------
 router
-  .route('/edit')
+  .route("/edit")
   .get(verifyToken, async (req, res) => {
     try {
       const profile = await userProfileData.getProfile(req.userId);
-      res.render('userProfile/edit', {
+      res.render("userProfile/edit", {
         title: "Edit Profile",
         layout: "main",
         firstName: profile.profile.firstName,
@@ -219,144 +219,79 @@ router
         city: profile.profile.city,
         state: profile.profile.state,
         zipCode: profile.profile.zipCode,
-        head: `<link rel="stylesheet" href="/css/editProfile.css">`
+        head: `<link rel="stylesheet" href="/css/editProfile.css">`,
       });
     } catch (e) {
-      res.status(404).render('error', { error: e.toString() });
+      res.status(404).render("error", { error: e.toString() });
     }
   })
   .post(verifyToken, async (req, res) => {
     try {
       const updated = await userProfileData.updateProfile(req.userId, req.body);
-      res.redirect('/api/profile/view?success=Profile updated successfully');
+      res.redirect("/api/profile/view?success=Profile updated successfully");
     } catch (e) {
-      res.status(400).render('error', { error: e.toString() });
+      res.status(400).render("error", { error: e.toString() });
     }
   });
 
-router
-  .route("/addprofile")
-  .get(verifyToken, async (req, res) => {
-    // console.log("req", req)
-    res.render("userProfile/complete-profile", {
-      title: "Complete Profile",
-      layout: "main",
-      error: req.query.error,
-      username: req.username || null || "",
-      email: req.query.email || "",
-      head: `
+router.route("/addprofile").get(verifyToken, async (req, res) => {
+  // console.log("req", req)
+  res.render("userProfile/complete-profile", {
+    title: "Complete Profile",
+    layout: "main",
+    error: req.query.error,
+    username: req.username || null || "",
+    email: req.query.email || "",
+    head: `
         <link rel="stylesheet" href="/css/signup.css">
         <link rel="stylesheet" href="/css/modal.css">
         <link rel="stylesheet" href="/css/styles.css">
       `,
-      layout: "main",
-      sportsList: ['Soccer', 'Basketball', 'Baseball', 'Tennis', 'Swimming', 'Running', 'Cycling', 'Hiking', 'Golf', 'Volleyball'],
-      workoutTypes: [
-        'Cardio',
-        'Weight Training',
-        'CrossFit',
-        'Yoga',
-        'HIIT',
-        'Pilates',
-        'Zumba',
-        'Bodyweight'
-      ],
-      gamingOptions: [
-        'FPS (e.g., Call of Duty)',
-        'Battle Royale (e.g., Fortnite)',
-        'MOBA (e.g., Dota 2)',
-        'Sports (e.g., FIFA)',
-        'Racing (e.g., Forza)',
-        'Simulation (e.g., Sims)',
-        'RPG (e.g., Elden Ring)',
-        'MMORPG',
-        'Strategy',
-        'Puzzle'
-      ],
-      // firstName: user.firstName || '',
-      // lastName: user.lastName || '',
-      // gender: user.gender || '',
-      // bio: user.bio || '',
-      // selectedPic: user.profilePic || '',
-      // selectedSports: user.sportsInterests || [],
-
-
-    });
-  })
+    layout: "main",
+    sportsList: [
+      "Soccer",
+      "Basketball",
+      "Baseball",
+      "Tennis",
+      "Swimming",
+      "Running",
+      "Cycling",
+      "Hiking",
+      "Golf",
+      "Volleyball",
+    ],
+    workoutTypes: [
+      "Cardio",
+      "Weight Training",
+      "CrossFit",
+      "Yoga",
+      "HIIT",
+      "Pilates",
+      "Zumba",
+      "Bodyweight",
+    ],
+    gamingOptions: [
+      "FPS (e.g., Call of Duty)",
+      "Battle Royale (e.g., Fortnite)",
+      "MOBA (e.g., Dota 2)",
+      "Sports (e.g., FIFA)",
+      "Racing (e.g., Forza)",
+      "Simulation (e.g., Sims)",
+      "RPG (e.g., Elden Ring)",
+      "MMORPG",
+      "Strategy",
+      "Puzzle",
+    ],
+    // firstName: user.firstName || '',
+    // lastName: user.lastName || '',
+    // gender: user.gender || '',
+    // bio: user.bio || '',
+    // selectedPic: user.profilePic || '',
+    // selectedSports: user.sportsInterests || [],
+  });
+});
 
 export default router;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 // // ==========================================
 // // 1. FIX FOR PROFILE CREATION ENDPOINT
@@ -384,16 +319,16 @@ export default router;
 //       checkString(lastName, "lastName");
 //       checkString(gender, "gender");
 //       checkString(profilePic, "profilePic");
-      
+
 //       // Validate arrays if they exist
 //       if (Array.isArray(sportsInterests)) {
 //         sportsInterests.forEach((interest) => checkString(interest, "sportsInterests"));
 //       }
-      
+
 //       if (Array.isArray(gymPreferences)) {
 //         gymPreferences.forEach((preference) => checkString(preference, "gymPreferences"));
 //       }
-      
+
 //       if (Array.isArray(gamingInterests)) {
 //         gamingInterests.forEach((interest) => checkString(interest, "gamingInterests"));
 //       }
@@ -429,13 +364,13 @@ export default router;
 
 // document.addEventListener('DOMContentLoaded', () => {
 //   console.log("User Profile JS Loaded");
-  
+
 //   // Setup form validation if we're on the edit profile page
 //   const editForm = document.getElementById('editProfileForm');
 //   if (editForm) {
 //     setupEditFormValidation(editForm);
 //   }
-  
+
 //   // Setup form validation if we're on the complete profile page
 //   const completeForm = document.getElementById('profileForm');
 //   if (completeForm) {
@@ -448,9 +383,9 @@ export default router;
 //     // Reset error messages
 //     const errorElements = document.querySelectorAll('.error-message');
 //     errorElements.forEach(el => el.textContent = '');
-    
+
 //     let isValid = true;
-    
+
 //     // Validate first name
 //     const firstName = form.firstName.value.trim();
 //     if (!firstName) {
@@ -460,7 +395,7 @@ export default router;
 //       displayError('firstName', 'First name must be at least 2 characters');
 //       isValid = false;
 //     }
-    
+
 //     // Validate last name
 //     const lastName = form.lastName.value.trim();
 //     if (!lastName) {
@@ -470,21 +405,21 @@ export default router;
 //       displayError('lastName', 'Last name must be at least 2 characters');
 //       isValid = false;
 //     }
-    
+
 //     // Validate bio (optional but if provided, should be reasonable)
 //     const bio = form.bio.value.trim();
 //     if (bio && bio.length > 500) {
 //       displayError('bio', 'Bio must be less than 500 characters');
 //       isValid = false;
 //     }
-    
+
 //     // Validate zip code if provided
 //     const zipCode = form.zipCode?.value?.trim();
 //     if (zipCode && !/^\d{5}(-\d{4})?$/.test(zipCode)) {
 //       displayError('zipCode', 'Please enter a valid zip code');
 //       isValid = false;
 //     }
-    
+
 //     // If the form is not valid, prevent submission
 //     if (!isValid) {
 //       e.preventDefault();
@@ -496,14 +431,14 @@ export default router;
 // function setupCompleteProfileValidation(form) {
 //   form.addEventListener('submit', async function(e) {
 //     e.preventDefault();
-    
+
 //     // Clear any previous error
 //     const existingError = document.getElementById('formError');
 //     if (existingError) existingError.remove();
-    
+
 //     // Reset validation states
 //     let isValid = true;
-    
+
 //     // Validate required fields
 //     const firstName = form.firstName.value.trim();
 //     const lastName = form.lastName.value.trim();
@@ -513,43 +448,43 @@ export default router;
 //     const workouts = Array.from(form.querySelectorAll('input[name="workoutTypes"]:checked')).map(i => i.value);
 //     const games = Array.from(form.querySelectorAll('input[name="gamingOptions"]:checked')).map(i => i.value);
 //     const bio = form.bio.value.trim();
-    
+
 //     // Validate each field
 //     if (!firstName) {
 //       showToast('First name is required.');
 //       isValid = false;
 //     }
-    
+
 //     if (!lastName) {
 //       showToast('Last name is required.');
 //       isValid = false;
 //     }
-    
+
 //     if (!gender) {
 //       showToast('Please select a gender.');
 //       isValid = false;
 //     }
-    
+
 //     if (!profilePic) {
 //       showToast('Please select a profile picture.');
 //       isValid = false;
 //     }
-    
+
 //     if (sports.length === 0) {
 //       showToast('Please select at least one sport.');
 //       isValid = false;
 //     }
-    
+
 //     if (workouts.length === 0) {
 //       showToast('Please select at least one workout type.');
 //       isValid = false;
 //     }
-    
+
 //     if (games.length === 0) {
 //       showToast('Please select at least one gaming interest.');
 //       isValid = false;
 //     }
-    
+
 //     // If all validations pass, submit the form
 //     if (isValid) {
 //       // Prepare and send the data
@@ -563,7 +498,7 @@ export default router;
 //         gymPreferences: workouts,
 //         gamingInterests: games
 //       };
-      
+
 //       try {
 //         // IMPORTANT FIX: Change endpoint from '/profile' to '/api/profile'
 //         const res = await fetch('/api/profile', {
@@ -571,7 +506,7 @@ export default router;
 //           headers: { 'Content-Type': 'application/json' },
 //           body: JSON.stringify(profileData)
 //         });
-        
+
 //         const result = await res.json();
 //         if (res.ok) {
 //           showToast('Profile saved successfully!', true);
@@ -591,7 +526,7 @@ export default router;
 // function displayError(fieldId, message) {
 //   const field = document.getElementById(fieldId);
 //   if (!field) return;
-  
+
 //   // Create error message element if it doesn't exist
 //   let errorElement = field.parentNode.querySelector('.error-message');
 //   if (!errorElement) {
@@ -599,7 +534,7 @@ export default router;
 //     errorElement.className = 'error-message text-danger small mt-1';
 //     field.parentNode.appendChild(errorElement);
 //   }
-  
+
 //   errorElement.textContent = message;
 // }
 
@@ -607,14 +542,14 @@ export default router;
 // function showToast(message, isSuccess = false) {
 //   const toast = document.getElementById('toastMsg');
 //   if (!toast) return;
-  
+
 //   const toastBody = document.getElementById('toastBody');
-  
+
 //   // Set message and color
 //   toastBody.textContent = message;
 //   toast.classList.remove('bg-danger', 'bg-success');
 //   toast.classList.add(isSuccess ? 'bg-success' : 'bg-danger');
-  
+
 //   // Show toast
 //   const toastBootstrap = bootstrap.Toast.getOrCreateInstance(toast);
 //   toastBootstrap.show();
@@ -629,65 +564,65 @@ export default router;
 // const validateProfileData = (data) => {
 //   // Validate profile data
 //   const { profile } = data;
-  
+
 //   if (!profile) {
 //     throw new Error("Profile information is required");
 //   }
-  
+
 //   if (profile.firstName) {
 //     checkString(profile.firstName, "First Name");
 //   }
-  
+
 //   if (profile.lastName) {
 //     checkString(profile.lastName, "Last Name");
 //   }
-  
+
 //   if (profile.bio && typeof profile.bio !== 'string') {
 //     throw new Error("Bio must be a string");
 //   }
-  
+
 //   if (profile.gender && !['Male', 'Female', 'Other'].includes(profile.gender)) {
 //     throw new Error("Gender must be Male, Female, or Other");
 //   }
-  
+
 //   // Validate arrays if they exist
 //   if (data.sportsInterests && !Array.isArray(data.sportsInterests)) {
 //     throw new Error("Sports interests must be an array");
 //   }
-  
+
 //   if (data.gymPreferences && !Array.isArray(data.gymPreferences)) {
 //     throw new Error("Gym preferences must be an array");
 //   }
-  
+
 //   if (data.gamingInterests && !Array.isArray(data.gamingInterests)) {
 //     throw new Error("Gaming interests must be an array");
 //   }
-  
+
 //   // Validate location if it exists
 //   if (data.location) {
 //     const { location } = data;
-    
+
 //     if (location.city && typeof location.city !== 'string') {
 //       throw new Error("City must be a string");
 //     }
-    
+
 //     if (location.state && typeof location.state !== 'string') {
 //       throw new Error("State must be a string");
 //     }
-    
+
 //     if (location.zipCode && typeof location.zipCode !== 'string') {
 //       throw new Error("Zip code must be a string");
 //     }
-    
+
 //     if (location.latitude && isNaN(Number(location.latitude))) {
 //       throw new Error("Latitude must be a number");
 //     }
-    
+
 //     if (location.longitude && isNaN(Number(location.longitude))) {
 //       throw new Error("Longitude must be a number");
 //     }
 //   }
-  
+
 //   return true;
 // };
 
@@ -696,13 +631,13 @@ export default router;
 // export const createProfile = async (userId, data) => {
 //   const existing = await UserProfile.findOne({ userId });
 //   if (existing) throw 'Profile already exists';
-  
+
 //   // Validate profile data
 //   validateProfileData(data);
-  
+
 //   const newProfile = new UserProfile({ userId, ...data });
 //   await newProfile.save();
-  
+
 //   if (newProfile) {
 //     // Update profileCompleted in userList
 //     await Userlist.updateOne({ _id: userId }, { $set: { profileCompleted: true } });
@@ -717,13 +652,13 @@ export default router;
 //   if (Object.keys(data).length > 0) {
 //     validateProfileData(data);
 //   }
-  
+
 //   const updated = await UserProfile.findOneAndUpdate(
 //     { userId },
 //     { $set: data },
 //     { new: true }
 //   );
-  
+
 //   if (!updated) throw 'Profile not found';
 //   return updated;
 // };

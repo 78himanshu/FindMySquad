@@ -1,30 +1,105 @@
-<h1>Recommended</h1>
-
-{{#each recommendedGames}}
-  <div>
-    <h2>{{this.title}} ({{this.sport}})</h2>
-    <p>Venue: {{this.venue}}, {{this.location}}</p>
-    <a href="/join/{{this._id}}">
-      <button>View Details</button>
-    </a>
+<main class="games-section container">
+  <!-- Tabs Section -->
+  <div class="game-tabs">
+    <button class="tab-button" onclick="showSection('calendar')">Calendar</button>
+    <button class="tab-button active" onclick="showSection('mySports')">My Sports</button>
+    <button class="tab-button" onclick="showSection('otherSports')">Other Sports</button>
   </div>
-{{/each}}
 
-<h1>All Games</h1>
+  <!-- Calendar Section -->
+  <section id="calendar" class="tab-content" style="display: none;">
+    <div id="calendar-container">
+      <div id="calendar"></div>
+    </div>
+  </section>
 
-<form method="GET" action="/join/filter">
-  City: <input type="text" name="city">
-  Sport: <input type="text" name="sport">
-  Min Players: <input type="number" name="minPlayers">
-  <button type="submit">Apply Filter</button>
-</form>
+  <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.css" rel="stylesheet" />
 
-{{#each allGames}}
-  <div>
-    <h2>{{this.title}} ({{this.sport}})</h2>
-    <p>Venue: {{this.venue}}, {{this.location}}</p>
-    <a href="/join/{{this._id}}">
-      <button>View Details</button>
-    </a>
-  </div>
-{{/each}}
+  <!-- My Sports Section (default visible) -->
+  <section id="mySports" class="tab-content" style="display: block;">
+    {{#if isLoggedIn}}
+      <section>
+        <h2 class="section-heading">Recommended Games</h2>
+        {{#if recommendedGames.length}}
+          <div class="game-grid">
+            {{#each recommendedGames}}
+              <div class="game-card">
+                <a href="/join/{{this._id}}">
+                  <h3>{{this.title}}</h3>
+                  <p>Sport: {{this.sport}}</p>
+                  <p>Location: {{this.location}}</p>
+                  <p>
+                    Date: {{formatDate this.startTime}} |
+                    Time: {{formatTime this.startTime}} - {{formatTime this.endTime}}
+                  </p>
+                </a>
+              </div>
+            {{/each}}
+          </div>
+        {{else}}
+          <div class="no-match-box">
+            <p class="no-match">Oops...No Match Found for this Selection Criteria</p>
+            <p>You can host an activity & we will shout-out to the community to join in :)</p>
+            <a href="/host/form" class="btn btn-success">Create Game</a>
+          </div>
+        {{/if}}
+      </section>
+    {{/if}}
+
+    <section>
+      <h2 class="section-heading">All Games</h2>
+      <div class="game-grid">
+        {{#each allGames}}
+          <div class="game-card">
+            <a href="/join/{{this._id}}">
+              <h3>{{this.title}}</h3>
+              <p>Sport: {{this.sport}}</p>
+              <p>Location: {{this.location}}</p>
+              <p>
+                Date: {{formatDate this.startTime}} |
+                Time: {{formatTime this.startTime}} - {{formatTime this.endTime}}
+              </p>
+            </a>
+          </div>
+        {{/each}}
+      </div>
+    </section>
+  </section>
+
+  <section id="otherSports" class="tab-content" style="display: none;">
+    <h3>Other Sports Filter</h3>
+    <p>Filter and discover new activities from other categories.</p>
+  </section>
+
+  <!-- JS Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js"></script>
+  <script>
+    function showSection(sectionId) {
+      const sections = document.querySelectorAll('.tab-content');
+      sections.forEach(sec => sec.style.display = 'none');
+
+      const buttons = document.querySelectorAll('.tab-button');
+      buttons.forEach(btn => btn.classList.remove('active'));
+
+      document.getElementById(sectionId).style.display = 'block';
+      event.target.classList.add('active');
+    }
+
+    document.addEventListener("DOMContentLoaded", function () {
+      const calendarEl = document.getElementById("calendar");
+
+      const calendar = new FullCalendar.Calendar(calendarEl, {
+        initialView: "dayGridMonth",
+        height: "auto",
+        headerToolbar: {
+          left: "prev,today,next",
+          center: "title",
+          right: "dayGridMonth,timeGridWeek,timeGridDay"
+        },
+        events: {{{json calendarEvents}}}
+      });
+
+      calendar.render();
+    });
+  </script>
+</main>

@@ -1,25 +1,56 @@
-<h1>Host Game</h1>
+<div class="host-game-container">
+  <h1>Host Game</h1>
+  <form action="/host" method="POST" class="host-game-form">
+    <input type="text" name="title" placeholder="Title" />
 
-<form action="/host" method="POST">
-  <input type="text" name="title" placeholder="Title" required /><br/>
-  <input type="text" name="sport" placeholder="Sport" required /><br/>
-  <input type="text" name="venue" placeholder="Venue" required /><br/>
-  <input type="number" name="playersRequired" placeholder="Players Required" required /><br/>
-  <input type="datetime-local" name="dateTime" required /><br/>
-  <input type="text" name="description" placeholder="Description" /><br/>
-  <input type="number" name="costPerHead" placeholder="Cost per Head" required /><br/>
-  
-  <select name="skillLevel" required>
-    <option value="">Select Skill Level</option>
-    <option value="Beginner">Beginner</option>
-    <option value="Intermediate">Intermediate</option>
-    <option value="Advanced">Advanced</option>
-  </select><br/>
+    <select name="sport" id="sportSelect" >
+      <option value="">Select Sport</option>
+      <option value="Football">Football</option>
+      <option value="Basketball">Basketball</option>
+      <option value="Volleyball">Volleyball</option>
+      <option value="Tennis">Tennis</option>
+      <option value="Badminton">Badminton</option>
+      <option value="Cricket">Cricket</option>
+      <option value="Table Tennis">Table Tennis</option>
+      <option value="Baseball">Baseball</option>
+      <option value="Hockey">Hockey</option>
+      <option value="Other">Other</option>
+    </select>
 
-  <input type="hidden" name="host" value="{{hostId}}" />
-    {{!-- need to update this after the user profile is done by session --}}
+    <input type="text" name="customSport" id="customSport" placeholder="Name your sport" style="display: none;" />
 
-  <input type="text" name="location" placeholder="City" required /><br/>
+    <input type="text" name="venue" placeholder="Venue" />
 
-  <button type="submit">Host Game</button>
-</form>
+
+    <input type="date" name="gameDate" />
+    <div class="form-row">
+      <input type="time" name="startTime" placeholder="Start Time" />
+      <input type="time" name="endTime" placeholder="End Time" />
+    </div>
+  <input type="number" name="playersRequired" placeholder="Players"  />
+    <input type="text" name="description" placeholder="Description" />
+    <input type="number" name="costPerHead" placeholder="Cost per Head" />
+
+    <select name="skillLevel">
+      <option value="">Select Skill Level</option>
+      <option value="Beginner">Beginner</option>
+      <option value="Intermediate">Intermediate</option>
+      <option value="Advanced">Advanced</option>
+    </select>
+
+    <input type="text" name="location" placeholder="City" />
+
+    <div class="form-checks">
+      <label><input type="checkbox" name="bringEquipment" /> Bring your own equipment</label>
+      <label><input type="checkbox" name="costShared" /> Cost shared</label>
+    </div>
+
+    <textarea name="extraInfo" placeholder="Use this space to tell about the format and other details"></textarea>
+
+    <input type="hidden" name="host" value="{{hostId}}" />
+
+    <button type="submit" class="submit-btn">Host Game</button>
+  </form>
+</div>
+
+<script src="/js/hostGame.js"></script>

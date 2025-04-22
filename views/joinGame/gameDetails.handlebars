@@ -1,19 +1,27 @@
-<h1>{{game.title}}</h1>
+<main class="game-detail-container">
+  <h1>{{game.title}}</h1>
 
-<p>Sport: {{game.sport}}</p>
-<p>Venue: {{game.venue}}</p>
-<p>Location: {{game.location}}</p>
-<p>Date & Time: {{game.dateTime}}</p>
-<p>Description: {{game.description}}</p>
-<p>Players: {{game.playersGoing}} / {{game.playersRequired}}</p>
+  <div class="game-info">
+    <p><strong>Sport:</strong> {{game.sport}}</p>
+    <p><strong>Venue:</strong> {{game.venue}}</p>
+    <p><strong>Location:</strong> {{game.location}}</p>
+    <p><strong>Date & Time:</strong> 
+      {{formatDate game.startTime}} | 
+      {{formatTime game.startTime}} – {{formatTime game.endTime}}
+    </p>    
+    <p><strong>Description:</strong> {{game.description}}</p>
+    <p><strong>Players:</strong> {{game.playersGoing}} / {{game.playersRequired}}</p>
+  </div>
 
-{{#if userLoggedIn}}
-  <form method="POST" action="/join">
-    <input type="hidden" name="gameId" value="{{game._id}}">
-    <button type="submit">Join Game</button>
-  </form>
-{{else}}
-  <a href="/login">
-    <button>Login to Join Game</button>
-  </a>
-{{/if}}
+  <div class="action-btn">
+    {{#if isLoggedIn}}
+      <form method="POST" action="/join">
+        <input type="hidden" name="gameId" value="{{game._id}}">
+        <button type="submit">Join Game</button>
+      </form>
+    {{else}}
+      <a href="/login?redirect=/join/{{game._id}}" class="btn btn-secondary">Login to Join</a>
+      </a>
+    {{/if}}
+  </div>
+</main>

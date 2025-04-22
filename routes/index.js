@@ -6,7 +6,8 @@ import authRoutes from "./authRoutes.js";
 import userProfileRoutes from "./userProfileRoutes.js";  // <-- ADD THIS
 
 import jwt from "jsonwebtoken";
-import User from "../models/User.js";
+import User from "../models/User.js"; 
+import gymBuddyRoutes from './gymBuddyRoutes.js';
 
 const configRoutesFunction = (app) => {
   // Authentication middleware (runs before all routes)
@@ -38,11 +39,13 @@ const configRoutesFunction = (app) => {
 
   // Host games routes
   app.use("/host", hostGamesRoutes);
-
-  app.use("/profile", userProfileRoutes);
+  app.use("/gymBuddy", gymBuddyRoutes);
 
   //Join game routes
   app.use('/join', joinGameRoutes);
+
+  app.use("/profile", userProfileRoutes);
+
 
 };
 
