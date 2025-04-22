@@ -1,67 +1,60 @@
-<div class="edit-profile-container">
-  <h2>Edit Your Profile</h2>
-  <form id="editProfileForm" action="userProfile/edit" method="POST">
-    <div class="form-group">
-      <label for="firstName">First Name</label>
-      <input 
-        type="text" 
-        id="firstName" 
-        name="profile[firstName]" 
-        value="{{firstName}}" 
-        required>
-    </div>
-    <div class="form-group">
-      <label for="lastName">Last Name</label>
-      <input 
-        type="text" 
-        id="lastName" 
-        name="profile[lastName]" 
-        value="{{lastName}}" 
-        required>
-    </div>
-    <div class="form-group">
-      <label for="bio">Bio</label>
-      <textarea 
-        id="bio" 
-        name="profile[bio]">{{bio}}</textarea>
-    </div>
-    <div class="form-group">
-      <label for="avatar">Avatar URL</label>
-      <input 
-        type="text" 
-        id="avatar" 
-        name="profile[avatar]" 
-        value="{{avatar}}">
-    </div>
-    <div class="form-group">
-      <label for="city">City</label>
-      <input 
-        type="text" 
-        id="city" 
-        name="profile[city]" 
-        value="{{city}}" 
-        required>
-    </div>
-    <div class="form-group">
-      <label for="state">State</label>
-      <input 
-        type="text" 
-        id="state" 
-        name="profile[state]" 
-        value="{{state}}" 
-        required>
-    </div>
-    <div class="form-group">
-      <label for="zipCode">Zip Code</label>
-      <input 
-        type="text" 
-        id="zipCode" 
-        name="profile[zipCode]" 
-        value="{{zipCode}}" 
-        required>
-    </div>
-    <button type="submit" class="submit-button">Save Changes</button>
-  </form>
-</div>
+{{!-- views/userProfile/edit.handlebars --}}
+<main class="container py-5">
+  <div class="card shadow-sm p-4 mx-auto" style="max-width: 600px;">
+    <h2 class="text-center mb-4">Edit Your Profile</h2>
+    <form id="editProfileForm" novalidate>
+      <div class="mb-3">
+        <label for="firstName" class="form-label">First Name</label>
+        <input type="text" id="firstName" name="firstName" class="form-control" value="{{firstName}}">
+        <div id="firstNameError" class="form-text text-danger"></div>
+      </div>
+      <div class="mb-3">
+        <label for="lastName" class="form-label">Last Name</label>
+        <input type="text" id="lastName" name="lastName" class="form-control" value="{{lastName}}">
+        <div id="lastNameError" class="form-text text-danger"></div>
+      </div>
+      <div class="mb-3">
+        <label for="gender" class="form-label">Gender</label>
+        <select id="gender" name="gender" class="form-select">
+          <option value="">-- Select Gender --</option>
+          <option value="Male" {{#if (eq gender "Male")}}selected{{/if}}>Male</option>
+          <option value="Female" {{#if (eq gender "Female")}}selected{{/if}}>Female</option>
+          <option value="Other" {{#if (eq gender "Other")}}selected{{/if}}>Other</option>
+        </select>
+        <div id="genderError" class="form-text text-danger"></div>
+      </div>
+      <div class="mb-3">
+        <label for="bio" class="form-label">Bio</label>
+        <textarea id="bio" name="bio" class="form-control" rows="3">{{bio}}</textarea>
+        <div id="bioError" class="form-text text-danger"></div>
+      </div>
+      <div class="mb-3">
+        <label for="avatar" class="form-label">Avatar URL</label>
+        <input type="text" id="avatar" name="avatar" class="form-control" value="{{avatar}}">
+        <div id="avatarError" class="form-text text-danger"></div>
+      </div>
+      <div class="mb-3">
+        <label for="city" class="form-label">City</label>
+        <input type="text" id="city" name="city" class="form-control" value="{{city}}">
+        <div id="cityError" class="form-text text-danger"></div>
+      </div>
+      <div class="mb-3">
+        <label for="state" class="form-label">State</label>
+        <input type="text" id="state" name="state" class="form-control" value="{{state}}">
+        <div id="stateError" class="form-text text-danger"></div>
+      </div>
+      <div class="mb-3">
+        <label for="zipCode" class="form-label">Zip Code</label>
+        <input type="text" id="zipCode" name="zipCode" class="form-control" value="{{zipCode}}">
+        <div id="zipCodeError" class="form-text text-danger"></div>
+      </div>
+      <div class="d-grid">
+        <button type="submit" class="btn btn-primary submit-button">Save Changes</button>
+      </div>
+    </form>
+    <!-- Toast container for notifications -->
+    <div id="toast-container" class="position-fixed bottom-0 end-0 p-3"></div>
+  </div>
+</main>
 
 <script src="/js/userProfile.js"></script>

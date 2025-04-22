@@ -25,14 +25,27 @@ const app = express();
 // Connect to MongoDB
 connectDB();
 
-// Handlebars configuration
+// // Handlebars configuration
+// const hbs = exphbs.create({
+//   defaultLayout: false,
+//   extname: ".handlebars",
+//   helpers: {
+//     // Add any custom helpers here if needed
+//   },
+// });
+
+
+// Handlebars setup with eq helper
 const hbs = exphbs.create({
   defaultLayout: false,
   extname: ".handlebars",
   helpers: {
-    // Add any custom helpers here if needed
+    eq: (a, b) => a === b,   // <— register `eq`
   },
 });
+
+
+
 
 app.engine("handlebars", hbs.engine);
 app.set("view engine", "handlebars");

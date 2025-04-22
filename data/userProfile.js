@@ -40,3 +40,4 @@ export const deleteProfile = async (userId) => {
   if (!deleted) throw 'Profile not found';
   return true;
 };
+
