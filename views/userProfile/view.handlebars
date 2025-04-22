@@ -1,10 +1,10 @@
-<div class="profile-page">
+{{!-- <div class="profile-page">
 
   <div class="sidebar">
     <img src="{{avatar}}" alt="User Avatar" class="avatar">
     <h3>{{firstName}} {{lastName}}</h3>
     <p>{{email}}</p>
-    <p>ID: {{userId}}</p>
+    <p>ID: {{username}}</p>
 
     <a href="/profile/games" class="button">All Games</a>
     <a href="/profile/edit" class="button edit">Edit Profile</a>
@@ -29,8 +29,134 @@
     </div>
 
   </div>
+</div> --}}
+
+<div class="container my-4">
+  <div class="row">
+    <!-- Sidebar -->
+    <div class="col-md-3">
+      <div class="card border rounded shadow-sm">
+        <div class="card-body text-center">
+          <img src="{{avatar}}" alt="avatar" class="rounded-circle mb-3" width="90" height="90">
+          <h5 class="fw-semibold mb-1">{{firstName}} {{lastName}}</h5>
+          <small class="text-muted d-block">{{email}}</small>
+          <small class="text-muted">{{gender}}</small>
+        </div>
+        <ul class="list-group list-group-flush">
+          <li class="list-group-item bg-success text-white fw-semibold nav-btn" data-target="overview">
+            <i class="bi bi-bookmark-fill me-2"></i> Overview
+          </li>
+          <li class="list-group-item nav-btn" data-target="edit">
+            <i class="bi bi-pencil me-2"></i> Edit Profile
+          </li>
+          <li class="list-group-item nav-btn" data-target="bookings">
+            <i class="bi bi-reply me-2"></i> Show All Bookings
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="col-md-9">
+      <div class="card border rounded shadow-sm">
+        <div class="card-body">
+
+          <!-- Section: Profile Overview -->
+          <div id="section-overview">
+            <h4 class="fw-semibold mb-3">Your Profile Overview</h4>
+            <p><strong>Bio:</strong> {{bio}}</p>
+
+            <div class="mb-3">
+              <strong>Sports Interests:</strong>
+              {{#each sportsInterests}}<span class="badge bg-primary me-1">{{this}}</span>{{/each}}
+            </div>
+
+            <div class="mb-3">
+              <strong>Gym Preferences:</strong>
+              {{#each gymPreferences}}<span class="badge bg-success me-1">{{this}}</span>{{/each}}
+            </div>
+
+            <div class="mb-3">
+              <strong>Gaming Interests:</strong>
+              {{#each gamingInterests}}<span class="badge bg-warning text-dark me-1">{{this}}</span>{{/each}}
+            </div>
+
+            <div class="mb-3">
+              <strong>Location:</strong>
+              {{#if location.city}}{{location.city}}, {{/if}}{{location.state}} {{location.zipCode}}
+            </div>
+
+            <div class="row text-center mt-4">
+              <div class="col-md-4">
+                <h5>{{karmaPoints}}</h5>
+                <p class="text-muted">Karma Points</p>
+              </div>
+              <div class="col-md-4">
+                <h5>{{followers.length}}</h5>
+                <p class="text-muted">Followers</p>
+              </div>
+              <div class="col-md-4">
+                <h5>{{following.length}}</h5>
+                <p class="text-muted">Following</p>
+              </div>
+            </div>
+
+            {{#if achievements.length}}
+            <div class="mt-4">
+              <strong>Achievements:</strong>
+              <ul>{{#each achievements}}<li>{{this}}</li>{{/each}}</ul>
+            </div>
+            {{/if}}
+          </div>
+
+          <!-- Section: Edit Profile -->
+          <div id="section-edit" class="d-none">
+            <h4 class="fw-semibold mb-3">Edit Your Profile</h4>
+            {{> editProfileForm }}
+          </div>
+
+          <!-- Section: Bookings -->
+          {{!-- <div id="section-bookings" class="d-none">
+            <h4 class="fw-semibold mb-3">Your Bookings</h4>
+            {{> bookingList }}
+          </div> --}}
+
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
 
+
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const navButtons = document.querySelectorAll('.nav-btn');
+    const sections = ['overview', 'edit', 'bookings'];
+
+    navButtons.forEach(btn => {
+      btn.addEventListener('click', function () {
+        const target = this.getAttribute('data-target');
+
+        // Hide all sections
+        sections.forEach(id => {
+          const el = document.getElementById(`section-${id}`);
+          if (el) el.classList.add('d-none');
+        });
+
+        // Show target section
+        const targetSection = document.getElementById(`section-${target}`);
+        if (targetSection) targetSection.classList.remove('d-none');
+
+        // Optional: Toggle active sidebar item
+        navButtons.forEach(b => b.classList.remove('bg-success', 'text-white'));
+        this.classList.add('bg-success', 'text-white');
+      });
+    });
+  });
+</script>
+
+
+
+
 <script src="/js/userProfile.js"></script>
-
-

@@ -177,12 +177,22 @@ router
   .get(verifyToken, async (req, res) => {
     try {
       const profile = await userProfileData.getProfile(req.userId);
+      console.log("profile",profile)
       res.render('userProfile/view', {
         title: "Your Profile",
+        layout: "main",
         firstName: profile.profile.firstName,
         lastName: profile.profile.lastName,
-        email: profile.profile.email,
-        userId: profile.userId,
+        email: profile.userId.email,
+        userId: profile.userId._id,
+        bio: profile.profile.bio,
+        sportsInterests: profile.sportsInterests,
+        username: profile.userId.username,
+        karmaPoints: profile.karmaPoints,
+        gymPreferences: profile.gymPreferences,
+        gamingInterests: profile.gamingInterests,
+        Followers: profile.Followers,
+        Following: profile.Following,
         avatar: profile.profile.avatar || "/images/default-avatar.png",
         head: `<link rel="stylesheet" href="/css/userProfile.css">`
       });
@@ -201,6 +211,7 @@ router
       const profile = await userProfileData.getProfile(req.userId);
       res.render('userProfile/edit', {
         title: "Edit Profile",
+        layout: "main",
         firstName: profile.profile.firstName,
         lastName: profile.profile.lastName,
         bio: profile.profile.bio,

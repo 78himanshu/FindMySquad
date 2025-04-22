@@ -42,6 +42,10 @@ const hbs = exphbs.create({
   },
 });
 
+// hbs.registerPartials(path.join(__dirname, 'views/partials'));
+
+
+
 
 
 

@@ -1,0 +1,58 @@
+<main class="container py-5">
+
+    <form id="editProfileForm" novalidate>
+        <div class="mb-3">
+            <label for="firstName" class="form-label">First Name</label>
+            <input type="text" id="firstName" name="firstName" class="form-control" value="{{firstName}}">
+            <div id="firstNameError" class="form-text text-danger"></div>
+        </div>
+        <div class="mb-3">
+            <label for="lastName" class="form-label">Last Name</label>
+            <input type="text" id="lastName" name="lastName" class="form-control" value="{{lastName}}">
+            <div id="lastNameError" class="form-text text-danger"></div>
+        </div>
+        <div class="mb-3">
+            <label for="gender" class="form-label">Gender</label>
+            <select id="gender" name="gender" class="form-select">
+                <option value="">-- Select Gender --</option>
+                <option value="Male" {{#if (eq gender "Male" )}}selected{{/if}}>Male</option>
+                <option value="Female" {{#if (eq gender "Female" )}}selected{{/if}}>Female</option>
+                <option value="Other" {{#if (eq gender "Other" )}}selected{{/if}}>Other</option>
+            </select>
+            <div id="genderError" class="form-text text-danger"></div>
+        </div>
+        <div class="mb-3">
+            <label for="bio" class="form-label">Bio</label>
+            <textarea id="bio" name="bio" class="form-control" rows="3">{{bio}}</textarea>
+            <div id="bioError" class="form-text text-danger"></div>
+        </div>
+        <div class="mb-3">
+            <label for="avatar" class="form-label">Avatar URL</label>
+            <input type="text" id="avatar" name="avatar" class="form-control" value="{{avatar}}">
+            <div id="avatarError" class="form-text text-danger"></div>
+        </div>
+        <div class="mb-3">
+            <label for="city" class="form-label">City</label>
+            <input type="text" id="city" name="city" class="form-control" value="{{city}}">
+            <div id="cityError" class="form-text text-danger"></div>
+        </div>
+        <div class="mb-3">
+            <label for="state" class="form-label">State</label>
+            <input type="text" id="state" name="state" class="form-control" value="{{state}}">
+            <div id="stateError" class="form-text text-danger"></div>
+        </div>
+        <div class="mb-3">
+            <label for="zipCode" class="form-label">Zip Code</label>
+            <input type="text" id="zipCode" name="zipCode" class="form-control" value="{{zipCode}}">
+            <div id="zipCodeError" class="form-text text-danger"></div>
+        </div>
+        <div class="d-grid">
+            <button type="submit" class="btn btn-primary submit-button">Save Changes</button>
+        </div>
+    </form>
+    <!-- Toast container for notifications -->
+    <div id="toast-container" class="position-fixed bottom-0 end-0 p-3"></div>
+
+</main>
+
+<script src="/js/userProfile.js"></script>
