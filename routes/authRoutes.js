@@ -21,40 +21,6 @@ router
     });
   })
   .post(async (req, res) => {
-    const x = req.body;
-    if (!x || Object.keys(x).length === 0) {
-      return res
-        .status(400)
-        .json({ error: "There are no fields in the request body" });
-    }
-
-    if (!x.username || !x.email || !x.password) {
-      return res
-        .status(400)
-        .json({ error: "All fields need to have valid values" });
-    }
-    try {
-      checkString(x.username, "username");
-      checkString(x.email, "email");
-      checkString(x.password, "password");
-      console.log(">>>>");
-    } catch (e) {
-      return res.status(400).json({ error: e.toString() });
-    }
-
-    try {
-      const newUser = await authUserData.register(
-        x.username,
-        x.email,
-        x.password
-      );
-      console.log("newUser", newUser);
-      return res.status(200).json(newUser);
-    } catch (e) {
-      return res.status(400).json({ error: e.toString() });
-    }
-  })
-  .post(async (req, res) => {
     try {
       const { email, password } = req.body;
 
@@ -67,38 +33,35 @@ router
       checkString(email, "email");
       checkString(password, "password");
 
-      const user = await authUserData.login(email, password);
+      const newUser = await authUserData.signup(username, email, password);
 
-      // Generate token HERE
-      const token = jwt.sign(
-        {
-          userId: user._id,
-          username: user.username,
-        },
-        process.env.JWT_SECRET,
-        { expiresIn: "1h" }
-      );
+      // const token = jwt.sign(
+      //   {
+      //     userId: newUser._id,
+      //     username: newUser.username,
+      //   },
+      //   process.env.JWT_SECRET,
+      //   { expiresIn: "1h" }
+      // );
 
-      // Set cookie
-      res.cookie("token", token, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        maxAge: 3600000,
-        sameSite: "lax",
-      });
+      // res.cookie("token", token, {
+      //   httpOnly: true,
+      //   secure: process.env.NODE_ENV === "production",
+      //   maxAge: 3600000,
+      //   sameSite: "lax",
+      // });
 
-      // Respond
       res.status(200).json({
-        message: "Login successful",
+        message: "Signup successful",
         token,
         user: {
-          id: user._id,
-          username: user.username,
-          email: user.email,
+          id: newUser._id,
+          username: newUser.username,
+          email: newUser.email,
         },
       });
     } catch (error) {
-      return res.status(400).json({ error: error.message || "Login failed" });
+      return res.status(400).json({ error: error.message || "Signup failed" });
     }
   });
 router
@@ -109,6 +72,7 @@ router
       layout: "main",
       redirect: req.query.redirect || "/",
       error: req.query.error,
+      redirect: req.query.redirect || "/",
       head: `
         <link rel="stylesheet" href="/css/login.css">
         <link rel="stylesheet" href="/css/styles.css">
@@ -136,6 +100,8 @@ router
         sameSite: "lax",
       });
 
+      const redirectTo = req.body.redirect || "/";
+      //return res.status(200).json({ redirectTo });
       res.status(200).json({
         message: "Login successful",
         token,

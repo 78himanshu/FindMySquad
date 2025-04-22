@@ -9,8 +9,8 @@ import exphbs from "express-handlebars";
 import fs from "fs";
 import cookieParser from "cookie-parser";
 import jwt from "jsonwebtoken";
-
 import configRoutesFunction from "./routes/index.js";
+import "./utils/handlebarsHelper.js";
 
 // Fix __dirname issue in ES Modules
 const __filename = fileURLToPath(import.meta.url);
@@ -29,7 +29,25 @@ const hbs = exphbs.create({
   defaultLayout: false,
   extname: ".handlebars",
   helpers: {
-    // Add any custom helpers here if needed
+    formatDate: (datetime) => {
+      if (!datetime) return "";
+      return new Date(datetime).toLocaleDateString("en-US", {
+        weekday: "short",
+        year: "numeric",
+        month: "short",
+        day: "numeric",
+      });
+    },
+    formatTime: (datetime) => {
+      if (!datetime) return "";
+      return new Date(datetime).toLocaleTimeString("en-US", {
+        hour: "2-digit",
+        minute: "2-digit",
+      });
+    },
+    json: (context) => {
+      return JSON.stringify(context, null, 2);
+    },
   },
 });
 

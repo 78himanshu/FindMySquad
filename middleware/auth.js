@@ -35,6 +35,6 @@ export default async function requireAuth(req, res, next) {
   } catch (err) {
     console.error("Auth Middleware Error:", err.message);
     res.clearCookie("token");
-    return res.redirect("/login?error=Session expired. Please log in again.");
+    return res.redirect(`/auth/login?redirect=${encodeURIComponent(req.originalUrl)}`);
   }
 }
