@@ -49,10 +49,7 @@ router
       // }
 
       // const token = jwt.sign(
-      //   {
-      //     userId: newUser._id,
-      //     username: newUser.username,
-      //   },
+      //   { userId: newUser._id, username: newUser.username },
       //   process.env.JWT_SECRET,
       //   { expiresIn: "1h" }
       // );
@@ -61,41 +58,32 @@ router
       //   httpOnly: true,
       //   secure: process.env.NODE_ENV === "production",
       //   maxAge: 3600000,
-      //   sameSite: "lax",
       // });
 
-      res.status(200).json({
-        message: "Signup successful",
-        token,
-        user: {
-          id: newUser._id,
-          username: newUser.username,
-          email: newUser.email,
-        },
-      });
+      return res.status(200).json({ message: "Signup successful", newUser });
     } catch (error) {
-      return res.status(400).json({ error: error.message || "Signup failed" });
       return res.status(400).json({ error: error.message || "Signup failed" });
     }
   });
+
 router
   .route("/login")
   .get((req, res) => {
     res.render("auth/login", {
       title: "Login",
       layout: "main",
-      redirect: req.query.redirect || "/",
       error: req.query.error,
-      redirect: req.query.redirect || "/",
       head: `
         <link rel="stylesheet" href="/css/login.css">
         <link rel="stylesheet" href="/css/styles.css">
+
       `,
     });
   })
   .post(async (req, res) => {
     try {
       const { email, password, redirect } = req.body; // <-- added for redirect
+
       if (!email || !password) {
         return res
           .status(400)
@@ -111,21 +99,16 @@ router
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
         maxAge: 3600000,
-        sameSite: "lax",
       });
       res.cookie("user", JSON.stringify(user), {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
         maxAge: 3600000,
-        sameSite: "lax",
       });
 
       // const nextPage = user.profileCompleted ? "./" : "/addprofile";
-
-      // const nextPage = user.profileCompleted ? "./" : "/addprofile";
-
       const redirectTo = req.body.redirect || "/";
-      //return res.status(200).json({ redirectTo });
+
       res.status(200).json({
         message: "Login successful",
         token,
@@ -136,10 +119,11 @@ router
           profileCompleted: user.profileCompleted,
           profilepic: user.profilePic || "/images/default-avatar.png",
         },
-        redirect: redirect || "/", // Included redirect in the response
         // nextPage
+        redirect: redirect || "/", // Included redirect in the response
       });
     } catch (error) {
+      // console.error("Login error:", error);
       return res.status(400).json({ error: error.message || "Login failed" });
     }
   });
