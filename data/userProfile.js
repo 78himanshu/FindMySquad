@@ -43,3 +43,21 @@ export const deleteProfile = async (userId) => {
   return true;
 };
 
+export const ratePlayers = async (raterId, bookingId, ratingsArray) => {
+  // ratingsArray = [{ userId, score }, …]
+  for (let { userId, score } of ratingsArray) {
+    if (!ObjectId.isValid(userId)) throw "Invalid rated user ID";
+    const profile = await UserProfile.findOne({ userId });
+    if (!profile) throw `No profile for user ${userId}`;
+
+    // append the rating
+    profile.ratings.push({ rater: raterId, score, bookingId });
+    profile.ratingCount++;
+    // recompute average
+    profile.averageRating =
+      ((profile.averageRating * (profile.ratingCount - 1)) + score)
+      / profile.ratingCount;
+
+    await profile.save();
+  }
+};

@@ -1,0 +1,116 @@
+<main class="container py-5">
+  <h2 class="mb-4">All Your Bookings</h2>
+
+  {{!-- Game Bookings --}}
+  <section class="mb-5">
+    <h3>🎾 Game Bookings</h3>
+
+    <div class="row">
+      <div class="col-md-6">
+        <h4>Future Games</h4>
+        {{#if futureGameBookings.length}}
+          {{#each futureGameBookings}}
+            <div class="card mb-3">
+              <div class="card-body">
+                <h5 class="card-title">{{this.title}}</h5>
+                <p>
+                  {{formatDate this.startTime}} |
+                  {{formatTime this.startTime}} – {{formatTime this.endTime}}
+                </p>
+                <a href="/join/{{this._id}}" class="btn btn-outline-primary">View Game</a>
+              </div>
+            </div>
+          {{/each}}
+        {{else}}
+          <p class="text-muted">No upcoming games.</p>
+        {{/if}}
+      </div>
+
+      <div class="col-md-6">
+        <h4>Past Games</h4>
+        {{#if pastGameBookings.length}}
+          {{#each pastGameBookings}}
+            <div class="card mb-3">
+              <div class="card-body">
+                <h5 class="card-title">{{this.title}}</h5>
+                <p>{{formatDate this.startTime}}</p>
+                <button
+                  class="btn btn-success btn-rate"
+                  data-booking-id="{{this._id}}"
+                  data-players='{{json this.players}}'
+                >
+                  Rate Players
+                </button>
+              </div>
+            </div>
+          {{/each}}
+        {{else}}
+          <p class="text-muted">No past games.</p>
+        {{/if}}
+      </div>
+    </div>
+  </section>
+
+  {{!-- Gym Bookings --}}
+  <section class="mb-5">
+    <h3>🏋️ Gym Bookings</h3>
+    <div class="row">
+      <div class="col-md-6">
+        <h4>Future Sessions</h4>
+        {{#if futureGymBookings.length}}
+          {{#each futureGymBookings}}
+            <div class="card mb-3">
+              <div class="card-body">
+                <h5 class="card-title">{{this.title}}</h5>
+                <p>{{formatDate this.dateTime}} {{formatTime this.dateTime}}</p>
+                <a href="/gymBuddy/details/{{this._id}}" class="btn btn-outline-primary">
+                  View Session
+                </a>
+              </div>
+            </div>
+          {{/each}}
+        {{else}}<p class="text-muted">No upcoming sessions.</p>{{/if}}
+      </div>
+      <div class="col-md-6">
+        <h4>Past Sessions</h4>
+        {{#if pastGymBookings.length}}
+          {{#each pastGymBookings}}
+            <div class="card mb-3">
+              <div class="card-body">
+                <h5 class="card-title">{{this.title}}</h5>
+                <p>{{formatDate this.dateTime}}</p>
+                <p class="text-muted">Session complete</p>
+              </div>
+            </div>
+          {{/each}}
+        {{else}}<p class="text-muted">No past sessions.</p>{{/if}}
+      </div>
+    </div>
+  </section>
+
+  {{!-- Esports Bookings (stub) --}}
+  <section class="mb-5">
+    <h3>🎮 Esports Bookings</h3>
+    <p class="text-muted">Coming soon!</p>
+  </section>
+
+  {{!-- Rate‐Players Modal (blank container) --}}
+  <div id="rateModal" class="modal" tabindex="-1">
+    <div class="modal-dialog">
+      <div class="modal-content p-4">
+        <h5>Rate Your Teammates</h5>
+        <form id="rateForm">
+          <div id="rateFields"></div>
+          <button type="submit" class="btn btn-primary mt-3">Submit Ratings</button>
+          <button type="button" class="btn btn-secondary mt-3" id="rateCancel">
+            Cancel
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast-container" class="position-fixed bottom-0 end-0 p-3"></div>
+</main>
+
+<script src="/js/bookings.js"></script>

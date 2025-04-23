@@ -1,6 +1,6 @@
 import Gym from "../models/Gym.js";
 import { ObjectId } from "mongodb";
-import { checkString } from "../utils/Helper.js";
+import { checkString } from "../utils/helper.js";
 import "../models/User.js"
 
 export const createGymSession = async (
@@ -107,4 +107,12 @@ export const deleteGymSession = async (sessionId) => {
 
 export const getAllGymSessions = async () => {
   return await Gym.find({}).populate("hostedBy", "username");
+};
+
+
+// NEW: get all gym sessions where this user is a member
+export const getJoinedSessionsByUser = async (userId) => {
+  if (!ObjectId.isValid(userId)) throw "Invalid user ID";
+  // Assumes your Gym schema has a `members: [ObjectId]` field
+  return await Gym.find({ members: userId }).populate("hostedBy", "username");
 };

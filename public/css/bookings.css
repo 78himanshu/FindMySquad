@@ -1,0 +1,17 @@
+/* public/css/bookings.css */
+.card { border-radius: .5rem; }
+.booking-section h4 { margin-top: 1rem; }
+.modal {
+  display: none; position: fixed; top:0; left:0; width:100%; height:100%;
+  background: rgba(0,0,0,0.5);
+  align-items: center; justify-content: center;
+}
+.modal .modal-dialog { max-width: 500px; margin: auto; }
+.toast { 
+  background: #333; color: #fff; padding: .75rem 1rem; border-radius: .25rem;
+  margin-top: .5rem; display: flex; justify-content: space-between;
+}
+.toast--success { background: #28a745; }
+.toast--error   { background: #dc3545; }
+.toast.show { animation: fadein .3s; }
+@keyframes fadein { from { opacity:0 } to { opacity:1 } }
