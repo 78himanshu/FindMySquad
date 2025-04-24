@@ -185,6 +185,39 @@ document.addEventListener("DOMContentLoaded", () => {
       document.querySelectorAll(".form-text.text-danger").forEach(el => (el.textContent = ""));
     }
   });
+
+
+  const followBtn = document.getElementById('followBtn');
+  if (followBtn) {
+    followBtn.addEventListener('click', async () => {
+      const targetId    = followBtn.dataset.userId;
+      const isFollowing = followBtn.dataset.following === 'true';
+      const action      = isFollowing ? 'unfollow' : 'follow';
+
+      try {
+        const res  = await fetch(`/profile/${action}/${targetId}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include'
+        });
+        const json = await res.json();
+        if (!res.ok) throw new Error(json.error || 'Failed to update follow status');
+
+        // Toggle UI
+        followBtn.dataset.following = (!isFollowing).toString();
+        followBtn.textContent       = isFollowing ? 'Follow' : 'Following';
+        followBtn.classList.toggle('btn-primary');
+        followBtn.classList.toggle('btn-outline-primary');
+
+        // Update follower count
+        const countEl = document.getElementById('followersCount');
+        if (countEl) countEl.textContent = json.followersCount;
+      } catch (err) {
+        alert(err.message);
+      }
+    });
+  }
+
   
   // Reuse your existing toast helper from auth.js:
   function showToast(message, type = "info", duration = 5000) {
@@ -207,3 +240,4 @@ document.addEventListener("DOMContentLoaded", () => {
     };
   }
   
+

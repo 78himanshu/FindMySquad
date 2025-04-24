@@ -14,6 +14,8 @@ import gymBuddyRoutes from './routes/gymBuddyRoutes.js';
 import configRoutesFunction from "./routes/index.js";
 import "./utils/handlebarsHelper.js";
 
+import userProfileRoutes from './routes/userProfileRoutes.js';
+
 // Fix __dirname issue in ES Modules
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -26,14 +28,6 @@ const app = express();
 // Connect to MongoDB
 connectDB();
 
-// // Handlebars configuration
-// const hbs = exphbs.create({
-//   defaultLayout: false,
-//   extname: ".handlebars",
-//   helpers: {
-//     // Add any custom helpers here if needed
-//   },
-// });
 
 
 // Handlebars setup with eq helper
@@ -120,6 +114,7 @@ app.use((req, res, next) => {
 // Routes
 configRoutesFunction(app);
 app.use('/gymBuddy', gymBuddyRoutes);
+app.use('/profile', userProfileRoutes); 
 
 // 404 Handler (must come after routes but before error handler)
 app.use((req, res, next) => {

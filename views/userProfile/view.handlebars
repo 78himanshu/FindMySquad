@@ -9,6 +9,22 @@
           <small class="text-muted d-block">{{email}}</small>
           <small class="text-muted">{{gender}}</small>
         </div>
+
+        {{!-- NEW: Follow/Unfollow Button (only when viewing someone else) --}}
+          {{#unless isOwn}}{{!-- NEW --}}
+            <button
+              id="followBtn"
+              data-user-id="{{userId}}"
+              data-following="{{isFollowing}}"
+              class="btn {{#if isFollowing}}btn-primary{{else}}btn-outline-primary{{/if}} mb-3"
+            >
+              {{#if isFollowing}}Following{{else}}Follow{{/if}}
+            </button>
+          {{/unless}}{{!-- NEW --}}
+        </div>
+
+
+
         <ul class="list-group list-group-flush">
           <li class="list-group-item bg-success text-white fw-semibold nav-btn" data-target="overview">
             <i class="bi bi-bookmark-fill me-2"></i> Overview
@@ -115,6 +131,40 @@
         this.classList.add('bg-success', 'text-white');
       });
     });
+
+
+    const followBtn = document.getElementById('followBtn');
+    if (followBtn) {
+      followBtn.addEventListener('click', async () => {
+        const targetId    = followBtn.dataset.userId;
+        const isFollowing = followBtn.dataset.following === 'true';
+        const action      = isFollowing ? 'unfollow' : 'follow';
+
+        try {
+          const res  = await fetch(`/profile/${action}/${targetId}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'include'
+          });
+          const json = await res.json();
+          if (!res.ok) throw new Error(json.error || 'Failed to update follow status');
+
+          // Toggle UI
+          followBtn.dataset.following = (!isFollowing).toString();
+          followBtn.textContent       = isFollowing ? 'Follow' : 'Following';
+          followBtn.classList.toggle('btn-primary');
+          followBtn.classList.toggle('btn-outline-primary');
+
+          // Update follower count
+          document.getElementById('followersCount').textContent = json.followersCount;
+        } catch (err) {
+          alert(err.message);
+        }
+      });
+    }
+
+
+
   });
 </script>
 

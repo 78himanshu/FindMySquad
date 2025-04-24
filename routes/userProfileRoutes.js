@@ -119,9 +119,11 @@ router.route("/view").get(verifyToken, async (req, res) => {
       email: profile.userId.email,
       userId: profile.userId._id,
       bio: profile.profile.bio,
+      // gender: profile.profile.gender,
       sportsInterests: profile.sportsInterests,
       username: profile.userId.username,
       karmaPoints: profile.karmaPoints,
+      //achievements: profile.achievements,
       gymPreferences: profile.gymPreferences,
       gamingInterests: profile.gamingInterests,
       Followers: profile.Followers,
@@ -282,6 +284,85 @@ router.post('/bookings/rate', verifyToken, async (req, res) => {
 
 
 
+// -----------------------------------------
+// Follow / Unfollow APIs
+// -----------------------------------------
+router.post(
+  '/follow/:targetUserId',
+  verifyToken,
+  async (req, res) => {
+    try {
+      const count = await userProfileData.followUser(
+        req.userId,
+        req.params.targetUserId
+      );
+      return res.json({ followersCount: count });
+    } catch (e) {
+      return res.status(400).json({ error: e.toString() });
+    }
+  }
+);
+
+router.post(
+  '/unfollow/:targetUserId',
+  verifyToken,
+  async (req, res) => {
+    try {
+      const count = await userProfileData.unfollowUser(
+        req.userId,
+        req.params.targetUserId
+      );
+      return res.json({ followersCount: count });
+    } catch (e) {
+      return res.status(400).json({ error: e.toString() });
+    }
+  }
+);
+
+// -----------------------------------------
+// View Any User’s Profile (HTML)
+// -----------------------------------------
+router.get(
+  '/:targetUserId',
+  verifyToken,
+  async (req, res) => {
+    try {
+      const profile      = await userProfileData.getProfile(req.params.targetUserId);
+      const isOwn        = req.params.targetUserId === req.userId;
+      const isFollowing  = profile.followers
+        .map(f => f.toString())
+        .includes(req.userId);
+
+        console.log(">>>",isOwn,isFollowing);
+
+      return res.render('userProfile/view', {
+        title: `${profile.profile.firstName} ${profile.profile.lastName}`,
+        layout: 'main',
+        firstName:    profile.profile.firstName,
+        lastName:     profile.profile.lastName,
+        email:        profile.userId.email,
+        username:     profile.userId.username,
+        userId:       profile.userId._id,
+        bio:          profile.profile.bio,
+        //gender:       profile.profile.gender,
+        avatar:       profile.profile.avatar || '/images/default-avatar.png',
+        sportsInterests: profile.sportsInterests,
+        gymPreferences:   profile.gymPreferences,
+        gamingInterests:  profile.gamingInterests,
+        location:         profile.location,
+        karmaPoints:      profile.karmaPoints,
+        //achievements:     profile.achievements,
+        followers:        profile.followers,
+        following:        profile.following,
+        isOwn,
+        isFollowing,
+        head: `<link rel="stylesheet" href="/css/userProfile.css">`
+      });
+    } catch (e) {
+      return res.status(404).render('error', { error: e.toString() });
+    }
+  }
+);
 
 export default router;
 

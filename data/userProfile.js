@@ -61,3 +61,71 @@ export const ratePlayers = async (raterId, bookingId, ratingsArray) => {
     await profile.save();
   }
 };
+
+
+/**
+ * Have userId follow targetUserId.
+ * Updates both profiles’ followers / following lists.
+ * Returns the new followers count of the target profile.
+ */
+export const followUser = async (userId, targetUserId) => {
+  if (!ObjectId.isValid(userId) || !ObjectId.isValid(targetUserId)) {
+    throw 'Invalid user ID';
+  }
+  if (userId === targetUserId) {
+    throw 'Cannot follow yourself';
+  }
+
+  const followerProfile = await UserProfile.findOne({ userId: ObjectId(userId) });
+  const targetProfile   = await UserProfile.findOne({ userId: ObjectId(targetUserId) });
+  if (!followerProfile || !targetProfile) {
+    throw 'Profile not found';
+  }
+
+  // Already following?
+  if (targetProfile.followers.some(f => f.toString() === userId)) {
+    throw 'Already following';
+  }
+
+  targetProfile.followers.push(ObjectId(userId));
+  followerProfile.following.push({ userId: ObjectId(targetUserId) });
+
+  await targetProfile.save();
+  await followerProfile.save();
+
+  return targetProfile.followers.length;
+};
+
+/**
+ * Have userId unfollow targetUserId.
+ * Returns the new followers count of the target profile.
+ */
+export const unfollowUser = async (userId, targetUserId) => {
+  if (!ObjectId.isValid(userId) || !ObjectId.isValid(targetUserId)) {
+    throw 'Invalid user ID';
+  }
+  if (userId === targetUserId) {
+    throw 'Cannot unfollow yourself';
+  }
+
+  const followerProfile = await UserProfile.findOne({ userId: ObjectId(userId) });
+  const targetProfile   = await UserProfile.findOne({ userId: ObjectId(targetUserId) });
+  if (!followerProfile || !targetProfile) {
+    throw 'Profile not found';
+  }
+
+  // Not following?
+  if (!targetProfile.followers.some(f => f.toString() === userId)) {
+    throw 'Not following';
+  }
+
+  targetProfile.followers = targetProfile.followers.filter(f => f.toString() !== userId);
+  followerProfile.following = followerProfile.following.filter(
+    f => f.userId.toString() !== targetUserId
+  );
+
+  await targetProfile.save();
+  await followerProfile.save();
+
+  return targetProfile.followers.length;
+};
