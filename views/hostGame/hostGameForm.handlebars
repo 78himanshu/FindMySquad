@@ -1,116 +1,56 @@
-<div class="container py-4">
-  <h2 class="mb-4 fw-bold">Host a Game</h2>
+<div class="host-game-container">
+  <h1>Host Game</h1>
+  <form action="/host" method="POST" class="host-game-form">
+    <input type="text" name="title" placeholder="Title" />
 
-  <!-- Toast Container -->
+    <select name="sport" id="sportSelect">
+      <option value="">Select Sport</option>
+      <option value="Football">Football</option>
+      <option value="Basketball">Basketball</option>
+      <option value="Volleyball">Volleyball</option>
+      <option value="Tennis">Tennis</option>
+      <option value="Badminton">Badminton</option>
+      <option value="Cricket">Cricket</option>
+      <option value="Table Tennis">Table Tennis</option>
+      <option value="Baseball">Baseball</option>
+      <option value="Hockey">Hockey</option>
+      <option value="Other">Other</option>
+    </select>
+
+    <input type="text" name="customSport" id="customSport" placeholder="Name your sport" style="display: none;" />
+
+    <input type="text" name="venue" placeholder="Venue" />
 
 
-  <form id="hostGameForm" class="card p-4 shadow-sm">
-    <div class="row g-3">
-      <div class="col-md-6">
-        <label for="title" class="form-label">Game Title</label>
-        <input type="text" id="title" name="title" class="form-control" placeholder="Enter title" />
-      </div>
+    <input type="date" name="gameDate" />
+    <div class="form-row">
+      <input type="time" name="startTime" placeholder="Start Time" />
+      <input type="time" name="endTime" placeholder="End Time" />
+    </div>
+    <input type="number" name="playersRequired" placeholder="Players" />
+    <input type="text" name="description" placeholder="Description" />
+    <input type="number" name="costPerHead" placeholder="Cost per Head" />
 
-      <div class="col-md-6">
-        <label for="sportSelect" class="form-label">Sport</label>
-        <select name="sport" id="sportSelect" class="form-select">
-          <option value="">Select Sport</option>
-          <option value="Football">Football</option>
-          <option value="Basketball">Basketball</option>
-          <option value="Volleyball">Volleyball</option>
-          <option value="Tennis">Tennis</option>
-          <option value="Badminton">Badminton</option>
-          <option value="Cricket">Cricket</option>
-          <option value="Table Tennis">Table Tennis</option>
-          <option value="Baseball">Baseball</option>
-          <option value="Hockey">Hockey</option>
-          <option value="Other">Other</option>
-        </select>
-        <input type="text" name="customSport" id="customSport" class="form-control mt-2 d-none"
-          placeholder="Name your sport" />
-      </div>
+    <select name="skillLevel">
+      <option value="">Select Skill Level</option>
+      <option value="Beginner">Beginner</option>
+      <option value="Intermediate">Intermediate</option>
+      <option value="Advanced">Advanced</option>
+    </select>
 
-      <div class="col-md-6">
-        <label for="venue" class="form-label">Venue</label>
-        <input type="text" name="venue" id="venue" class="form-control" placeholder="Enter venue" />
-      </div>
+    <input type="text" name="location" placeholder="City" />
 
-      <div class="col-md-6">
-        <label for="gameDate" class="form-label">Date</label>
-        <input type="date" name="gameDate" id="gameDate" class="form-control" />
-      </div>
-
-      <div class="col-md-6">
-        <label for="startTime" class="form-label">Start Time</label>
-        <input type="time" name="startTime" id="startTime" class="form-control" />
-      </div>
-
-      <div class="col-md-6">
-        <label for="endTime" class="form-label">End Time</label>
-        <input type="time" name="endTime" id="endTime" class="form-control" />
-      </div>
-
-      <div class="col-md-6">
-        <label for="playersRequired" class="form-label">Players Required</label>
-        <input type="number" name="playersRequired" id="playersRequired" class="form-control" min="1"
-          placeholder="e.g., 10" />
-      </div>
-
-      <div class="col-md-6">
-        <label for="costPerHead" class="form-label">Cost per Head ($)</label>
-        <input type="number" name="costPerHead" id="costPerHead" class="form-control" min="0" placeholder="Optional" />
-      </div>
-
-      <div class="col-md-6">
-        <label for="skillLevel" class="form-label">Skill Level</label>
-        <select name="skillLevel" id="skillLevel" class="form-select">
-          <option value="">Select Skill Level</option>
-          <option value="Beginner">Beginner</option>
-          <option value="Intermediate">Intermediate</option>
-          <option value="Advanced">Advanced</option>
-        </select>
-      </div>
-
-      <div class="col-md-6">
-        <label for="location" class="form-label">City</label>
-        <input type="text" name="location" id="location" class="form-control" placeholder="e.g., New York" />
-      </div>
-
-      <div class="col-12">
-        <label for="description" class="form-label">Short Description</label>
-        <input type="text" name="description" id="description" class="form-control"
-          placeholder="e.g., Casual Sunday match" />
-      </div>
-
-      <div class="col-12">
-        <label for="extraInfo" class="form-label">Extra Info</label>
-        <textarea name="extraInfo" id="extraInfo" class="form-control" rows="3"
-          placeholder="Tell players about the format, rules, gear, etc."></textarea>
-      </div>
-
-      <div class="col-12">
-        <div class="form-check form-check-inline">
-          <input class="form-check-input" type="checkbox" id="bringEquipment" name="bringEquipment" />
-          <label class="form-check-label" for="bringEquipment">Bring your own equipment</label>
-        </div>
-
-        <div class="form-check form-check-inline">
-          <input class="form-check-input" type="checkbox" id="costShared" name="costShared" />
-          <label class="form-check-label" for="costShared">Cost shared</label>
-        </div>
-      </div>
-
-      <input type="hidden" name="host" value="{{hostId}}" />
+    <div class="form-checks">
+      <label><input type="checkbox" name="bringEquipment" /> Bring your own equipment</label>
+      <label><input type="checkbox" name="costShared" /> Cost shared</label>
     </div>
 
-    <div class="d-grid mt-4">
-      <button type="submit" class="btn btn-primary btn-lg">🚀 Host Game</button>
-    </div>
+    <textarea name="extraInfo" placeholder="Use this space to tell about the format and other details"></textarea>
+
+    <input type="hidden" name="host" value="{{hostId}}" />
+
+    <button type="submit" class="submit-btn">Host Game</button>
   </form>
-
-
-  <div id="toast-container" class="position-fixed bottom-0 end-0 p-3"></div>
 </div>
-
 
 <script src="/js/hostGame.js"></script>
