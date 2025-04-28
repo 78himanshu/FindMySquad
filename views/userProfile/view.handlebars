@@ -21,7 +21,7 @@
               {{#if isFollowing}}Following{{else}}Follow{{/if}}
             </button>
           {{/unless}}{{!-- NEW --}}
-        </div>
+        
 
 
 
@@ -98,12 +98,17 @@
             {{> editProfileForm }}
           </div>
 
+          <!-- Section: Bookings -->
+          {{!-- <div id="section-bookings" class="d-none">
+            <h4 class="fw-semibold mb-3">Your Bookings</h4>
+            {{> bookingList }}
+          </div> --}}
+
         </div>
       </div>
     </div>
   </div>
 </div>
-
 <script>
   document.addEventListener('DOMContentLoaded', () => {
     const navButtons = document.querySelectorAll('.nav-btn');
