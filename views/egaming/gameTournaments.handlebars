@@ -1,0 +1,43 @@
+<link rel="stylesheet" href="/css/gameTournaments.css">
+<main class="container-fluid p-0">
+  <!-- Game Banner -->
+  <div class="game-banner" style="background: url('{{backgroundImage}}') center center / cover no-repeat;">
+    <div class="banner-overlay"></div>
+    <div class="banner-text">
+      <h1>{{gameName}}</h1>
+    </div>
+  </div>
+
+  <div class="container py-5">
+    <h2 class="text-center mb-5 fw-bold">Upcoming Tournaments</h2>
+
+    {{#if tournaments.length}}
+      <div class="d-flex flex-column gap-4">
+        {{#each tournaments}}
+        <div class="tournament-card bg-dark text-light p-4 rounded shadow">
+          <div class="d-flex flex-column flex-md-row align-items-center justify-content-between">
+
+            <div>
+              <h4 class="fw-bold mb-3">{{this.format}}</h4>
+              <p class="mb-1"><strong>Date:</strong> {{formatDate this.date}}</p>
+              <p class="mb-1"><strong>Skill Level:</strong> {{this.skillLevel}}</p>
+              <p class="mb-1"><strong>Prize Pool:</strong> ${{this.prizePool.total}}</p>
+              <p class="mb-1"><strong>Created By:</strong> {{this.creator.username}}</p>
+              <p class="mb-1"><strong>Team Size:</strong> {{this.format}}</p>
+            </div>
+
+            <div class="text-center mt-3 mt-md-0">
+              <a href="/esports/{{this._id}}/register-team" class="btn btn-success">Enroll</a>
+            </div>
+
+          </div>
+        </div>
+        {{/each}}
+      </div>
+    {{else}}
+      <div class="text-center py-5">
+        <h4 class="fw-bold text-muted">No tournaments available for this game yet.</h4>
+      </div>
+    {{/if}}
+  </div>
+</main>

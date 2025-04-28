@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Esports - FindMySquad</title>
+  <link rel="stylesheet" href="/css/styles.css">
+  <link rel="stylesheet" href="/css/bootstrap-lite.css">
+  <style>
+    .game-card {
+      border-radius: 12px;
+      overflow: hidden;
+      position: relative;
+      height: 300px;
+      background-size: cover;
+      background-position: center;
+      transition: transform 0.3s ease;
+    }
+
+    .game-card:hover {
+      transform: scale(1.03);
+    }
+
+    .game-overlay {
+      position: absolute;
+      bottom: 0;
+      width: 100%;
+      padding: 1rem;
+      background: rgba(0, 0, 0, 0.7);
+      color: white;
+      font-weight: bold;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+
+  <nav class="navbar bg-light px-4">
+    <div class="container-fluid d-flex align-items-center justify-content-between flex-wrap">
+      <a class="navbar-brand fw-bold" href="/">FindMySquad</a>
+
+      <div class="d-flex align-items-center gap-3">
+        <div class="d-flex gap-2">
+            <!-- Dropdown menu for Tournaments -->
+          <div class="dropdown">
+            <button class="btn btn-outline-primary dropdown-toggle" type="button" id="tournamentDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+              Tournaments
+            </button>
+            <ul class="dropdown-menu" aria-labelledby="tournamentDropdown">
+              <li><a class="dropdown-item" href="/tournaments/create">Create Your Own Tournament</a></li>
+            </ul>
+          </div>
+        </div>
+          <a href="/join"><button class="btn btn-outline-primary">Join</button></a>
+          <a href="/host"><button class="btn btn-outline-primary">Host</button></a>
+          <a href="/esports"><button class="btn btn-outline-primary">Esports</button></a>
+          <a href="/gymBuddy"><button class="btn btn-outline-primary">GymBuddy</button></a>
+
+        <div class="d-flex gap-2">
+          {{#if isLoggedIn}}
+          <a href="/profile/view" class="d-flex align-items-center gap-2 text-decoration-none text-dark">
+            <img src="{{profilePic}}" alt="profile" class="rounded-circle" width="40" height="40">
+            <span class="fw-semibold">{{username}}</span>
+          </a>
+          <button class="btn btn-outline-danger" onclick="window.location='/logout'">Logout</button>
+          {{else}}
+          <button class="btn btn-outline-primary" onclick="window.location='/login'">Login</button>
+          <button class="btn btn-primary" onclick="window.location='/signup'">Signup</button>
+          {{/if}}
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <main class="container py-5">
+    <h1 class="text-center mb-4">Esports Games</h1>
+
+    <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4">
+      {{#each games}}
+      <div class="col">
+        <a href="/esports/{{encodeURI this.title}}" class="text-decoration-none text-light">
+          <div class="game-card" style="background-image: url('{{this.image}}');">
+            <div class="game-overlay">
+              <small class="text-muted d-block">{{this.platform}}</small>
+              {{this.title}}
+            </div>
+          </div>
+        </a>
+      </div>
+      {{/each}}
+    </div>
+  </main>
+
+  <script src="/js/bootstrap.bundle.min.js"></script>
+  <script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const toggles = document.querySelectorAll('.dropdown-toggle');
+    toggles.forEach(function (toggle) {
+      toggle.addEventListener('click', function (e) {
+        e.preventDefault();
+        const menu = this.nextElementSibling;
+        menu.classList.toggle('show');
+      });
+    });
+  });
+</script>
+
+</body>
+</html>

@@ -1,0 +1,95 @@
+<main class="container py-5">
+  <h2 class="mb-4">Create Your Own Tournament</h2>
+
+  <form action="/tournaments/create" method="POST">
+    <!-- Game Selection -->
+    <div class="mb-3">
+      <label class="form-label">Game</label>
+      <select name="game" class="form-control" required>
+        {{#each games}}
+        <option value="{{this}}">{{this}}</option>
+        {{/each}}
+      </select>
+    </div>
+
+    <!-- Format Dropdown -->
+    <div class="mb-3">
+    <label class="form-label">Format</label>
+      <select name="format" class="form-control" required>
+        <option disabled selected>Select Format</option>
+        <option value="1v1">1v1</option>
+        <option value="2v2">2v2</option>
+        <option value="3v3">3v3</option>
+        <option value="4v4">4v4</option>
+        <option value="5v5">5v5</option>
+      </select>
+    </div>
+
+
+    <!-- Date and Time -->
+    <div class="row">
+      <div class="col-md-6 mb-3">
+        <label class="form-label">Date</label>
+        <input type="date" name="date" class="form-control" required>
+      </div>
+      <div class="col-md-6 mb-3">
+        <label class="form-label">Time</label>
+        <input type="time" name="time" class="form-control" required>
+      </div>
+    </div>
+
+    <!-- Skill Level -->
+    <div class="mb-3">
+      <label class="form-label">Skill Level</label>
+      <select name="skillLevel" class="form-control" required>
+        <option disabled selected>Choose a level</option>
+        <option>Novice 1</option>
+        <option>Novice 2</option>
+        <option>Novice 3</option>
+        <option>Amateur 1</option>
+        <option>Amateur 2</option>
+        <option>Amateur 3</option>
+        <option>Expert 1</option>
+        <option>Expert 2</option>
+        <option>Expert 3</option>
+      </select>
+    </div>
+
+    <!-- Max Teams -->
+    <div class="mb-3">
+      <label class="form-label">Max Teams (1–100)</label>
+      <input type="number" name="maxTeams" class="form-control" min="1" max="100" required>
+    </div>
+
+    <!-- Description -->
+    <div class="mb-3">
+      <label class="form-label">Description (optional)</label>
+      <textarea name="description" class="form-control" rows="3"></textarea>
+    </div>
+
+    <!-- Prize Pool -->
+    <h5 class="mt-4">Prize Pool Breakdown</h5>
+
+    <div class="row">
+      <div class="col-md-3 mb-3">
+        <label class="form-label">1st Place</label>
+        <input type="number" name="first" class="form-control" required>
+      </div>
+      <div class="col-md-3 mb-3">
+        <label class="form-label">2nd Place</label>
+        <input type="number" name="second" class="form-control" required>
+      </div>
+      <div class="col-md-3 mb-3">
+        <label class="form-label">3rd Place</label>
+        <input type="number" name="third" class="form-control" required>
+      </div>
+      <div class="col-md-3 mb-3">
+        <label class="form-label">Total Prize Pool</label>
+        <input type="number" name="total" class="form-control" required>
+      </div>
+    </div>
+
+    <!-- Submit -->
+    <button type="submit" class="btn btn-primary mt-3">Create Tournament</button>
+  </form>
+</main>

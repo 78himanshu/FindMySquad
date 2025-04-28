@@ -10,9 +10,10 @@ import fs from "fs";
 import cookieParser from "cookie-parser";
 import jwt from "jsonwebtoken";
 import gymBuddyRoutes from './routes/gymBuddyRoutes.js';
-
+import tournamentRoutes from './routes/tournamentRoutes.js';
 import configRoutesFunction from "./routes/index.js";
 import "./utils/handlebarsHelper.js";
+import { allowInsecurePrototypeAccess } from '@handlebars/allow-prototype-access';
 
 // Fix __dirname issue in ES Modules
 const __filename = fileURLToPath(import.meta.url);
@@ -40,9 +41,13 @@ connectDB();
 const hbs = exphbs.create({
   defaultLayout: false,
   extname: ".handlebars",
+  runtimeOptions: {
+    allowProtoPropertiesByDefault: true,
+    allowProtoMethodsByDefault: true,
+  },
   helpers: {
     eq: (a, b) => a === b,
-    json: (context) => JSON.stringify(context),
+    json: (context) => JSON.stringify(context, null, 2),
     formatDate: (datetime) => {
       if (!datetime) return "";
       return new Date(datetime).toLocaleDateString("en-US", {
@@ -59,18 +64,12 @@ const hbs = exphbs.create({
         minute: "2-digit",
       });
     },
-    json: (context) => {
-      return JSON.stringify(context, null, 2);
-    },
+    encodeURI: (str) => {
+      return encodeURIComponent(str);
+    }
   },
-});
-
+})
 // hbs.registerPartials(path.join(__dirname, 'views/partials'));
-
-
-
-
-
 
 app.engine("handlebars", hbs.engine);
 app.set("view engine", "handlebars");
@@ -101,7 +100,7 @@ app.use((req, res, next) => {
         return next();
       }
 
-      req.user = decoded; // ✅ this line is the key
+      req.user = decoded; //  this line is the key
       res.locals.isLoggedIn = true;
       res.locals.username = decoded.username;
       req.user = decoded;
