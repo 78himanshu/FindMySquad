@@ -1,73 +1,3 @@
-// import express from 'express';
-// import { Router } from 'express';
-// import { userProfileData } from '../data/index.js';
-// import verifyToken from '../middleware/auth.js';
-
-// const router = Router();
-
-// // API Routes - For frontend AJAX or Postman use
-
-// router
-//   .route('/')
-//   .get(verifyToken, async (req, res) => {
-//     try {
-//       const profile = await userProfileData.getProfile(req.user.userID);
-//       res.status(200).json(profile);
-//     } catch (e) {
-//       res.status(404).json({ error: e.toString() });
-//     }
-//   })
-//   .post(verifyToken, async (req, res) => {
-//     try {
-//       // Use req.user.userID here because the auth middleware sets it
-//       const profile = await userProfileData.createProfile(req.user.userID, req.body);
-//       res.status(201).json(profile);
-//     } catch (e) {
-//       res.status(400).json({ error: e.toString() });
-//     }
-//   })
-//   .put(verifyToken, async (req, res) => {
-//     try {
-//       const updated = await userProfileData.updateProfile(req.user.userID, req.body);
-//       res.status(200).json(updated);
-//     } catch (e) {
-//       res.status(400).json({ error: e.toString() });
-//     }
-//   })
-//   .delete(verifyToken, async (req, res) => {
-//     try {
-//       await userProfileData.deleteProfile(req.user.userID);
-//       res.status(200).json({ message: 'Profile deleted successfully' });
-//     } catch (e) {
-//       res.status(400).json({ error: e.toString() });
-//     }
-//   });
-
-// // View Route - To Render UserProfile Frontend Page
-
-// router
-//   .route('/view')
-//   .get(verifyToken, async (req, res) => {
-//     try {
-//       const profile = await userProfileData.getProfile(req.user.userID);
-//       res.render('userProfile/view', {
-//         title: "Your Profile",
-//         firstName: profile.profile.firstName,
-//         lastName: profile.profile.lastName,
-//         email: profile.profile.email,
-//         userId: profile.userId,
-//         avatar: profile.profile.avatar || "/images/default-avatar.png",
-//         head: `
-//           <link rel="stylesheet" href="/css/userProfile.css">
-//         `
-//       });
-//     } catch (e) {
-//       res.status(404).render('error', { error: e.toString() });  // <-- this is correct now
-//     }
-//   });
-
-// export default router;
-
 import express from "express";
 import { Router } from "express";
 import { userProfileData } from "../data/index.js";
@@ -189,9 +119,11 @@ router.route("/view").get(verifyToken, async (req, res) => {
       email: profile.userId.email,
       userId: profile.userId._id,
       bio: profile.profile.bio,
+      // gender: profile.profile.gender,
       sportsInterests: profile.sportsInterests,
       username: profile.userId.username,
       karmaPoints: profile.karmaPoints,
+      //achievements: profile.achievements,
       gymPreferences: profile.gymPreferences,
       gamingInterests: profile.gamingInterests,
       Followers: profile.Followers,
@@ -297,7 +229,187 @@ router.route("/addprofile").get(verifyToken, async (req, res) => {
   });
 });
 
+
+
+// ————— Show All Bookings Page ——————
+router.get('/bookings', verifyToken, async (req, res) => {
+  const userId = req.userId;
+  const now = new Date();
+
+  const allGameBookings = [];
+  const pastGameBookings = [];
+  const futureGameBookings = [];
+
+
+
+  const allGymBookings = [];
+  const pastGymBookings = [];
+  const futureGymBookings = [];
+
+  // 1) Game bookings
+  // const allGameBookings = await joinGameData.getJoinedGamesByUser(userId);
+  // const pastGameBookings   = allGameBookings.filter(g => g.startTime < now);
+  // const futureGameBookings = allGameBookings.filter(g => g.startTime >= now);
+
+  // // 2) Gym bookings
+  // const allGymBookings = await gymBuddyData.getJoinedSessionsByUser(userId);
+  // const pastGymBookings   = allGymBookings.filter(s => s.dateTime < now);
+  // const futureGymBookings = allGymBookings.filter(s => s.dateTime >= now);
+
+  // // 3) Esports bookings (stub for now)
+  const pastEsportsBookings   = [];
+  const futureEsportsBookings = [];
+
+  return res.render('userProfile/bookings', {
+    title: 'Your Bookings',
+    pastGameBookings, futureGameBookings,
+    pastGymBookings,   futureGymBookings,
+    pastEsportsBookings, futureEsportsBookings,
+    head: `<link rel="stylesheet" href="/css/bookings.css">`
+  });
+});
+
+// ————— Rate Players API ——————
+router.post('/bookings/rate', verifyToken, async (req, res) => {
+  const raterId  = req.userId;
+  const { bookingId, ratings } = req.body; 
+  // ratings: [{ userId, score },…]
+  try {
+    await userProfileData.ratePlayers(raterId, bookingId, ratings);
+    return res.json({ success: true });
+  } catch (e) {
+    return res.status(400).json({ error: e.toString() });
+  }
+});
+
+
+
+// -----------------------------------------
+// Follow / Unfollow APIs
+// -----------------------------------------
+router.post(
+  '/follow/:targetUserId',
+  verifyToken,
+  async (req, res) => {
+    try {
+      const count = await userProfileData.followUser(
+        req.userId,
+        req.params.targetUserId
+      );
+      return res.json({ followersCount: count });
+    } catch (e) {
+      return res.status(400).json({ error: e.toString() });
+    }
+  }
+);
+
+router.post(
+  '/unfollow/:targetUserId',
+  verifyToken,
+  async (req, res) => {
+    try {
+      const count = await userProfileData.unfollowUser(
+        req.userId,
+        req.params.targetUserId
+      );
+      return res.json({ followersCount: count });
+    } catch (e) {
+      return res.status(400).json({ error: e.toString() });
+    }
+  }
+);
+
+// -----------------------------------------
+// View Any User’s Profile (HTML)
+// -----------------------------------------
+router.get(
+  '/:targetUserId',
+  verifyToken,
+  async (req, res) => {
+    try {
+      const profile      = await userProfileData.getProfile(req.params.targetUserId);
+      const isOwn        = req.params.targetUserId === req.userId;
+      const isFollowing  = profile.followers
+        .map(f => f.toString())
+        .includes(req.userId);
+
+        console.log(">>>",isOwn,isFollowing);
+
+      return res.render('userProfile/view', {
+        title: `${profile.profile.firstName} ${profile.profile.lastName}`,
+        layout: 'main',
+        firstName:    profile.profile.firstName,
+        lastName:     profile.profile.lastName,
+        email:        profile.userId.email,
+        username:     profile.userId.username,
+        userId:       profile.userId._id,
+        bio:          profile.profile.bio,
+        //gender:       profile.profile.gender,
+        avatar:       profile.profile.avatar || '/images/default-avatar.png',
+        sportsInterests: profile.sportsInterests,
+        gymPreferences:   profile.gymPreferences,
+        gamingInterests:  profile.gamingInterests,
+        location:         profile.location,
+        karmaPoints:      profile.karmaPoints,
+        //achievements:     profile.achievements,
+        followers:        profile.followers,
+        following:        profile.following,
+        isOwn,
+        isFollowing,
+        head: `<link rel="stylesheet" href="/css/userProfile.css">`
+      });
+    } catch (e) {
+      return res.status(404).render('error', { error: e.toString() });
+    }
+  }
+);
+
 export default router;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 // // ==========================================
 // // 1. FIX FOR PROFILE CREATION ENDPOINT

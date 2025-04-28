@@ -18,6 +18,8 @@ import Handlebars from "handlebars";
 import configRoutesFunction from "./routes/index.js";
 import "./utils/handlebarsHelper.js";
 
+import userProfileRoutes from './routes/userProfileRoutes.js';
+
 // Fix __dirname issue in ES Modules
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
