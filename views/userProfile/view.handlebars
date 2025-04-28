@@ -10,31 +10,41 @@
           <small class="text-muted">{{gender}}</small>
         </div>
 
-        {{!-- NEW: Follow/Unfollow Button (only when viewing someone else) --}}
-          {{#unless isOwn}}{{!-- NEW --}}
-            <button
-              id="followBtn"
-              data-user-id="{{userId}}"
-              data-following="{{isFollowing}}"
-              class="btn {{#if isFollowing}}btn-primary{{else}}btn-outline-primary{{/if}} mb-3"
-            >
-              {{#if isFollowing}}Following{{else}}Follow{{/if}}
-            </button>
-          {{/unless}}{{!-- NEW --}}
-        
+        {{!-- NEW: Follow/Unfollow Button (only when viewing someone else)
+          {{#unless isOwn}}
+            <form method="POST" action="/profile/{{#if isFollowing}}unfollow{{else}}follow{{/if}}/{{userId}}">
+              <button type="submit" class="btn {{#if isFollowing}}btn-secondary{{else}}btn-primary{{/if}}">
+                {{#if isFollowing}}Unfollow{{else}}Follow{{/if}}
+              </button>
+            </form>
+          {{/unless}}
+         --}}
 
+{{#if isOwn}}
+  <!-- Do not show Follow button if it’s your own profile -->
+{{else}}
+  <button id="followButton" data-user-id="{{userId}}">
+    {{#if isFollowing}}Following{{else}}Follow{{/if}}
+  </button>
+{{/if}}
 
 
         <ul class="list-group list-group-flush">
           <li class="list-group-item bg-success text-white fw-semibold nav-btn" data-target="overview">
             <i class="bi bi-bookmark-fill me-2"></i> Overview
           </li>
-          <li class="list-group-item nav-btn" data-target="edit">
-            <i class="bi bi-pencil me-2"></i> Edit Profile
-          </li>
-          <li class="list-group-item nav-btn" data-target="bookings">
-            <i class="bi bi-reply me-2"></i> Show All Bookings
-          </li>
+
+          {{#if isOwn}}
+          <ul class="list-group list-group-flush">
+            <li class="list-group-item nav-btn" data-target="edit">
+              <i class="bi bi-pencil me-2"></i> Edit Profile
+            </li>
+            <li class="list-group-item nav-btn" data-target="bookings">
+              <i class="bi bi-reply me-2"></i> Show All Bookings
+            </li>
+          </ul>
+          {{/if}}
+
         </ul>
       </div>
     </div>
@@ -99,79 +109,114 @@
           </div>
 
           <!-- Section: Bookings -->
-          {{!-- <div id="section-bookings" class="d-none">
+          <div id="section-bookings" class="d-none">
             <h4 class="fw-semibold mb-3">Your Bookings</h4>
-            {{> bookingList }}
-          </div> --}}
+
+            <p>🎾 <strong>Game Bookings</strong></p>
+            <p><strong>Future Games:</strong> No upcoming games.</p>
+            <p><strong>Past Games:</strong> No past games.</p>
+
+            <p>🐕‍🦺 <strong>Gym Bookings</strong></p>
+            <p><strong>Future Sessions:</strong> No upcoming sessions.</p>
+            <p><strong>Past Sessions:</strong> No past sessions.</p>
+
+            <p>🎮 <strong>Esports Bookings:</strong> Coming soon!</p>
+          </div>
+
 
         </div>
       </div>
     </div>
   </div>
 </div>
+
+
 <script>
-  document.addEventListener('DOMContentLoaded', () => {
-    const navButtons = document.querySelectorAll('.nav-btn');
-    const sections = ['overview', 'edit'];
+document.addEventListener('DOMContentLoaded', () => {
+  const navButtons = document.querySelectorAll('.nav-btn');
+  const sections = ['overview', 'edit'];
 
-    navButtons.forEach(btn => {
-      btn.addEventListener('click', function () {
-        const target = this.getAttribute('data-target');
+  navButtons.forEach(btn => {
+    btn.addEventListener('click', function () {
+      const target = this.getAttribute('data-target');
 
-        // If user clicked "Show All Bookings", redirect to /profile/bookings
-        if (target === 'bookings') {
-          return window.location.href = '/profile/bookings';
-        }
+      // ✅ Fix: Redirect immediately to /profile/bookings when clicked
+      if (target === 'bookings') {
+        window.location.href = '/profile/bookings';
+        return; // ⬅️ very important to exit early
+      }
 
-        // Otherwise toggle inline sections
-        sections.forEach(id => {
-          const el = document.getElementById(`section-${id}`);
-          if (el) el.classList.add('d-none');
-        });
-        const sectionEl = document.getElementById(`section-${target}`);
-        if (sectionEl) sectionEl.classList.remove('d-none');
-
-        // Sidebar highlight
-        navButtons.forEach(b => b.classList.remove('bg-success', 'text-white'));
-        this.classList.add('bg-success', 'text-white');
+      // Otherwise toggle internal sections
+      sections.forEach(id => {
+        const el = document.getElementById(`section-${id}`);
+        if (el) el.classList.add('d-none');
       });
+      const sectionEl = document.getElementById(`section-${target}`);
+      if (sectionEl) sectionEl.classList.remove('d-none');
+
+      // Sidebar highlight
+      navButtons.forEach(b => b.classList.remove('bg-success', 'text-white'));
+      this.classList.add('bg-success', 'text-white');
     });
-
-
-    const followBtn = document.getElementById('followBtn');
-    if (followBtn) {
-      followBtn.addEventListener('click', async () => {
-        const targetId    = followBtn.dataset.userId;
-        const isFollowing = followBtn.dataset.following === 'true';
-        const action      = isFollowing ? 'unfollow' : 'follow';
-
-        try {
-          const res  = await fetch(`/profile/${action}/${targetId}`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            credentials: 'include'
-          });
-          const json = await res.json();
-          if (!res.ok) throw new Error(json.error || 'Failed to update follow status');
-
-          // Toggle UI
-          followBtn.dataset.following = (!isFollowing).toString();
-          followBtn.textContent       = isFollowing ? 'Follow' : 'Following';
-          followBtn.classList.toggle('btn-primary');
-          followBtn.classList.toggle('btn-outline-primary');
-
-          // Update follower count
-          document.getElementById('followersCount').textContent = json.followersCount;
-        } catch (err) {
-          alert(err.message);
-        }
-      });
-    }
-
-
-
   });
+
+
+  const followButton = document.getElementById('followButton');
+  if (followButton) {
+    followButton.addEventListener('click', async () => {
+      const targetUserId = followButton.dataset.userId;
+      const isFollowing = followButton.innerText.trim() === 'Following';
+      const action = isFollowing ? 'unfollow' : 'follow';
+
+      try {
+        const res = await fetch(`/profile/${action}/${targetUserId}`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          credentials: 'include'
+        });
+
+        const result = await res.json();
+
+        if (res.ok) {
+          // ✅ Toggle Follow/Following
+          followButton.innerText = isFollowing ? 'Follow' : 'Following';
+          showToast(`${isFollowing ? 'Unfollowed' : 'Followed'} successfully! 🎉`, true);
+        } else {
+          // ❌ Handle server error like "Already following"
+          showToast(result.error || 'Something went wrong.', false);
+        }
+      } catch (err) {
+        showToast('Server error. Please try again.', false);
+      }
+    });
+  }
+});
+
+// Popup message (basic version)
+function showToast(message, isSuccess) {
+  const color = isSuccess ? 'green' : 'red';
+  const toast = document.createElement('div');
+  toast.textContent = message;
+  toast.style.position = 'fixed';
+  toast.style.top = '20px';
+  toast.style.right = '20px';
+  toast.style.background = color;
+  toast.style.color = 'white';
+  toast.style.padding = '10px 15px';
+  toast.style.borderRadius = '8px';
+  toast.style.zIndex = 9999;
+  toast.style.fontSize = '14px';
+  document.body.appendChild(toast);
+
+  setTimeout(() => {
+    toast.remove();
+  }, 2000);
+}
 </script>
+
+
 
 <script src="/js/userProfile.js"></script>
 

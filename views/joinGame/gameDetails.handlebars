@@ -12,24 +12,23 @@
     <p><strong>Description:</strong> {{game.description}}</p>
     <p><strong>Players:</strong> {{game.playersGoing}} / {{game.playersRequired}}</p>
 
-    {{#if game.host.username}}
-      <p><strong>Hosted By:</strong> 
-        <a href="/user/{{game.host._id}}" class="host-link">
-          {{game.host.username}}
-        </a>
-      </p>
-    {{/if}}
+<p><strong>Hosted By:</strong> 
+<a href="/profile/view/{{game.host._id}}" class="host-link">{{game.host.username}}</a>
+</p>
 
-    {{#if joinedPlayers.length}}
-      <p><strong>Players Joined:</strong></p>
-      <ul>
-        {{#each joinedPlayers}}
-          <li>
-            <a href="/user/{{this._id}}" class="host-link">{{this.username}}</a>
-          </li>
-        {{/each}}
-      </ul>
-    {{/if}}
+{{#if joinedPlayers.length}}
+  <p><strong>Players Joined:</strong></p>
+  <ul>
+    {{#each joinedPlayers}}
+      <li>
+<a href="/profile/view/{{this._id}}" class="player-link">{{this.username}}</a>
+      </li>
+    {{/each}}
+  </ul>
+{{/if}}
+
+
+
   </div>
 
   {{#if error}}

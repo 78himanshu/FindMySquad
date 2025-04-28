@@ -1,8 +1,10 @@
 import express from "express";
 import { Router } from "express";
-import { userProfileData } from "../data/index.js";
+import { userProfileData, joinGameData, gymBuddyData } from "../data/index.js";
 import verifyToken from "../middleware/auth.js";
 import { checkString } from "../utils/helper.js";
+import Userlist from "../models/User.js";
+import mongoose from "mongoose";
 
 const router = Router();
 
@@ -110,32 +112,34 @@ router
 router.route("/view").get(verifyToken, async (req, res) => {
   try {
     const profile = await userProfileData.getProfile(req.user.userID);
-    console.log("profile", profile);
+    const isOwn = true; // Important: mark as your own
+    const isFollowing = false; // You can't follow yourself
+
     res.render("userProfile/view", {
       title: "Your Profile",
       layout: "main",
       firstName: profile.profile.firstName,
       lastName: profile.profile.lastName,
       email: profile.userId.email,
+      username: profile.userId.username,
       userId: profile.userId._id,
       bio: profile.profile.bio,
-      // gender: profile.profile.gender,
+      avatar: profile.profile.avatar || "/images/default-avatar.png",
       sportsInterests: profile.sportsInterests,
-      username: profile.userId.username,
-      karmaPoints: profile.karmaPoints,
-      //achievements: profile.achievements,
       gymPreferences: profile.gymPreferences,
       gamingInterests: profile.gamingInterests,
-      Followers: profile.Followers,
-      Following: profile.Following,
-      avatar: profile.profile.avatar || "/images/default-avatar.png",
+      location: profile.location,
+      karmaPoints: profile.karmaPoints,
+      followers: profile.followers,
+      following: profile.following,
+      isOwn, // 👈 pass true
+      isFollowing, // 👈 pass false
       head: `<link rel="stylesheet" href="/css/userProfile.css">`,
     });
   } catch (e) {
     res.status(404).render("error", { error: e.toString() });
   }
 });
-
 // -----------------------------------------
 // Edit Profile Routes - Render Edit Form & Process Updates
 // -----------------------------------------
@@ -229,142 +233,188 @@ router.route("/addprofile").get(verifyToken, async (req, res) => {
   });
 });
 
-
-
 // ————— Show All Bookings Page ——————
-router.get('/bookings', verifyToken, async (req, res) => {
-  const userId = req.userId;
-  const now = new Date();
+// /profile/bookings route
+router.get("/bookings", verifyToken, async (req, res) => {
+  const userId = req.user.userID;
 
-  const allGameBookings = [];
-  const pastGameBookings = [];
-  const futureGameBookings = [];
+  try {
+    const allGameBookings = await joinGameData.getJoinedGamesByUser(userId);
+    const allGymBookings = await gymBuddyData.getJoinedSessionsByUser(userId);
 
+    const now = new Date();
 
+    const allGameBookingsEnriched = await Promise.all(
+      allGameBookings.map(async (game) => {
+        const enrichedPlayers = await Promise.all(
+          game.players.map(async (pid) => {
+            const user = await Userlist.findById(pid).select("username");
+            return {
+              userId: pid,
+              username: user ? user.username : "Unknown",
+            };
+          })
+        );
 
-  const allGymBookings = [];
-  const pastGymBookings = [];
-  const futureGymBookings = [];
+        return {
+          ...game.toObject(),
+          players: enrichedPlayers,
+        };
+      })
+    );
 
-  // 1) Game bookings
-  // const allGameBookings = await joinGameData.getJoinedGamesByUser(userId);
-  // const pastGameBookings   = allGameBookings.filter(g => g.startTime < now);
-  // const futureGameBookings = allGameBookings.filter(g => g.startTime >= now);
+    const pastGameBookings = allGameBookingsEnriched.filter(
+      (game) => new Date(game.startTime) < now
+    );
+    const futureGameBookings = allGameBookingsEnriched.filter(
+      (game) => new Date(game.startTime) >= now
+    );
 
-  // // 2) Gym bookings
-  // const allGymBookings = await gymBuddyData.getJoinedSessionsByUser(userId);
-  // const pastGymBookings   = allGymBookings.filter(s => s.dateTime < now);
-  // const futureGymBookings = allGymBookings.filter(s => s.dateTime >= now);
+    const pastGymBookings = allGymBookings.filter(
+      (session) => new Date(session.dateTime) < now
+    );
+    const futureGymBookings = allGymBookings.filter(
+      (session) => new Date(session.dateTime) >= now
+    );
 
-  // // 3) Esports bookings (stub for now)
-  const pastEsportsBookings   = [];
-  const futureEsportsBookings = [];
-
-  return res.render('userProfile/bookings', {
-    title: 'Your Bookings',
-    pastGameBookings, futureGameBookings,
-    pastGymBookings,   futureGymBookings,
-    pastEsportsBookings, futureEsportsBookings,
-    head: `<link rel="stylesheet" href="/css/bookings.css">`
-  });
+    res.render("userProfile/bookings", {
+      title: "Your Bookings",
+      pastGameBookings,
+      futureGameBookings,
+      pastGymBookings,
+      futureGymBookings,
+      pastEsportsBookings: [],
+      futureEsportsBookings: [],
+      head: `<link rel="stylesheet" href="/css/bookings.css">`,
+    });
+  } catch (err) {
+    res.status(500).render("error", { error: err.toString() });
+  }
 });
 
 // ————— Rate Players API ——————
-router.post('/bookings/rate', verifyToken, async (req, res) => {
-  const raterId  = req.userId;
-  const { bookingId, ratings } = req.body; 
-  // ratings: [{ userId, score },…]
+router.post("/bookings/rate", verifyToken, async (req, res) => {
+  const raterId = req.user.userID;
+  const { bookingId, ratings } = req.body;
+
   try {
-    await userProfileData.ratePlayers(raterId, bookingId, ratings);
+    if (!bookingId || !ratings || !Array.isArray(ratings)) {
+      return res.status(400).json({ error: "Missing bookingId or ratings" });
+    }
+
+    const processedRatings = ratings.map((r) => {
+      if (!mongoose.Types.ObjectId.isValid(r.userId)) {
+        throw new Error(`Invalid rated user ID: ${r.userId}`);
+      }
+
+      return {
+        bookingId: new mongoose.Types.ObjectId(bookingId),
+        ratedUserId: new mongoose.Types.ObjectId(r.userId),
+        ratingValue: r.score,
+      };
+    });
+
+    await userProfileData.ratePlayers(raterId, processedRatings);
     return res.json({ success: true });
+  } catch (e) {
+    console.error("Error saving ratings:", e);
+    return res.status(400).json({ error: e.message || e.toString() });
+  }
+});
+
+// ————— Show Rate Players Form ——————
+router.get("/bookings/rate/:bookingId", verifyToken, async (req, res) => {
+  const { bookingId } = req.params;
+  const userId = req.user.userID;
+
+  try {
+    const booking = await joinGameData.getBookingDetails(bookingId);
+
+    if (!booking) throw "Booking not found";
+
+    const teammates = booking.players
+      .filter((player) => player._id.toString() !== userId.toString())
+      .map((player) => ({
+        _id: player._id.toString(),
+        username: player.username,
+      }));
+
+    res.render("userProfile/ratePlayers", {
+      title: "Rate Your Teammates",
+      teammates,
+      bookingId,
+      head: `<link rel="stylesheet" href="/css/ratings.css">`,
+    });
+  } catch (e) {
+    return res.status(404).render("error", { error: e.toString() });
+  }
+});
+
+// -----------------------------------------
+// Follow / Unfollow APIs
+// -----------------------------------------
+router.get("/view/:targetUserId", verifyToken, async (req, res) => {
+  try {
+    const profile = await userProfileData.getProfile(req.params.targetUserId);
+    const isOwn = req.params.targetUserId === req.user.userID;
+    const isFollowing = profile.followers
+      .map((f) => f.toString())
+      .includes(req.user.userID);
+
+    res.render("userProfile/view", {
+      title: `${profile.profile.firstName} ${profile.profile.lastName}`,
+      layout: "main",
+      firstName: profile.profile.firstName,
+      lastName: profile.profile.lastName,
+      email: profile.userId.email,
+      username: profile.userId.username,
+      userId: profile.userId._id,
+      bio: profile.profile.bio,
+      avatar: profile.profile.avatar || "/images/default-avatar.png",
+      sportsInterests: profile.sportsInterests,
+      gymPreferences: profile.gymPreferences,
+      gamingInterests: profile.gamingInterests,
+      location: profile.location,
+      karmaPoints: profile.karmaPoints,
+      followers: profile.followers,
+      following: profile.following,
+      isOwn, // 👈 correctly detected
+      isFollowing, // 👈 correctly detected
+      head: `<link rel="stylesheet" href="/css/userProfile.css">`,
+    });
+  } catch (e) {
+    res.status(404).render("error", { error: e.toString() });
+  }
+});
+
+router.post("/follow/:targetUserId", verifyToken, async (req, res) => {
+  try {
+    const count = await userProfileData.followUser(
+      req.user.userID,
+      req.params.targetUserId
+    );
+    return res.json({ followersCount: count });
   } catch (e) {
     return res.status(400).json({ error: e.toString() });
   }
 });
 
-
-
-// -----------------------------------------
-// Follow / Unfollow APIs
-// -----------------------------------------
-router.post(
-  '/follow/:targetUserId',
-  verifyToken,
-  async (req, res) => {
-    try {
-      const count = await userProfileData.followUser(
-        req.userId,
-        req.params.targetUserId
-      );
-      return res.json({ followersCount: count });
-    } catch (e) {
-      return res.status(400).json({ error: e.toString() });
-    }
+router.post("/unfollow/:targetUserId", verifyToken, async (req, res) => {
+  try {
+    const count = await userProfileData.unfollowUser(
+      req.user.userID,
+      req.params.targetUserId
+    );
+    return res.json({ followersCount: count });
+  } catch (e) {
+    return res.status(400).json({ error: e.toString() });
   }
-);
-
-router.post(
-  '/unfollow/:targetUserId',
-  verifyToken,
-  async (req, res) => {
-    try {
-      const count = await userProfileData.unfollowUser(
-        req.userId,
-        req.params.targetUserId
-      );
-      return res.json({ followersCount: count });
-    } catch (e) {
-      return res.status(400).json({ error: e.toString() });
-    }
-  }
-);
-
-// -----------------------------------------
-// View Any User’s Profile (HTML)
-// -----------------------------------------
-router.get(
-  '/:targetUserId',
-  verifyToken,
-  async (req, res) => {
-    try {
-      const profile      = await userProfileData.getProfile(req.params.targetUserId);
-      const isOwn        = req.params.targetUserId === req.userId;
-      const isFollowing  = profile.followers
-        .map(f => f.toString())
-        .includes(req.userId);
-
-        console.log(">>>",isOwn,isFollowing);
-
-      return res.render('userProfile/view', {
-        title: `${profile.profile.firstName} ${profile.profile.lastName}`,
-        layout: 'main',
-        firstName:    profile.profile.firstName,
-        lastName:     profile.profile.lastName,
-        email:        profile.userId.email,
-        username:     profile.userId.username,
-        userId:       profile.userId._id,
-        bio:          profile.profile.bio,
-        //gender:       profile.profile.gender,
-        avatar:       profile.profile.avatar || '/images/default-avatar.png',
-        sportsInterests: profile.sportsInterests,
-        gymPreferences:   profile.gymPreferences,
-        gamingInterests:  profile.gamingInterests,
-        location:         profile.location,
-        karmaPoints:      profile.karmaPoints,
-        //achievements:     profile.achievements,
-        followers:        profile.followers,
-        following:        profile.following,
-        isOwn,
-        isFollowing,
-        head: `<link rel="stylesheet" href="/css/userProfile.css">`
-      });
-    } catch (e) {
-      return res.status(404).render('error', { error: e.toString() });
-    }
-  }
-);
+});
 
 export default router;
+
+
+
 
 
 

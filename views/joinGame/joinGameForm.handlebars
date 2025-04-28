@@ -80,12 +80,6 @@
               {{else if (gte (length this.players) this.playersRequired)}}
                 <!-- Session full and not joined -->
                 <p class="full-session">🚫 Session is Full</p>
-              {{else}}
-                <!-- Available to join -->
-                <form method="POST" action="/join">
-                  <input type="hidden" name="gameId" value="{{this._id}}">
-                  <button type="submit" class="btn btn-primary">Join</button>
-                </form>
               {{/if}}
             {{/if}}
           </div>

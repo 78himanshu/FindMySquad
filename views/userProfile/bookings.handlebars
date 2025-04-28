@@ -1,110 +1,109 @@
-<main class="container py-5">
-  <h2 class="mb-4">All Your Bookings</h2>
+<main class="py-5 d-flex flex-column align-items-center">
+  <h2 class="fw-bold text-center mb-5">📅 Your Bookings</h2>
 
   {{!-- Game Bookings --}}
-  <section class="mb-5">
-    <h3>🎾 Game Bookings</h3>
-
-    <div class="row">
+<section class="booking-section w-100 mb-5 text-center">
+  <h3 class="section-title text-success mb-4">🎾 Game Bookings</h3>
+  <div class="row g-4 justify-content-center">
       <div class="col-md-6">
-        <h4>Future Games</h4>
+        <h5 class="text-center mb-3">Future Games</h5>
         {{#if futureGameBookings.length}}
           {{#each futureGameBookings}}
-            <div class="card mb-3">
+            <div class="card mb-4 text-center shadow-sm">
               <div class="card-body">
-                <h5 class="card-title">{{this.title}}</h5>
-                <p>
-                  {{formatDate this.startTime}} |
-                  {{formatTime this.startTime}} – {{formatTime this.endTime}}
-                </p>
+                <h5 class="card-title fw-semibold">{{this.title}}</h5>
+                <p class="card-text text-muted">{{formatDate this.startTime}} | {{formatTime this.startTime}} – {{formatTime this.endTime}}</p>
                 <a href="/join/{{this._id}}" class="btn btn-outline-primary">View Game</a>
               </div>
             </div>
           {{/each}}
         {{else}}
-          <p class="text-muted">No upcoming games.</p>
+          <p class="text-muted text-center">No upcoming games 🎯</p>
         {{/if}}
       </div>
 
       <div class="col-md-6">
-        <h4>Past Games</h4>
+        <h5 class="text-center mb-3">Past Games</h5>
         {{#if pastGameBookings.length}}
           {{#each pastGameBookings}}
-            <div class="card mb-3">
+            <div class="card mb-4 text-center shadow-sm">
               <div class="card-body">
-                <h5 class="card-title">{{this.title}}</h5>
-                <p>{{formatDate this.startTime}}</p>
+                <h5 class="card-title fw-semibold">{{this.title}}</h5>
+                <p class="card-text text-muted">{{formatDate this.startTime}}</p>
                 <button
                   class="btn btn-success btn-rate"
                   data-booking-id="{{this._id}}"
                   data-players='{{json this.players}}'
                 >
-                  Rate Players
+                  ⭐ Rate Players
                 </button>
               </div>
             </div>
           {{/each}}
         {{else}}
-          <p class="text-muted">No past games.</p>
+          <p class="text-muted text-center">No past games ⌛</p>
         {{/if}}
       </div>
     </div>
   </section>
 
   {{!-- Gym Bookings --}}
-  <section class="mb-5">
-    <h3>🏋️ Gym Bookings</h3>
-    <div class="row">
+  <section class="w-100 mb-5">
+    <h3 class="text-primary text-center mb-4">🏋️ Gym Bookings</h3>
+    <div class="row justify-content-center">
       <div class="col-md-6">
-        <h4>Future Sessions</h4>
+        <h5 class="text-center mb-3">Future Sessions</h5>
         {{#if futureGymBookings.length}}
           {{#each futureGymBookings}}
-            <div class="card mb-3">
+            <div class="card mb-4 text-center shadow-sm">
               <div class="card-body">
-                <h5 class="card-title">{{this.title}}</h5>
-                <p>{{formatDate this.dateTime}} {{formatTime this.dateTime}}</p>
-                <a href="/gymBuddy/details/{{this._id}}" class="btn btn-outline-primary">
-                  View Session
-                </a>
+                <h5 class="card-title fw-semibold">{{this.title}}</h5>
+                <p class="card-text text-muted">{{formatDate this.dateTime}} {{formatTime this.dateTime}}</p>
+                <a href="/gymBuddy/details/{{this._id}}" class="btn btn-outline-primary">View Session</a>
               </div>
             </div>
           {{/each}}
-        {{else}}<p class="text-muted">No upcoming sessions.</p>{{/if}}
+        {{else}}
+          <p class="text-muted text-center">No upcoming sessions 🏋️</p>
+        {{/if}}
       </div>
+
       <div class="col-md-6">
-        <h4>Past Sessions</h4>
+        <h5 class="text-center mb-3">Past Sessions</h5>
         {{#if pastGymBookings.length}}
           {{#each pastGymBookings}}
-            <div class="card mb-3">
+            <div class="card mb-4 text-center shadow-sm">
               <div class="card-body">
-                <h5 class="card-title">{{this.title}}</h5>
-                <p>{{formatDate this.dateTime}}</p>
-                <p class="text-muted">Session complete</p>
+                <h5 class="card-title fw-semibold">{{this.title}}</h5>
+                <p class="card-text text-muted">{{formatDate this.dateTime}}</p>
+                <p class="text-muted small">Session complete ✅</p>
               </div>
             </div>
           {{/each}}
-        {{else}}<p class="text-muted">No past sessions.</p>{{/if}}
+        {{else}}
+          <p class="text-muted text-center">No past sessions 💤</p>
+        {{/if}}
       </div>
     </div>
   </section>
 
-  {{!-- Esports Bookings (stub) --}}
-  <section class="mb-5">
-    <h3>🎮 Esports Bookings</h3>
-    <p class="text-muted">Coming soon!</p>
+  {{!-- Esports Bookings --}}
+  <section class="w-100 text-center mb-5">
+    <h3 class="text-warning">🎮 Esports Bookings</h3>
+    <p class="text-muted">Coming soon! 🚀</p>
   </section>
 
-  {{!-- Rate‐Players Modal (blank container) --}}
+  {{!-- Modal + Toast --}}
   <div id="rateModal" class="modal" tabindex="-1">
-    <div class="modal-dialog">
+    <div class="modal-dialog modal-dialog-centered">
       <div class="modal-content p-4">
-        <h5>Rate Your Teammates</h5>
-        <form id="rateForm">
-          <div id="rateFields"></div>
-          <button type="submit" class="btn btn-primary mt-3">Submit Ratings</button>
-          <button type="button" class="btn btn-secondary mt-3" id="rateCancel">
-            Cancel
-          </button>
+        <h5 class="fw-bold text-center">⭐ Rate Your Teammates</h5>
+        <form id="rateForm" class="text-center">
+          <div id="rateFields" class="my-3"></div>
+          <div class="d-flex justify-content-center gap-3">
+            <button type="submit" class="btn btn-primary">Submit Ratings</button>
+            <button type="button" class="btn btn-secondary" id="rateCancel">Cancel</button>
+          </div>
         </form>
       </div>
     </div>
