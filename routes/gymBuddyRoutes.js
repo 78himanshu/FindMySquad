@@ -15,14 +15,14 @@ router.get("/", (req, res) => {
     title: "GymBuddy Home",
     layout: "main",
     head: `<link rel="stylesheet" href="/css/gym.css">`,
-    success: req.query.success 
+    success: req.query.success
   });
 });
 
 // CREATE a new gym session
 router;
 router
-  .get("/create",requireAuth, (req, res) => {
+  .get("/create", requireAuth, (req, res) => {
     res.render("Gym/createSession", {
       title: "Create Gym Session",
       layout: "main",
@@ -36,87 +36,102 @@ router
   })
   .post("/create", requireAuth, async (req, res) => {
     const data = req.body;
-  
+
     if (!data || Object.keys(data).length === 0) {
       return res.status(400).json({ error: "Request body cannot be empty" });
     }
-  
+
     const {
       title,
       gym,
       description,
-      dateTime,
+      date,
+      startTime,
+      endTime,
       gymlocation,
       experience,
       workoutType,
       hostedBy,
       maxMembers
     } = data;
-  
+
+    // Basic validations
     if (!ObjectId.isValid(hostedBy)) {
       return res.status(400).json({ error: "Invalid hostedBy ID" });
     }
-  
+
     if (!["1", "2", "3", "4"].includes(maxMembers)) {
       return res.status(400).json({ error: "Invalid maxMembers value" });
     }
-  
-    const now = new Date();
-    const sessionDate = new Date(dateTime);
-    if (sessionDate < now) {
-      return res.status(400).json({ error: "Session date and time must be in the future." });
-    }
-  
-    if (!title || !gym || !dateTime || !gymlocation || !experience || !workoutType) {
+
+    if (!title || !gym || !date || !startTime || !endTime || !gymlocation || !experience || !workoutType) {
       return res.status(400).json({ error: "All required fields must be provided" });
     }
-  
+
     try {
       checkString(title, "Title");
-      checkString(gym, "Venue");
+      checkString(gym, "Gym");
       checkString(gymlocation, "Gym Location");
-      checkString(experience, "Skill Level");
+      checkString(experience, "Experience");
       checkString(workoutType, "Workout Type");
       if (description) checkString(description, "Description");
-  
-      // Time clash check here
-      const newSessionTime = new Date(dateTime);
-  
-      const existingSessions = await Gym.find({
-        $or: [
-          { hostedBy: hostedBy },
-          { members: hostedBy }
-        ]
-      });
-  
-      const hasClash = existingSessions.some(s => {
-        const existingTime = new Date(s.dateTime);
-        const diffInMinutes = Math.abs(newSessionTime - existingTime) / (1000 * 60);
-        return diffInMinutes < 60;
-      });
-  
-      if (hasClash) {
-        return res.redirect(`/gymBuddy/create?error=${encodeURIComponent("You already have a session within 1 hour of this time.")}`);
+
+      // Time logic validation
+      const startDateTime = new Date(`${date}T${startTime}`);
+      const endDateTime = new Date(`${date}T${endTime}`);
+      const now = new Date();
+
+      if (startDateTime < now) {
+        return res.status(400).json({ error: "Session start time must be in the future." });
       }
-  
-      // ✅ All good — create the session
+
+      if (startDateTime >= endDateTime) {
+        return res.status(400).json({ error: "End Time must be after Start Time." });
+      }
+
+      // Check time clash with other sessions
+      const existingSessions = await Gym.find({
+        $or: [{ hostedBy: hostedBy }, { members: hostedBy }],
+        date: date  // only check clashes on the same date
+      });
+
+      const hasClash = existingSessions.some(s => {
+        const existingStart = new Date(`${s.date}T${s.startTime}`);
+        const existingEnd = new Date(`${s.date}T${s.endTime}`);
+
+        return (
+          (startDateTime >= existingStart && startDateTime < existingEnd) ||
+          (endDateTime > existingStart && endDateTime <= existingEnd) ||
+          (startDateTime <= existingStart && endDateTime >= existingEnd)
+        );
+      });
+
+      if (hasClash) {
+        return res.redirect(`/gymBuddy/create?error=${encodeURIComponent("You already have a session that overlaps with this time.")}`);
+      }
+
+      // ✅ Create session
       await gymBuddyData.createGymSession(
         title,
         gym,
         description,
-        dateTime,
+        date,
+        startTime,
+        endTime,
         gymlocation,
         experience,
         workoutType,
         hostedBy,
         maxMembers
       );
-  
+
       return res.redirect("/gymBuddy?success=Session created successfully");
     } catch (e) {
-      return res.status(400).json({ error: e.message });
+      console.error(e);
+      return res.status(400).json({ error: e.message || "Failed to create session" });
     }
-  });  
+  });
+
 
 // UPDATE a gym session by ID
 router.put("/update/:id", async (req, res) => {
@@ -151,37 +166,37 @@ router.delete("/delete/:id", async (req, res) => {
 export default router;
 // for find session
 router.get("/find", async (req, res) => {
-   // Build filter criteria from query parameters
-   const { experience, workoutType, error, success } = req.query;
-   const queryFilters = {};
-   
-   if (experience && experience !== "") {
-     queryFilters.experience = experience;
-   }
-   
-   if (workoutType && workoutType !== "") {
-     queryFilters.workoutType = workoutType;
-   }
+  // Build filter criteria from query parameters
+  const { experience, workoutType, error, success } = req.query;
+  const queryFilters = {};
+
+  if (experience && experience !== "") {
+    queryFilters.experience = experience;
+  }
+
+  if (workoutType && workoutType !== "") {
+    queryFilters.workoutType = workoutType;
+  }
 
   const now = new Date();
   queryFilters.dateTime = { $gte: now };
   let rawSessions = [];
-    rawSessions = await Gym.find(queryFilters).populate({
-      path: 'hostedBy',
-      model: 'Userlist',
-      select: 'username'
-    }).populate({
-      path: 'members',
-      model: 'Userlist',
-      select: 'username'
-    });
-    //rawSessions = await gymBuddyData.getAllGymSessions();
-   // Convert Mongoose documents to plain JS objects
-   const sessions = rawSessions.map(session =>{
+  rawSessions = await Gym.find(queryFilters).populate({
+    path: 'hostedBy',
+    model: 'Userlist',
+    select: 'username'
+  }).populate({
+    path: 'members',
+    model: 'Userlist',
+    select: 'username'
+  });
+  //rawSessions = await gymBuddyData.getAllGymSessions();
+  // Convert Mongoose documents to plain JS objects
+  const sessions = rawSessions.map(session => {
     const obj = session.toObject();
     obj.formattedDateTime = format(new Date(session.dateTime), "eee MMM dd, yyyy h:mm a");
 
-    obj.currentMembers = session.members.length; 
+    obj.currentMembers = session.members.length;
     obj.maxMembers = session.maxMembers;
     obj.members = session.members.map(member => ({ username: member.username }));
     obj.hasJoined = req.user ? session.members.some(m => m._id.toString() === req.user.userId) : false;
@@ -361,7 +376,7 @@ router.get('/edit/:id', requireAuth, async (req, res) => {
     user: {
       userId: session.hostedBy._id.toString(),
       username: session.hostedBy.username
-    }    
+    }
   });
 });
 

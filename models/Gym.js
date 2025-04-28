@@ -7,7 +7,9 @@ const gymSchema = new structure({
   title: { type: String, required: true },
   gym: { type: String, required: true, trim: true },
   description: { type: String, trim: true },
-  dateTime: { type: Date, required: true },
+  date: { type: String, required: true }, // e.g., "2025-05-01"
+  startTime: { type: String, required: true }, // e.g., "19:00"
+  endTime: { type: String, required: true }, // e.g., "21:00"
   gymlocation: { type: String, required: true },
   experience: {
     type: String,

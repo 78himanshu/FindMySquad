@@ -1,23 +1,17 @@
 import Gym from "../models/Gym.js";
 import { ObjectId } from "mongodb";
 import { checkString } from "../utils/helper.js";
+import UserProfile from "../models/userProfile.js";
+
 import "../models/User.js"
 
-export const createGymSession = async (
-  title,
-  gym,
-  description,
-  dateTime,
-  gymlocation,
-  experience,
-  workoutType,
-  hostedBy,
-  maxMembers
-) => {
+export const createGymSession = async (title, gym, description, date, startTime, endTime, gymlocation, experience, workoutType, hostedBy, maxMembers) => {
   if (
     !title ||
     !gym ||
-    !dateTime ||
+    !date ||
+    !startTime ||
+    !endTime ||
     !gymlocation ||
     !experience ||
     !workoutType ||
@@ -38,11 +32,26 @@ export const createGymSession = async (
     ? checkString(description, "Description", 1)
     : "";
 
+  // ⚡ Combine date and time for internal validation
+  const startDateTime = new Date(`${date}T${startTime}`);
+  const endDateTime = new Date(`${date}T${endTime}`);
+
+  if (isNaN(startDateTime) || isNaN(endDateTime)) {
+    throw "Invalid Date or Time format.";
+  }
+
+  if (startDateTime >= endDateTime) {
+    throw "End Time must be after Start Time.";
+  }
+
+  // ⚡ Save new Session
   const newSession = new Gym({
     title: trimmedTitle,
     gym: trimmedGym,
     description: trimmedDescription,
-    dateTime: new Date(dateTime),
+    date: date,                // e.g., "2025-05-01"
+    startTime: startTime,       // e.g., "19:00"
+    endTime: endTime,           // e.g., "21:00"
     gymlocation: trimmedLocation,
     experience: trimmedExperience,
     workoutType: trimmedWorkout,
@@ -50,7 +59,34 @@ export const createGymSession = async (
     maxMembers: parseInt(maxMembers),
     currentMembers: 0
   });
+
   const saved = await newSession.save();
+
+  if (!saved) {
+    throw "Failed to create new gym session.";
+  }
+
+  const updatedUserProfile = await UserProfile.findOneAndUpdate(
+    { userId: hostedBy },
+    { $inc: { karmaPoints: 15 } },
+    { new: true }
+  );
+
+  if (updatedUserProfile) {
+    console.log("✅ Karma Points Updated:", updatedUserProfile.karmaPoints);
+  } else {
+    console.error("❌ Failed to update karma points for user:", hostedBy);
+  }
+
+  // ⚡ Add the session to the user's hosted sessions
+  // const user = await UserProfile.findById(hostedBy);
+  // if (!user) throw "User not found";
+  // user.hostedSessions.push(saved._id);
+  // await user.save();
+  // console.log("saved", saved);
+  // console.log("user", user);
+
+
   return saved;
 };
 
