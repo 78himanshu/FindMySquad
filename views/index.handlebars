@@ -189,7 +189,7 @@
     crossorigin="anonymous"></script>
 
 
-  <script>
+  {{!-- <script>
     document.addEventListener('DOMContentLoaded', () => {
       const cookiee="user_location"
       function getCookie(x){
@@ -219,7 +219,31 @@
         );
       }
     })
-  </script>
+  </script> --}}
+
+  <script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const cookiee = "user_location"
+    function getCookie(x) {
+      const y = document.cookie.match(new RegExp('(^| )' + x + '=([^;]+)'))
+      return y ? decodeURIComponent(y[2]) : null;
+    }
+
+    if (!getCookie(cookiee) && 'geolocation' in navigator) {
+      navigator.geolocation.getCurrentPosition(
+        async (position) => {
+          const { latitude, longitude } = position.coords;
+          const value = JSON.stringify({ lat: latitude, lng: longitude });
+          document.cookie = `${cookiee}=${encodeURIComponent(value)}; path=/; max-age=${60 * 60 * 24 * 7}`
+          console.log("Location stored in cookie:", value);
+        },
+        (error) => {
+          console.warn('Geolocation error:', error.message);
+        }
+      );
+    }
+  })
+</script>
 
 </body>
 
