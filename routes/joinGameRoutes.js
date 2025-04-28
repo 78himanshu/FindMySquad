@@ -98,7 +98,7 @@ router
       const plainAllGames = allGames.map((x) => x.toObject());
 
       res.render("joinGame/joinGameForm", {
-        recommendedGames: plainRecommendation.length > 0 ? plainRecommendation : plainAllGames,
+        recommendedGames: plainRecommendation, //.length > 0 ? plainRecommendation : plainAllGames,
         allGames: plainAllGames,
         calendarEvents,
         userId,
