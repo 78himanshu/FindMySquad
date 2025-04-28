@@ -114,17 +114,21 @@ router
       checkString(email, "email");
       checkString(password, "password");
 
-      const { token, user } = await authUserData.login(email, password);
+      const { token, user, profilePic } = await authUserData.login(email, password);
+
+      console.log(token, user, profilePic)
 
       res.cookie("token", token, {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
         maxAge: 3600000,
       });
-      res.cookie("user", JSON.stringify(user), {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        maxAge: 3600000,
+      res.cookie("user", JSON.stringify({
+        username: user.username,
+        profilePic: profilePic
+      }), {
+        httpOnly: false,
+        maxAge: 3600000
       });
 
       const redirectTo = redirect || "/";

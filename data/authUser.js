@@ -36,7 +36,7 @@ export const login = async (email, password) => {
   const userProfile = await UserProfile.findOne({ userId: user._id });
   console.log("userProfile", userProfile);
 
-  const profilePic = userProfile?.avatar || "/images/default-avatar.png";
+  const profilePic = userProfile?.profile?.avatar || "/images/default-avatar.png";
 
   const token = jwt.sign(
     {
@@ -57,6 +57,7 @@ export const login = async (email, password) => {
       profileCompleted: user.profileCompleted,
       profilePic,
     },
+    profilePic
   };
 };
 
