@@ -71,9 +71,15 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         showToast("Signup successful! Redirecting...", "success");
+
         setTimeout(() => {
-          window.location.href = "/login";
+          if (data.redirect) {
+            window.location.href = data.redirect;  // ✅ redirect to /profile/addprofile
+          } else {
+            window.location.href = "/login"; // fallback
+          }
         }, 1500);
+        
       } catch (error) {
         showToast(error.message || "Something went wrong", "error");
       } finally {
@@ -146,7 +152,11 @@ document.addEventListener("DOMContentLoaded", () => {
         showToast("Login successful! Redirecting...", "success");
 
         setTimeout(() => {
-          if (data.user.profileCompleted) {
+          if (data.redirect) {
+            //  Redirect to the original page user intended (e.g., /host)
+            window.location.href = data.redirect;
+          } else if (data.user.profileCompleted) {
+            // fallback logic if no redirect provided
             window.location.href = "/";
           } else {
             window.location.href = "/profile/addprofile";

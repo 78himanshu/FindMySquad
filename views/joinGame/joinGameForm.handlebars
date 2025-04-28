@@ -15,7 +15,7 @@
 
   <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.css" rel="stylesheet" />
 
-  <!-- My Sports Section (default visible) -->
+  <!-- My Sports Section -->
   <section id="mySports" class="tab-content" style="display: block;">
     {{#if isLoggedIn}}
       <section>
@@ -46,6 +46,7 @@
       </section>
     {{/if}}
 
+    <!-- All Games -->
     <section>
       <h2 class="section-heading">All Games</h2>
       <div class="game-grid">
@@ -59,13 +60,41 @@
                 Date: {{formatDate this.startTime}} |
                 Time: {{formatTime this.startTime}} - {{formatTime this.endTime}}
               </p>
+              {{#if this.host.username}}
+                <p>Hosted By: {{this.host.username}}</p>
+              {{/if}}
             </a>
+
+            {{#if (eq ../hostId this.host._id)}}
+              <!-- Host: Edit/Delete buttons -->
+              <a href="/host/edit/{{this._id}}" class="btn btn-warning">Edit</a>
+              <form action="/host/delete/{{this._id}}" method="POST" style="display:inline;" onsubmit="return confirm('Are you sure you want to delete this game?')">
+                <button type="submit" class="btn btn-danger">Delete</button>
+              </form>
+            {{else}}
+              {{#if (includes ../joinedGameIdStrings this._id)}}
+                <!-- Already joined -->
+                <form action="/join/leave/{{this._id}}" method="POST">
+                  <button type="submit" class="btn btn-secondary">Leave</button>
+                </form>
+              {{else if (gte (length this.players) this.playersRequired)}}
+                <!-- Session full and not joined -->
+                <p class="full-session">🚫 Session is Full</p>
+              {{else}}
+                <!-- Available to join -->
+                <form method="POST" action="/join">
+                  <input type="hidden" name="gameId" value="{{this._id}}">
+                  <button type="submit" class="btn btn-primary">Join</button>
+                </form>
+              {{/if}}
+            {{/if}}
           </div>
         {{/each}}
       </div>
     </section>
   </section>
 
+  <!-- Other Sports Filter -->
   <section id="otherSports" class="tab-content" style="display: none;">
     <h3>Other Sports Filter</h3>
     <p>Filter and discover new activities from other categories.</p>

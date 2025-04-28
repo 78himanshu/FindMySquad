@@ -17,10 +17,14 @@ const gameStructure = new structure({
     required: true,
     enum: ["Beginner", "Intermediate", "Advanced"],
   },
-  host: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
+  host: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Userlist",
+    required: true,
+  },
   createdAt: { type: Date, default: Date.now },
   location: { type: String, required: true },
-  players: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
+  players: [{ type: mongoose.Schema.Types.ObjectId, ref: "Userlist" }],
 });
 
 export default mongoose.model("Game", gameStructure);

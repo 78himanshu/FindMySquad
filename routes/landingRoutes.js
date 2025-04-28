@@ -7,13 +7,14 @@ import * as hostGameData from "../data/hostGame.js";
 router.get("/", async (req, res) => {
   try {
     const recentGames = await hostGameData.getRecentGames();
-    console.log("Fetched Recent Games:", recentGames);
+    console.log("Fetched Recent Games:", JSON.stringify(recentGames, null, 2));
 
     res.render("index", {
       user: req.session?.user,
       isLoggedIn: !!req.session?.user,
       username: req.session?.user?.username || null,
-      recentGames: recentGames.map((g) => g.toObject?.() ?? g),
+      //recentGames: recentGames.map((g) => g.toObject?.() ?? g),
+      recentGames: recentGames,
       title: "Home",
     });
   } catch (e) {

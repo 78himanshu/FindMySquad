@@ -22,6 +22,7 @@ router
     x.host = req.user.userID;
     x.playersRequired = Number(x.playersRequired);
     x.costPerHead = Number(x.costPerHead);
+
     // for date + times into Date objects
     const gameDate = new Date(x.gameDate);
     const [startHours, startMinutes] = x.startTime.split(":");
@@ -38,6 +39,10 @@ router
       return res
         .status(400)
         .json({ error: "End time must be after start time" });
+    }
+
+    if (x.startTime < new Date()) {
+      return res.status(400).json({ error: "Cannot host games in the past." });
     }
 
     if (!x || Object.keys(x).length === 0) {
@@ -124,5 +129,80 @@ router.route("/form").get(requireAuth, (req, res) => {
         <link rel="stylesheet" href="/css/hostGame.css">
       `,
   });
+});
+
+// Edit Game Form
+router.get("/edit/:id", requireAuth, async (req, res) => {
+  try {
+    const game = await hostGameData.getGameById(req.params.id);
+
+    if (!game) {
+      return res.status(404).render("error", { error: "Game not found" });
+    }
+
+    // Host Check: Only allow host to edit
+    if (game.host.toString() !== req.user.userID) {
+      return res.status(403).render("error", { error: "Unauthorized access" });
+    }
+
+    res.render("hostGame/editGameForm", {
+      game: game.toObject(),
+      hostId: req.user.userID,
+      title: "Edit Game",
+      layout: "main",
+      head: `<link rel="stylesheet" href="/css/hostGame.css">`,
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).render("error", { error: "Server Error" });
+  }
+});
+
+// Handle Edit Submission
+router.post("/edit/:id", requireAuth, async (req, res) => {
+  try {
+    const updates = req.body;
+
+    const gameDate = new Date(updates.gameDate);
+    const [startHours, startMinutes] = updates.startTime.split(":");
+    const [endHours, endMinutes] = updates.endTime.split(":");
+
+    updates.startTime = new Date(gameDate);
+    updates.startTime.setHours(startHours, startMinutes);
+    updates.endTime = new Date(gameDate);
+    updates.endTime.setHours(endHours, endMinutes);
+
+    if (updates.startTime >= updates.endTime) {
+      return res.status(400).send("End time must be after start time");
+    }
+
+    await hostGameData.updateGame(req.params.id, updates, req.user.userID);
+    res.redirect("/join");
+  } catch (err) {
+    res.status(400).send(err.message);
+  }
+});
+
+router.post("/delete/:id", requireAuth, async (req, res) => {
+  try {
+    const gameId = req.params.id;
+    const userId = req.user.userID;
+    const game = await hostGameData.getGameById(gameId);
+
+    if (!game) {
+      return res.status(404).send("Game not found.");
+    }
+
+    if (game.host.toString() !== userId) {
+      return res
+        .status(403)
+        .send("You are not authorized to delete this game.");
+    }
+
+    await hostGameData.deleteGame(gameId);
+    res.redirect("/join");
+  } catch (e) {
+    res.status(500).send(e.message);
+  }
 });
 export default router;

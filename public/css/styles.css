@@ -361,24 +361,49 @@ label.btn.active {
 
 /* Discover games */
 .discover-games-section {
-  margin: 2rem;
-}
-
-.discover-card h4 {
-  margin-bottom: 0.5rem;
+  padding: 2rem;
+  background: #f9f9f9;
+  margin-top: 2rem;
 }
 
 .discover-cards {
   display: flex;
   flex-wrap: wrap;
-  gap: 1rem;
+  gap: 1.5rem;
+  justify-content: center;
   margin-top: 1rem;
 }
 
 .discover-card {
-  border: 1px solid #ccc;
-  padding: 1rem;
-  border-radius: 8px;
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 12px;
+  padding: 1.5rem;
   width: 300px;
-  background-color: #f9f9f9;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  text-align: center;
+}
+
+.discover-card h4 {
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+}
+
+.discover-card p {
+  font-size: 0.95rem;
+  margin: 0.25rem 0;
+}
+
+.discover-card .btn {
+  margin-top: 1rem;
+}
+
+.host-link {
+  text-decoration: none;
+  color: #007bff;
+  font-weight: bold;
+}
+
+.host-link:hover {
+  text-decoration: underline;
 }

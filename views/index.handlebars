@@ -101,21 +101,63 @@
   </section>
 
 
-        <section class="discover-games-section">
-          <h2>Discover Games</h2>
-          <pre>{{{json recentGames}}}</pre>
-          <div class="discover-cards">
-            <p>Total recent games: {{recentGames.length}}</p>
-            {{#each recentGames}}   
-              <div class="discover-card">
-                <h4>{{this.title}}</h4>
-                <p><strong>{{formatDate this.startTime}}</strong> | {{formatTime this.startTime}} - {{formatTime this.endTime}}</p>
-                <p>{{this.location}}</p>
-                <a href="/join/{{this._id}}" class="btn btn-primary">Join</a>
+<section class="discover-games-section">
+  {{!-- <div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <h2 class="fw-bold">Discover Games</h2>
+      <a href="/join" class="btn btn-outline-primary btn-sm">See All Games</a>
+    </div>
+
+{{#if recentGames.length}}
+  <div class="row">
+    {{#each recentGames}}
+      <div class="card">
+        <h5>{{this.title}}</h5>
+        <p>{{this.sport}} at {{this.location}}</p>
+        <p>{{formatDate this.startTime}} {{formatTime this.startTime}} - {{formatTime this.endTime}}</p>
+        <a href="/join/{{this._id}}" class="btn btn-primary">Join</a>
+      </div>
+    {{/each}}
+  </div>
+{{else}}
+  <div>No upcoming games found.</div>
+{{/if}}
+  </div> --}}
+
+<div class="container py-4"></div>
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <h2 class="fw-bold">Discover Games</h2>
+      <a href="/join" class="btn btn-outline-primary btn-sm">See All Games</a>
+    </div>
+
+    {{#if recentGames.length}}
+      <div class="discover-scroll-container">
+        <div class="discover-scroll-wrapper">
+          {{#each recentGames}}
+            <div class="discover-card">
+              <div class="card-content">
+                <h5 class="card-title">{{this.title}}</h5>
+                <p class="card-text">{{this.sport}} | {{this.location}}</p>
+                <p class="card-text">{{formatDate this.startTime}} | {{formatTime this.startTime}} - {{formatTime this.endTime}}</p>
+                <a href="/join/{{this._id}}" class="btn btn-primary btn-sm mt-2">Join</a>
               </div>
-            {{/each}}
-          </div>
-        </section>
+            </div>
+          {{/each}}
+        </div>
+      </div>
+    {{else}}
+      <div class="alert alert-warning" role="alert">
+        No upcoming games found. <a href="/host/form" class="alert-link">Host one now!</a>
+      </div>
+    {{/if}}
+  </div>
+
+
+
+
+
+
+</section>
 
 
 

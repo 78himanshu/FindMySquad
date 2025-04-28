@@ -9,10 +9,16 @@ import exphbs from "express-handlebars";
 import fs from "fs";
 import cookieParser from "cookie-parser";
 import jwt from "jsonwebtoken";
-import gymBuddyRoutes from './routes/gymBuddyRoutes.js';
+import gymBuddyRoutes from "./routes/gymBuddyRoutes.js";
+import hostGameRoutes from "./routes/hostGamesRoutes.js";
 
+// Handlebars prototype access (to fix _id issues in Handlebars)
+import { allowInsecurePrototypeAccess } from "@handlebars/allow-prototype-access";
+import Handlebars from "handlebars";
 import configRoutesFunction from "./routes/index.js";
 import "./utils/handlebarsHelper.js";
+
+import userProfileRoutes from './routes/userProfileRoutes.js';
 
 // Fix __dirname issue in ES Modules
 const __filename = fileURLToPath(import.meta.url);
@@ -23,26 +29,19 @@ dotenv.config({ path: path.resolve(__dirname, ".env") });
 
 const app = express();
 
-// Connect to MongoDB
 connectDB();
-
-// // Handlebars configuration
-// const hbs = exphbs.create({
-//   defaultLayout: false,
-//   extname: ".handlebars",
-//   helpers: {
-//     // Add any custom helpers here if needed
-//   },
-// });
-
 
 // Handlebars setup with eq helper
 const hbs = exphbs.create({
   defaultLayout: false,
   extname: ".handlebars",
+  handlebars: allowInsecurePrototypeAccess(Handlebars),
   helpers: {
     eq: (a, b) => a === b,
-    json: (context) => JSON.stringify(context),
+    gte: (a, b) => a >= b,
+    length: (array) => (Array.isArray(array) ? array.length : 0),
+    includes: (arr, val) => Array.isArray(arr) && arr.includes(val.toString()),
+    json: (context) => JSON.stringify(context, null, 2),
     formatDate: (datetime) => {
       if (!datetime) return "";
       return new Date(datetime).toLocaleDateString("en-US", {
@@ -59,18 +58,18 @@ const hbs = exphbs.create({
         minute: "2-digit",
       });
     },
-    json: (context) => {
-      return JSON.stringify(context, null, 2);
+    formatDateInput: (datetime) => {
+      if (!datetime) return "";
+      const date = new Date(datetime);
+      return date.toISOString().split("T")[0]; // yyyy-mm-dd
+    },
+    formatTimeInput: (datetime) => {
+      if (!datetime) return "";
+      const date = new Date(datetime);
+      return date.toTimeString().slice(0, 5); // hh:mm
     },
   },
 });
-
-// hbs.registerPartials(path.join(__dirname, 'views/partials'));
-
-
-
-
-
 
 app.engine("handlebars", hbs.engine);
 app.set("view engine", "handlebars");
@@ -101,7 +100,7 @@ app.use((req, res, next) => {
         return next();
       }
 
-      req.user = decoded; // ✅ this line is the key
+      req.user = decoded; // this line is the key
       res.locals.isLoggedIn = true;
       res.locals.username = decoded.username;
       req.user = decoded;
@@ -117,9 +116,11 @@ app.use((req, res, next) => {
 
   next();
 });
+
 // Routes
 configRoutesFunction(app);
-app.use('/gymBuddy', gymBuddyRoutes);
+app.use("/host", hostGameRoutes);
+app.use("/gymBuddy", gymBuddyRoutes);
 
 // 404 Handler (must come after routes but before error handler)
 app.use((req, res, next) => {

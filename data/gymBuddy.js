@@ -57,7 +57,7 @@ export const createGymSession = async (title, gym, description, date, startTime,
     workoutType: trimmedWorkout,
     hostedBy,
     maxMembers: parseInt(maxMembers),
-    currentMembers: 0
+    currentMembers: 0,
   });
 
   const saved = await newSession.save();

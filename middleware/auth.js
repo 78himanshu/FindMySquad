@@ -48,6 +48,8 @@ export default async function requireAuth(req, res, next) {
     res.clearCookie("token");
     // res.clearCookie("user");
 
-    return res.redirect(`/auth/login?redirect=${encodeURIComponent(req.originalUrl)}`);
+    return res.redirect(
+      `/login?redirect=${encodeURIComponent(req.originalUrl)}`
+    );
   }
 }

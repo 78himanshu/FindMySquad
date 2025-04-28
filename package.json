@@ -12,6 +12,7 @@
   "license": "ISC",
   "dependencies": {
     "@elasticemail/elasticemail-client": "^4.0.26",
+    "@handlebars/allow-prototype-access": "^1.0.5",
     "@material/snackbar": "^14.0.0",
     "axios": "^1.8.4",
     "bcrypt": "^5.1.1",
