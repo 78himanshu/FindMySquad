@@ -38,7 +38,8 @@
       <option value="Advanced">Advanced</option>
     </select>
 
-    <input type="text" name="location" placeholder="City" />
+    {{!-- <input type="text" name="location" placeholder="City" /> --}}
+    <input type="text" id="game-location" name="location" required placeholder="Enter a location">
 
     <div class="form-checks">
       <label><input type="checkbox" name="bringEquipment" /> Bring your own equipment</label>
@@ -53,4 +54,27 @@
   </form>
 </div>
 
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBP-FJZsXytqUxzesnIEkrkUu4JoB1zO-M&libraries=places"></script>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const input = document.getElementById('game-location');
+    if (input) {
+      const autocomplete = new google.maps.places.Autocomplete(input, {
+        types: ['geocode'],
+        componentRestrictions: { country: "us" } // Optional: restrict to United States
+      });
+      autocomplete.addListener('place_changed', function() {
+        const place = autocomplete.getPlace();
+        console.log("Selected Place:", place);
+        if (place && place.formatted_address) {
+          input.value = place.formatted_address;
+        }
+      });
+    }
+  });
+</script>
+
+
 <script src="/js/hostGame.js"></script>
+

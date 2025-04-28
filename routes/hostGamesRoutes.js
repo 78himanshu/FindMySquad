@@ -3,6 +3,7 @@ const router = Router();
 import { hostGameData } from "../data/index.js";
 import { checkString, checkNumber } from "../utils/helper.js";
 import requireAuth from "../middleware/auth.js";
+import axios from "axios";
 
 router
   .route("/")
@@ -86,6 +87,26 @@ router
       return res.status(400).json({ error: e.message });
     }
     try {
+      const apiKey = process.env.GOOGLE_MAPS_API_KEY;
+      const encodedLoc = encodeURIComponent(x.location);
+      const geoRes = await axios.get(
+        `https://maps.googleapis.com/maps/api/geocode/json?address=${encodedLoc}&key=${apiKey}`
+      );
+      console.log("Geocode API result:", geoRes.data);
+      if (
+        !geoRes.data ||
+        !geoRes.data.results ||
+        !geoRes.data.results[0]?.geometry?.location
+      ) {
+        return res.status(400).json({ error: "Invalid address entered." });
+      }
+      const { lat, lng } = geoRes.data.results[0].geometry.location;
+      const formattedAddress = geoRes.data.results[0].formatted_address;
+      const geoLocation = {
+        type: "Point",
+        coordinates: [lng, lat]
+      };
+      x.location = formattedAddress;
       const newGame = await hostGameData.createGame(
         x.title,
         x.sport,
@@ -97,7 +118,8 @@ router
         x.costPerHead,
         x.skillLevel,
         x.host,
-        x.location
+        x.location,
+        geoLocation
       );
       console.log(" Game created:", newGame);
       return res.redirect("/host/success");
@@ -106,23 +128,29 @@ router
     }
   });
 
-router.route("/success").get((req, res) => {
-  res.render("hostGame/hostGameSuccess", {
-    title: "Game Hosted!",
-    layout: "main",
-    head: `<link rel="stylesheet" href="/css/hostGame.css">`,
+router
+  .route("/success")
+  .get((req, res) => {
+    res.render("hostGame/hostGameSuccess", {
+      title: "Game Hosted!",
+      layout: "main",
+      head: `<link rel="stylesheet" href="/css/hostGame.css">`,
+    });
   });
-});
 
-router.route("/form").get(requireAuth, (req, res) => {
-  const hostId = req.user.userID;
-  res.render("hostGame/hostGameForm", {
-    hostId,
-    title: "Host a Game",
-    layout: "main",
-    head: `
-        <link rel="stylesheet" href="/css/hostGame.css">
-      `,
+router
+  .route("/form")
+  .get(requireAuth, (req, res) => {
+    const hostId = req.user.userID;
+    res.render("hostGame/hostGameForm", {
+      hostId,
+      title: "Host a Game",
+      layout: "main",
+      head: `
+          <link rel="stylesheet" href="/css/hostGame.css">
+        `,
+    });
   });
-});
+
+
 export default router;

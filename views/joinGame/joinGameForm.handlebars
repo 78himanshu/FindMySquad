@@ -15,9 +15,54 @@
 
   <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.css" rel="stylesheet" />
 
+  <div id="game-map" style="height: 400px; margin-bottom: 20px;"></div>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const mapContainer = document.getElementById('game-map');
+      if (!mapContainer) return;
+
+      // Default coordinates: NYC
+      let defaultLat = 40.7128;
+      let defaultLng = -74.0060;
+      const cookieMatch = document.cookie.match(/user_location=([^;]+)/);
+        if (cookieMatch) {
+          try {
+            const loc = JSON.parse(decodeURIComponent(cookieMatch[1]));
+            if (loc.lat && loc.lng) {
+              defaultLat = loc.lat;
+              defaultLng = loc.lng;
+            }
+          } catch (e) {
+            console.warn('Could not parse location cookie');
+          }
+        }
+
+      const map = L.map('game-map').setView([defaultLat, defaultLng], 12);
+
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap contributors'
+      }).addTo(map);
+
+      // Games are passed in via Handlebars
+      const games = {{{json allGames}}};
+
+      games.forEach(game => {
+        if (game.geoLocation && game.geoLocation.coordinates) {
+          const [lng, lat] = game.geoLocation.coordinates;
+          L.marker([lat, lng]).addTo(map)
+            .bindPopup(`<strong>${game.title}</strong><br>${game.sport}<br><a href="/join/${game._id}">View Game</a>`);
+        }
+      });
+    });
+  </script>
+
+
+
   <!-- My Sports Section (default visible) -->
   <section id="mySports" class="tab-content" style="display: block;">
-    {{#if isLoggedIn}}
       <section>
         <h2 class="section-heading">Recommended Games</h2>
         {{#if recommendedGames.length}}
@@ -44,7 +89,6 @@
           </div>
         {{/if}}
       </section>
-    {{/if}}
 
     <section>
       <h2 class="section-heading">All Games</h2>
