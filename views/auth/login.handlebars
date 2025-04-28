@@ -4,7 +4,8 @@
       <div class="card shadow-sm p-4">
         <h2 class="text-center mb-4">Welcome Back!</h2>
 
-        <form id="loginForm" novalidate>
+        <form id="loginForm" method="POST" action="/login" novalidate>
+
              <!-- HIDDEN REDIRECT INPUT HERE -->
           <input type="hidden" name="redirect" id="redirectInput" value="{{redirect}}" />
           <!-- Email -->

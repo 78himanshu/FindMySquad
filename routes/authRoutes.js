@@ -42,25 +42,45 @@ router
 
       console.log("newUser", newUser);
 
-      // console.log("==>>", newUser)
+      // return res.status(200).json({ message: "Signup successful", newUser });
+      const token = jwt.sign(
+        {
+          userId: newUser._id,
+          username: newUser.username,
+          profilePic: "/images/default-avatar.png",
+        },
+        process.env.JWT_SECRET,
+        { expiresIn: "2h" }
+      );
 
-      // if(!newUser){
-      //   return
-      // }
+      // Set cookie
+      res.cookie("token", token, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        maxAge: 3600000,
+      });
 
-      // const token = jwt.sign(
-      //   { userId: newUser._id, username: newUser.username },
-      //   process.env.JWT_SECRET,
-      //   { expiresIn: "1h" }
-      // );
+      res.cookie(
+        "user",
+        JSON.stringify({
+          id: newUser._id,
+          username: newUser.username,
+          email: newUser.email,
+          profileCompleted: false,
+          profilePic: "/images/default-avatar.png",
+        }),
+        {
+          httpOnly: true,
+          secure: process.env.NODE_ENV === "production",
+          maxAge: 3600000,
+        }
+      );
 
-      // res.cookie("token", token, {
-      //   httpOnly: true,
-      //   secure: process.env.NODE_ENV === "production",
-      //   maxAge: 3600000,
-      // });
-
-      return res.status(200).json({ message: "Signup successful", newUser });
+      // Redirect to add profile page
+      res.status(200).json({
+        message: "Signup successful",
+        redirect: "/profile/addprofile",
+      });
     } catch (error) {
       return res.status(400).json({ error: error.message || "Signup failed" });
     }
@@ -73,6 +93,7 @@ router
       title: "Login",
       layout: "main",
       error: req.query.error,
+      redirect: req.query.redirect || "",
       head: `
         <link rel="stylesheet" href="/css/login.css">
         <link rel="stylesheet" href="/css/styles.css">
@@ -106,10 +127,9 @@ router
         maxAge: 3600000,
       });
 
-      // const nextPage = user.profileCompleted ? "./" : "/addprofile";
-      const redirectTo = req.body.redirect || "/";
+      const redirectTo = redirect || "/";
 
-      res.status(200).json({
+      return res.status(200).json({
         message: "Login successful",
         token,
         user: {
@@ -119,12 +139,12 @@ router
           profileCompleted: user.profileCompleted,
           profilepic: user.profilePic || "/images/default-avatar.png",
         },
-        // nextPage
-        redirect: redirect || "/", // Included redirect in the response
+        redirect: redirectTo,
       });
     } catch (error) {
-      // console.error("Login error:", error);
-      return res.status(400).json({ error: error.message || "Login failed" });
+      return res.status(400).json({
+        error: error.message || "Invalid email or password. Please try again.",
+      });
     }
   });
 

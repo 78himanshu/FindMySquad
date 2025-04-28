@@ -30,7 +30,7 @@ export default async function requireAuth(req, res, next) {
       userID: decoded.userId, // Required by routes
       username: decoded.username, // Optional
     };
-     // ✅ Pass user info to Handlebars
+    // ✅ Pass user info to Handlebars
     //  const userCookie = req.cookies.user;
     //  if (userCookie) {
     //    const userData = JSON.parse(userCookie);
@@ -40,7 +40,6 @@ export default async function requireAuth(req, res, next) {
     //  } else {
     //    res.locals.isLoggedIn = false;
     //  }
- 
 
     next();
   } catch (err) {
@@ -48,6 +47,8 @@ export default async function requireAuth(req, res, next) {
     res.clearCookie("token");
     // res.clearCookie("user");
 
-    return res.redirect(`/auth/login?redirect=${encodeURIComponent(req.originalUrl)}`);
+    return res.redirect(
+      `/login?redirect=${encodeURIComponent(req.originalUrl)}`
+    );
   }
 }

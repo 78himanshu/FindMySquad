@@ -55,6 +55,7 @@ export const createGame = async (
     host,
     location: trimmedLocation,
     players: [host],
+    playersGoing: 1,
   });
 
   const savedGame = await newGame.save();
@@ -78,7 +79,53 @@ export const getGamesByIds = async (ids) => {
 };
 
 export const getRecentGames = async () => {
-  return Game.find({ startTime: { $gte: new Date() } }) // upcoming only
-    .sort({ startTime: 1 })
-    .limit(4);
+  try {
+    const now = new Date();
+    const games = await Game.find({
+      endTime: { $gte: now },
+    })
+      .sort({ startTime: 1 })
+      .limit(10)
+      .populate("host", "username")
+      .exec();
+    return games;
+  } catch (error) {
+    console.error("Error fetching recent games:", error);
+    return [];
+  }
 };
+
+export const updateGame = async (gameId, updates, hostId) => {
+  if (!ObjectId.isValid(gameId)) throw new Error("Invalid game ID");
+  const game = await Game.findById(gameId);
+  if (!game) throw new Error("Game not found");
+  if (game.host.toString() !== hostId)
+    throw new Error("Unauthorized edit attempt");
+
+  const allowedFields = [
+    "title",
+    "sport",
+    "venue",
+    "playersRequired",
+    "startTime",
+    "endTime",
+    "description",
+    "costPerHead",
+    "skillLevel",
+    "location",
+  ];
+
+  allowedFields.forEach((field) => {
+    if (updates[field] !== undefined) {
+      game[field] = updates[field];
+    }
+  });
+
+  await game.save();
+  return game;
+};
+
+export async function deleteGame(gameId) {
+  if (!gameId) throw new Error("Game ID is required");
+  await Game.findByIdAndDelete(gameId);
+}

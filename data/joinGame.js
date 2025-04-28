@@ -7,6 +7,10 @@ export const joinGame = async (gameId, userId) => {
   }
   const game = await Game.findById(gameId);
 
+  if (game.players.length >= game.playersRequired) {
+    throw new Error("Session is Full");
+  }
+
   if (!game) {
     throw new Error("Game doesnt exist, Please try another game");
   }
@@ -25,8 +29,35 @@ export const joinGame = async (gameId, userId) => {
 
   return game;
 };
+
 export const getJoinedGamesByUser = async (userId) => {
   if (!ObjectId.isValid(userId)) throw new Error("Invalid user ID");
   const joinedGames = await Game.find({ players: userId });
   return joinedGames;
+};
+
+export const leaveGame = async (gameId, userId) => {
+  const game = await Game.findById(gameId);
+  if (!game) {
+    throw new Error("Game not found.");
+  }
+  if (game.host.toString() === userId.toString()) {
+    const game = await hostGameData.getGameById(gameId);
+    return res.render("joinGame/gameDetails", {
+      game: game.toObject(),
+      isLoggedIn: true,
+      userId,
+      hostId: req.user.userID,
+      hasJoined: true,
+      error: "Host cannot leave their own game",
+      layout: "main",
+      head: `<link rel="stylesheet" href="/css/joinGame.css">`,
+    });
+  }
+
+  game.players = game.players.filter(
+    (id) => id.toString() !== userId.toString()
+  );
+  game.playersGoing = game.players.length;
+  await game.save();
 };
