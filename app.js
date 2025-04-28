@@ -97,25 +97,30 @@ app.use((req, res, next) => {
         res.clearCookie("token");
         res.locals.isLoggedIn = false;
         res.locals.username = null;
+        res.locals.profilePic = '/images/default-avatar.png'; // fallback
         return next();
       }
 
-      req.user = decoded; // this line is the key
+      req.user = decoded;
       res.locals.isLoggedIn = true;
       res.locals.username = decoded.username;
-      req.user = decoded;
+      res.locals.profilePic = decoded.profilePic || '/images/default-avatar.png'; // ✅ ADD THIS
+
     } catch (err) {
       res.locals.isLoggedIn = false;
       res.locals.username = null;
+      res.locals.profilePic = '/images/default-avatar.png'; // fallback
       res.clearCookie("token");
     }
   } else {
     res.locals.isLoggedIn = false;
     res.locals.username = null;
+    res.locals.profilePic = '/images/default-avatar.png'; // fallback
   }
 
   next();
 });
+
 
 // Routes
 configRoutesFunction(app);
