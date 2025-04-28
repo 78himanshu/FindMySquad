@@ -3,6 +3,10 @@ const router = express.Router();
 
 import { hostGameData, joinGameData } from "../data/index.js";
 import auth from "../middleware/auth.js";
+import User from "../models/User.js";
+import { userProfileData } from "../data/index.js";
+//import userProfile from '../models/userProfile.js';
+
 
 router
   .get("/", async (req, res) => {
@@ -11,18 +15,42 @@ router
       let userId = null;
       let recommendation = [];
       let joinedGameIdStrings = [];
+      let filters={}
+      let calendarEvents = [];
+      let allGames = [];
 
+
+      //---------if the user has logged in------------
       if (req.user && req.user.userId) {
         userId = req.user.userId;
-        const filtering = {
-          //need to change this and get it from userProfile
-          location: "Jersey City",
-          sport: { $in: ["Football", "Basketball"] },
-        };
-        recommendation = await hostGameData.getAllGames(filtering);
-      }
-      const allGames = await hostGameData.getAllGames({});
-      await Promise.all(allGames.map((game) => game.populate("host")));
+        const userProfile = await userProfileData.getProfile(userId);
+        const cookiecontaininglocation = req.cookies.user_location//need to verify this
+
+        if(userProfile){
+          if(cookiecontaininglocation){
+            const{ lat, lng }=JSON.parse(cookiecontaininglocation);
+            filters={
+              geoLocation: {
+                $near: {
+                  $geometry: { type: "Point", coordinates: [lng, lat] },
+                  $maxDistance: 10000
+                }
+              },
+              //sport: { $in: userProfile.sportsInterests.map((a) => a.sport)},
+              sport: { $in: (userProfile.sportsInterests || []) },
+              skillLevel: userProfile.gymPreferences?.skillLevel || "Beginner"
+            }
+          }
+          else{
+            filters={
+              location: userProfile.city, //need to check this
+              //sport: { $in: userProfile.sportsInterests.map((a) => a.sport)},
+              sport: { $in: (userProfile.sportsInterests || [])},
+              skillLevel: userProfile.gymPreferences?.skillLevel || "Beginner"
+            }
+          }
+        }
+        await Promise.all(allGames.map((game) => game.populate("host")));
       const now = new Date();
 
       // Filter out games that are already over
@@ -33,8 +61,6 @@ router
       const plainAllGames = upcomingGames.map((g) => g.toObject());
 
       // Prepare events for FullCalendar
-      let calendarEvents = [];
-      if (userId) {
         const joinedGameIds = await joinGameData.getJoinedGamesByUser(userId); // array of gameIds
         const joinedGames = await hostGameData.getGamesByIds(joinedGameIds); // fetch games from DB
         calendarEvents = joinedGames.map((game) => ({
@@ -44,9 +70,35 @@ router
           url: `/join/${game._id}`,
         }));
       }
+      //---------if the user is not logged in-------------
+      else{
+        const cookiecontaininglocation= req.cookies.user_location
+        if(cookiecontaininglocation){
+          try{
+          const{lat,lng}=JSON.parse(cookiecontaininglocation);
+          filters = {
+            geoLocation: {
+              $near: {
+                $geometry: { type: "Point", coordinates: [lng, lat] },
+                $maxDistance: 5000
+              }
+            }  
+          }
+        }
+        catch(e){console.warn("Invalid user_location cookie", e);}
+        }
+      }
+      //recommendation=await hostGameData.getAllGames(filters);
+      if (Object.keys(filters).length > 0) {
+        console.log("Filters for recommendation:", JSON.stringify(filters, null, 2));
+        recommendation = await hostGameData.getAllGames(filters);
+      }      
+      allGames=await hostGameData.getAllGames({})
+      const plainRecommendation = recommendation.map((x) => x.toObject());
+      const plainAllGames = allGames.map((x) => x.toObject());
 
       res.render("joinGame/joinGameForm", {
-        recommendedGames: recommendation.map((g) => g.toObject()),
+        recommendedGames: plainRecommendation.length > 0 ? plainRecommendation : plainAllGames,
         allGames: plainAllGames,
         calendarEvents,
         userId,
@@ -55,7 +107,11 @@ router
         isLoggedIn: !!userId,
         title: "Join Games",
         layout: "main",
-        head: `<link rel="stylesheet" href="/css/joinGame.css">`,
+        head: `
+              <link rel="stylesheet" href="/css/joinGame.css">
+              <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+              <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+                `,
       });
     } catch (e) {
       res.status(500).send(e.message);

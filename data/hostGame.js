@@ -13,7 +13,8 @@ export const createGame = async (
   costPerHead,
   skillLevel,
   host,
-  location
+  location,
+  geoLocation
 ) => {
   if (
     !title ||
@@ -55,6 +56,7 @@ export const createGame = async (
     host,
     location: trimmedLocation,
     players: [host],
+    geoLocation,
     playersGoing: 1,
   });
 

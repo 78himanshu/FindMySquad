@@ -25,6 +25,21 @@ const gameStructure = new structure({
   createdAt: { type: Date, default: Date.now },
   location: { type: String, required: true },
   players: [{ type: mongoose.Schema.Types.ObjectId, ref: "Userlist" }],
+  //Adding Geolocation part for our Map Integration
+  geoLocation: { 
+    type: {
+      type: String,
+      enum: ['Point'],
+      default: 'Point',
+      required: true
+    },
+    coordinates: {
+      type: [Number],
+      required: true
+    }
+  }
 });
+
+gameStructure.index({geoLocation: '2dsphere'});
 
 export default mongoose.model("Game", gameStructure);

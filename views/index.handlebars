@@ -191,15 +191,22 @@
 
   <script>
     document.addEventListener('DOMContentLoaded', () => {
-      if ('geolocation' in navigator) {
+      const cookiee="user_location"
+      function getCookie(x){
+        const y= document.cookie.match(new RegExp('(^| )' + x + '=([^;]+)'))
+        return y ? decodeURIComponent(y[2]) : null;
+      }
+
+      if (!getCookie(cookiee) && 'geolocation' in navigator) {
         navigator.geolocation.getCurrentPosition(
           async (position) => {
             const { latitude, longitude } = position.coords;
+            const value = JSON.stringify({ lat: latitude, lng: longitude });
 
             // You can auto-fill hidden fields or display the coordinates
 
-
-            console.log('Location:', latitude, longitude);
+            document.cookie = `${cookiee}=${encodeURIComponent(value)}; path=/; max-age=${60 * 60 * 24 * 7}`
+            console.log("Location stored in cookie:", value);
 
             // OPTIONAL: Use a reverse geocoding API to get the city/address
             // let locationResponse = await fetch(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${latitude}&longitude=${longitude}&localityLanguage=en`);
@@ -210,8 +217,6 @@
             console.warn('Geolocation error:', error.message);
           }
         );
-      } else {
-        alert('Geolocation is not supported by your browser.');
       }
     })
   </script>
