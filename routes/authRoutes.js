@@ -2,7 +2,6 @@ import { Router } from "express";
 const router = Router();
 import { authUserData } from "../data/index.js";
 import { checkString } from "../utils/helper.js";
-import jwt from "jsonwebtoken";
 
 router
   .route("/signup")
@@ -42,44 +41,10 @@ router
 
       console.log("newUser", newUser);
 
-      // return res.status(200).json({ message: "Signup successful", newUser });
-      const token = jwt.sign(
-        {
-          userId: newUser._id,
-          username: newUser.username,
-          profilePic: "/images/default-avatar.png",
-        },
-        process.env.JWT_SECRET,
-        { expiresIn: "2h" }
-      );
-
-      // Set cookie
-      res.cookie("token", token, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        maxAge: 3600000,
-      });
-
-      res.cookie(
-        "user",
-        JSON.stringify({
-          id: newUser._id,
-          username: newUser.username,
-          email: newUser.email,
-          profileCompleted: false,
-          profilePic: "/images/default-avatar.png",
-        }),
-        {
-          httpOnly: true,
-          secure: process.env.NODE_ENV === "production",
-          maxAge: 3600000,
-        }
-      );
-
       // Redirect to add profile page
-      res.status(200).json({
+      return res.status(200).json({
         message: "Signup successful",
-        redirect: "/profile/addprofile",
+        redirect: "/login?success=Account created successfully. Please login.",
       });
     } catch (error) {
       return res.status(400).json({ error: error.message || "Signup failed" });
@@ -114,28 +79,39 @@ router
       checkString(email, "email");
       checkString(password, "password");
 
-      const { token, user, profilePic } = await authUserData.login(email, password);
+      const { token, user, profilePic } = await authUserData.login(
+        email,
+        password
+      );
 
-      console.log(token, user, profilePic)
+      console.log(token, user, profilePic);
 
       res.cookie("token", token, {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
         maxAge: 3600000,
       });
-      res.cookie("user", JSON.stringify({
-        username: user.username,
-        profilePic: profilePic
-      }), {
-        httpOnly: false,
-        maxAge: 3600000
-      });
+      res.cookie(
+        "user",
+        JSON.stringify({
+          username: user.username,
+          profilePic: profilePic,
+        }),
+        {
+          httpOnly: false,
+          maxAge: 3600000,
+        }
+      );
 
-      const redirectTo = redirect || "/";
+      let redirectTo = redirect || "/";
+
+      if (!user.profileCompleted) {
+        redirectTo = "/profile/addprofile";
+      }
 
       return res.status(200).json({
         message: "Login successful",
-        token,
+        redirect: redirectTo,
         user: {
           id: user._id,
           username: user.username,
@@ -143,7 +119,6 @@ router
           profileCompleted: user.profileCompleted,
           profilepic: user.profilePic || "/images/default-avatar.png",
         },
-        redirect: redirectTo,
       });
     } catch (error) {
       return res.status(400).json({

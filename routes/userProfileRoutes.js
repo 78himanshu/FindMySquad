@@ -332,12 +332,17 @@ router.get("/bookings/rate/:bookingId", verifyToken, async (req, res) => {
 
     if (!booking) throw "Booking not found";
 
-    const teammates = booking.players
-      .filter((player) => player._id.toString() !== userId.toString())
-      .map((player) => ({
-        _id: player._id.toString(),
-        username: player.username,
-      }));
+    const teammates = await Promise.all(
+      booking.players
+        .filter((pid) => pid.toString() !== userId.toString())
+        .map(async (pid) => {
+          const user = await Userlist.findById(pid).select("username");
+          return {
+            userId: pid.toString(),
+            username: user?.username || "Unknown",
+          };
+        })
+    );
 
     res.render("userProfile/ratePlayers", {
       title: "Rate Your Teammates",
@@ -378,8 +383,8 @@ router.get("/view/:targetUserId", verifyToken, async (req, res) => {
       karmaPoints: profile.karmaPoints,
       followers: profile.followers,
       following: profile.following,
-      isOwn, // 👈 correctly detected
-      isFollowing, // 👈 correctly detected
+      isOwn,
+      isFollowing,
       head: `<link rel="stylesheet" href="/css/userProfile.css">`,
     });
   } catch (e) {
@@ -412,54 +417,6 @@ router.post("/unfollow/:targetUserId", verifyToken, async (req, res) => {
 });
 
 export default router;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 // // ==========================================
 // // 1. FIX FOR PROFILE CREATION ENDPOINT
