@@ -74,7 +74,7 @@ router.post('/create', requireAuth, async (req, res) => {
 
   try {
     const tournament = new Tournament({
-      creator: req.user.userId,
+      creator: req.user.userID,
       game,
       format,
       date,
@@ -82,6 +82,7 @@ router.post('/create', requireAuth, async (req, res) => {
       description,
       skillLevel,
       maxTeams,
+      teams:[],
       prizePool: { total, first, second, third }
     });
 

@@ -1,3 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Create Tournament</title>
+  <link rel="stylesheet" href="/css/bootstrap-lite.css">
+  <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+<nav class="navbar bg-light px-4">
+  <div class="container-fluid d-flex justify-content-between align-items-center">
+
+    <!-- LEFT SECTION: Brand -->
+    <a class="navbar-brand fw-bold" href="/">FindMySquad</a>
+
+    <!-- CENTER SECTION: Navigation Links -->
+    <div class="d-flex justify-content-center flex-grow-1 gap-3">
+      <a href="/join" class="btn btn-outline-primary text-decoration-none">Join</a>
+      <a href="/host" class="btn btn-outline-primary text-decoration-none">Host</a>
+      <a href="/esports" class="btn btn-outline-primary text-decoration-none">Esports</a>
+      <a href="/gymBuddy" class="btn btn-outline-primary text-decoration-none">GymBuddy</a>
+    </div>
+
+    <!-- RIGHT SECTION: User Info -->
+    <div class="d-flex align-items-center gap-2">
+      {{#if isLoggedIn}}
+        <a href="/profile/view" class="d-flex align-items-center gap-2 text-decoration-none text-dark">
+          <img src="{{profilePic}}" alt="profile" class="rounded-circle" width="32" height="32">
+          <span class="fw-semibold">{{username}}</span>
+        </a>
+        <a href="/logout" class="btn btn-outline-danger">Logout</a>
+      {{else}}
+        <a href="/login" class="btn btn-outline-primary text-decoration-none">Login</a>
+        <a href="/signup" class="btn btn-primary text-decoration-none">Signup</a>
+      {{/if}}
+    </div>
+
+  </div>
+</nav>
+
 <main class="container py-5">
   <h2 class="mb-4">Create Your Own Tournament</h2>
 

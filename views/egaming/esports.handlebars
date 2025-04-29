@@ -33,42 +33,47 @@
 </head>
 <body>
 
-  <nav class="navbar bg-light px-4">
-    <div class="container-fluid d-flex align-items-center justify-content-between flex-wrap">
+<nav class="navbar bg-light px-4">
+  <div class="container-fluid d-flex justify-content-between align-items-center flex-nowrap w-100">
+
+    <!-- LEFT SECTION -->
+    <div class="d-flex align-items-center gap-3">
       <a class="navbar-brand fw-bold" href="/">FindMySquad</a>
 
-      <div class="d-flex align-items-center gap-3">
-        <div class="d-flex gap-2">
-            <!-- Dropdown menu for Tournaments -->
-          <div class="dropdown">
-            <button class="btn btn-outline-primary dropdown-toggle" type="button" id="tournamentDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-              Tournaments
-            </button>
-            <ul class="dropdown-menu" aria-labelledby="tournamentDropdown">
-              <li><a class="dropdown-item" href="/tournaments/create">Create Your Own Tournament</a></li>
-            </ul>
-          </div>
-        </div>
-          <a href="/join"><button class="btn btn-outline-primary">Join</button></a>
-          <a href="/host"><button class="btn btn-outline-primary">Host</button></a>
-          <a href="/esports"><button class="btn btn-outline-primary">Esports</button></a>
-          <a href="/gymBuddy"><button class="btn btn-outline-primary">GymBuddy</button></a>
-
-        <div class="d-flex gap-2">
-          {{#if isLoggedIn}}
-          <a href="/profile/view" class="d-flex align-items-center gap-2 text-decoration-none text-dark">
-            <img src="{{profilePic}}" alt="profile" class="rounded-circle" width="40" height="40">
-            <span class="fw-semibold">{{username}}</span>
-          </a>
-          <button class="btn btn-outline-danger" onclick="window.location='/logout'">Logout</button>
-          {{else}}
-          <button class="btn btn-outline-primary" onclick="window.location='/login'">Login</button>
-          <button class="btn btn-primary" onclick="window.location='/signup'">Signup</button>
-          {{/if}}
-        </div>
+      <div class="dropdown">
+        <button class="btn btn-outline-primary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+          Tournaments
+        </button>
+        <ul class="dropdown-menu">
+          <li><a class="dropdown-item" href="/tournaments/create">Create Your Own Tournament</a></li>
+        </ul>
       </div>
     </div>
-  </nav>
+
+    <!-- CENTER SECTION -->
+    <div class="d-flex align-items-center gap-3 mx-auto">
+      <a href="/join" class="btn btn-outline-primary text-decoration-none">Join</a>
+      <a href="/host" class="btn btn-outline-primary text-decoration-none">Host</a>
+      <a href="/esport" class="btn btn-outline-primary text-decoration-none">Esports</a>
+      <a href="/gymBuddy" class="btn btn-outline-primary text-decoration-none">GymBuddy</a>
+    </div>
+
+    <!-- RIGHT SECTION -->
+    <div class="d-flex align-items-center gap-2">
+      {{#if isLoggedIn}}
+        <a href="/profile/view" class="d-flex align-items-center gap-2 text-decoration-none text-dark">
+          <img src="{{profilePic}}" alt="profile" class="rounded-circle" width="32" height="32">
+          <span class="fw-semibold">{{username}}</span>
+        </a>
+        <a href="/logout" class="btn btn-outline-danger">Logout</a>
+      {{else}}
+        <a href="/login" class="btn btn-outline-primary text-decoration-none">Login</a>
+        <a href="/signup" class="btn btn-primary text-decoration-none">Signup</a>
+      {{/if}}
+    </div>
+
+  </div>
+</nav>
 
   <main class="container py-5">
     <h1 class="text-center mb-4">Esports Games</h1>

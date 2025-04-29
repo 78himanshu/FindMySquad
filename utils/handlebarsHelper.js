@@ -35,3 +35,7 @@ Handlebars.registerHelper('timeUntil', function(date) {
   }
 });
 
+
+Handlebars.registerHelper('lt', function (a, b) {
+  return a < b;
+});

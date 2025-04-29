@@ -14,6 +14,7 @@ import tournamentRoutes from './routes/tournamentRoutes.js';
 import configRoutesFunction from "./routes/index.js";
 import "./utils/handlebarsHelper.js";
 import { allowInsecurePrototypeAccess } from '@handlebars/allow-prototype-access';
+import esportsRoutes from './routes/esports.js';
 
 // Fix __dirname issue in ES Modules
 const __filename = fileURLToPath(import.meta.url);
@@ -47,6 +48,7 @@ const hbs = exphbs.create({
   },
   helpers: {
     eq: (a, b) => a === b,
+    gt: (a, b) => a > b, 
     json: (context) => JSON.stringify(context, null, 2),
     formatDate: (datetime) => {
       if (!datetime) return "";
@@ -57,12 +59,14 @@ const hbs = exphbs.create({
         day: "numeric",
       });
     },
-    formatTime: (datetime) => {
-      if (!datetime) return "";
-      return new Date(datetime).toLocaleTimeString("en-US", {
-        hour: "2-digit",
-        minute: "2-digit",
-      });
+    formatTime: (time24) => {  
+      if (!time24) return '';
+      const [hourStr, minuteStr] = time24.split(':');
+      let hour = parseInt(hourStr, 10);
+      const minute = parseInt(minuteStr, 10);
+      const ampm = hour >= 12 ? 'PM' : 'AM';
+      hour = hour % 12 || 12;
+      return `${hour}:${minute.toString().padStart(2, '0')} ${ampm}`;
     },
     encodeURI: (str) => {
       return encodeURIComponent(str);
@@ -92,6 +96,12 @@ app.use((req, res, next) => {
     try {
       const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
+      if (!decoded.userId) {
+        res.clearCookie("token");
+        res.locals.isLoggedIn = false;
+        return res.status(401).send("Unauthorized: User info missing");
+      }
+
       // Invalidate token if it's older than server boot time
       if (decoded.iat * 1000 < serverBootTime) {
         res.clearCookie("token");
@@ -100,10 +110,13 @@ app.use((req, res, next) => {
         return next();
       }
 
-      req.user = decoded; //  this line is the key
+      req.user = {
+        userId: decoded.userId,  
+        username: decoded.username,
+        profilePic: decoded.profilePic
+      };
       res.locals.isLoggedIn = true;
       res.locals.username = decoded.username;
-      req.user = decoded;
     } catch (err) {
       res.locals.isLoggedIn = false;
       res.locals.username = null;
@@ -119,6 +132,7 @@ app.use((req, res, next) => {
 // Routes
 configRoutesFunction(app);
 app.use('/gymBuddy', gymBuddyRoutes);
+app.use('/esports', esportsRoutes);
 
 // 404 Handler (must come after routes but before error handler)
 app.use((req, res, next) => {

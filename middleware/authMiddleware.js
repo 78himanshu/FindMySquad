@@ -10,7 +10,13 @@ export function requireAuth(req, res, next) {
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    req.user = decoded; 
+
+    req.user = {
+      userId: decoded.userId, 
+      username: decoded.username,
+      profilePic: decoded.profilePic || "/images/default-avatar.png"
+    };
+
     next();
   } catch (err) {
     return res.redirect("/login?error=loginRequired");
