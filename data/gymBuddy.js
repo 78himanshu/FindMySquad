@@ -2,7 +2,7 @@ import Gym from "../models/Gym.js";
 import { ObjectId } from "mongodb";
 import { checkString } from "../utils/helper.js";
 import UserProfile from "../models/userProfile.js";
-
+import { updateKarmaPoints } from "../utils/karmaHelper.js";
 import "../models/User.js"
 
 export const createGymSession = async (title, gym, description, date, startTime, endTime, gymlocation, experience, workoutType, hostedBy, maxMembers) => {
@@ -66,17 +66,7 @@ export const createGymSession = async (title, gym, description, date, startTime,
     throw "Failed to create new gym session.";
   }
 
-  const updatedUserProfile = await UserProfile.findOneAndUpdate(
-    { userId: hostedBy },
-    { $inc: { karmaPoints: 15 } },
-    { new: true }
-  );
-
-  if (updatedUserProfile) {
-    console.log("✅ Karma Points Updated:", updatedUserProfile.karmaPoints);
-  } else {
-    console.error("❌ Failed to update karma points for user:", hostedBy);
-  }
+  await updateKarmaPoints(hostedBy, 15);
 
   // ⚡ Add the session to the user's hosted sessions
   // const user = await UserProfile.findById(hostedBy);

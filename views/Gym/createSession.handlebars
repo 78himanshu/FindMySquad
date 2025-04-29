@@ -14,8 +14,20 @@
       <label for="description">Description:</label>
       <textarea id="description" name="description">{{description}}</textarea>
 
-      <label for="dateTime">Date and Time:</label>
-      <input type="datetime-local" id="dateTime" name="dateTime" value="{{dateTime}}" required />
+     <label for="sessionDate">Date:</label>
+    <input type="date" id="sessionDate" name="sessionDate" value="{{sessionDate}}" required />
+
+    <div class="form-row">
+      <div style="display:inline-block; margin-right:10px;">
+        <label for="startTime">Start Time:</label>
+        <input type="time" id="startTime" name="startTime" value="{{startTime}}" required />
+      </div>
+      <div style="display:inline-block;">
+        <label for="endTime">End Time:</label>
+        <input type="time" id="endTime" name="endTime" value="{{endTime}}" required />
+      </div>
+    </div>
+
 
       <label for="gymlocation">Gym Location:</label>
       <input type="text" id="gymlocation" name="gymlocation" value="{{gymlocation}}" required />

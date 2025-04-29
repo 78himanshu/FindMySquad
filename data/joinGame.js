@@ -1,5 +1,7 @@
 import Game from "../models/hostGame.js";
 import { ObjectId } from "mongodb";
+import { updateKarmaPoints } from "../utils/karmaHelper.js"; 
+
 
 export const joinGame = async (gameId, userId) => {
   if (!ObjectId.isValid(gameId) || !ObjectId.isValid(userId)) {
@@ -25,6 +27,9 @@ export const joinGame = async (gameId, userId) => {
 
   game.players.push(userId);
   game.playersGoing = game.playersGoing + 1;
+
+  await updateKarmaPoints(userId, 10);
+
   await game.save();
 
   return game;

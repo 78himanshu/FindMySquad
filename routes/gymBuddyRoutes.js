@@ -45,7 +45,7 @@ router
       title,
       gym,
       description,
-      date,
+      sessionDate,
       startTime,
       endTime,
       gymlocation,
@@ -64,7 +64,7 @@ router
       return res.status(400).json({ error: "Invalid maxMembers value" });
     }
 
-    if (!title || !gym || !date || !startTime || !endTime || !gymlocation || !experience || !workoutType) {
+    if (!title || !gym || !sessionDate || !startTime || !endTime || !gymlocation || !experience || !workoutType) {
       return res.status(400).json({ error: "All required fields must be provided" });
     }
 
@@ -77,8 +77,8 @@ router
       if (description) checkString(description, "Description");
 
       // Time logic validation
-      const startDateTime = new Date(`${date}T${startTime}`);
-      const endDateTime = new Date(`${date}T${endTime}`);
+      const startDateTime = new Date(`${sessionDate}T${startTime}`);
+      const endDateTime = new Date(`${sessionDate}T${endTime}`);
       const now = new Date();
 
       if (startDateTime < now) {
@@ -92,12 +92,12 @@ router
       // Check time clash with other sessions
       const existingSessions = await Gym.find({
         $or: [{ hostedBy: hostedBy }, { members: hostedBy }],
-        date: date  // only check clashes on the same date
+        sessionDate: sessionDate  // only check clashes on the same date
       });
 
       const hasClash = existingSessions.some(s => {
-        const existingStart = new Date(`${s.date}T${s.startTime}`);
-        const existingEnd = new Date(`${s.date}T${s.endTime}`);
+        const existingStart = new Date(`${s.sessionDate}T${s.startTime}`);
+        const existingEnd = new Date(`${s.sessionDate}T${s.endTime}`);
 
         return (
           (startDateTime >= existingStart && startDateTime < existingEnd) ||
@@ -115,7 +115,7 @@ router
         title,
         gym,
         description,
-        date,
+        sessionDate,
         startTime,
         endTime,
         gymlocation,

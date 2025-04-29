@@ -1,6 +1,9 @@
 import Game from "../models/hostGame.js";
 import { ObjectId } from "mongodb";
 import { checkNumber, checkString } from "../utils/helper.js";
+import UserProfile from "../models/userProfile.js";
+import { updateKarmaPoints } from "../utils/karmaHelper.js"; 
+
 
 export const createGame = async (
   title,
@@ -59,6 +62,22 @@ export const createGame = async (
   });
 
   const savedGame = await newGame.save();
+
+  // const updatedUserProfile = await UserProfile.findOneAndUpdate(
+  //   { userId: "6806c40d8e65a501855cdfa0" },
+  //   { $inc: { karmaPoints: 15 } },
+  //   { new: true }
+  // );
+
+  // if (updatedUserProfile) {
+  //   console.log("✅ Karma Points Updated:", updatedUserProfile.karmaPoints);
+  // } else {
+  //   console.error("❌ Failed to update karma points for user:", hostedBy);
+  // }
+
+  await updateKarmaPoints(host, 15);
+
+
   return savedGame;
 };
 
