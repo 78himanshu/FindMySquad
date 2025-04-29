@@ -68,8 +68,27 @@ const hbs = exphbs.create({
       const date = new Date(datetime);
       return date.toTimeString().slice(0, 5); // hh:mm
     },
+    ifCond: function (v1, operator, v2, options) {
+      switch (operator) {
+        case '!=':
+          return (v1 != v2) ? options.fn(this) : options.inverse(this);
+        case '==':
+          return (v1 == v2) ? options.fn(this) : options.inverse(this);
+        case '>':
+          return (v1 > v2) ? options.fn(this) : options.inverse(this);
+        case '<':
+          return (v1 < v2) ? options.fn(this) : options.inverse(this);
+        case '>=':
+          return (v1 >= v2) ? options.fn(this) : options.inverse(this);
+        case '<=':
+          return (v1 <= v2) ? options.fn(this) : options.inverse(this);
+        default:
+          return options.inverse(this);
+      }
+    }
   },
 });
+
 
 app.engine("handlebars", hbs.engine);
 app.set("view engine", "handlebars");

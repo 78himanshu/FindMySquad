@@ -17,14 +17,13 @@ document.addEventListener("DOMContentLoaded", () => {
         group.className = "mb-2";
 
         group.innerHTML = `
-          <label class="form-label fw-bold">${
-            player.username || "Player"
+          <label class="form-label fw-bold">${player.username || "Player"
           }:</label>
           <select name="rating_${player.userId}" class="form-select"> 
             <option value="">Rate...</option>
             ${[5, 4, 3, 2, 1]
-              .map((n) => `<option value="${n}">${n} ★</option>`)
-              .join("")}
+            .map((n) => `<option value="${n}">${n} ★</option>`)
+            .join("")}
           </select>
         `;
 

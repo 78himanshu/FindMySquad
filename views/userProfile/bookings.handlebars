@@ -1,115 +1,113 @@
-<main class="py-5 d-flex flex-column align-items-center">
-  <h2 class="fw-bold text-center mb-5">📅 Your Bookings</h2>
+<div class="container my-4">
 
-  {{!-- Game Bookings --}}
-<section class="booking-section w-100 mb-5 text-center">
-  <h3 class="section-title text-success mb-4">🎾 Game Bookings</h3>
-  <div class="row g-4 justify-content-center">
-      <div class="col-md-6">
-        <h5 class="text-center mb-3">Future Games</h5>
-        {{#if futureGameBookings.length}}
-          {{#each futureGameBookings}}
-            <div class="card mb-4 text-center shadow-sm">
-              <div class="card-body">
-                <h5 class="card-title fw-semibold">{{this.title}}</h5>
-                <p class="card-text text-muted">{{formatDate this.startTime}} | {{formatTime this.startTime}} – {{formatTime this.endTime}}</p>
-                <a href="/join/{{this._id}}" class="btn btn-outline-primary">View Game</a>
-              </div>
+  <h2 class="mb-4">Your Bookings</h2>
+
+  <!-- Past Games Section -->
+  {{#if pastGameBookings.length}}
+  <h4>Past Games</h4>
+  {{#each pastGameBookings}}
+  <div class="booking-card card mb-4">
+    <div class="card-body">
+      <h5 class="card-title">{{title}}</h5>
+      <p class="card-text"><strong>Date:</strong> {{formattedDateTime}}</p>
+      <p class="card-text"><strong>Venue:</strong> {{venue}}</p>
+
+      {{#ifCond players.length '>' 1}}
+      <button class="btn btn-primary btn-sm rate-players-btn" data-booking-id="{{_id}}">
+        Rate Players
+      </button>
+      {{/ifCond}}
+
+      <div id="rate-players-{{_id}}" class="rate-players-panel d-none mt-3">
+        <form class="rate-form" data-booking-id="{{_id}}">
+          {{#each players}}
+          {{#ifCond this._id '!=' ../host}}
+          <div class="mb-2">
+            <strong>{{this.username}}</strong>
+            <div class="rating-stars" data-user-id="{{this._id}}">
+              <i class="fa-regular fa-star" data-score="1"></i>
+              <i class="fa-regular fa-star" data-score="2"></i>
+              <i class="fa-regular fa-star" data-score="3"></i>
+              <i class="fa-regular fa-star" data-score="4"></i>
+              <i class="fa-regular fa-star" data-score="5"></i>
             </div>
-          {{/each}}
-        {{else}}
-          <p class="text-muted text-center">No upcoming games 🎯</p>
-        {{/if}}
-      </div>
-
-      <div class="col-md-6">
-        <h5 class="text-center mb-3">Past Games</h5>
-        {{#if pastGameBookings.length}}
-          {{#each pastGameBookings}}
-            <div class="card mb-4 text-center shadow-sm">
-              <div class="card-body">
-                <h5 class="card-title fw-semibold">{{this.title}}</h5>
-                <p class="card-text text-muted">{{formatDate this.startTime}}</p>
-                <button
-                  class="btn btn-success btn-rate"
-                  data-booking-id="{{this._id}}"
-                  data-players='{{json this.players}}'
-                >
-                  ⭐ Rate Players
-                </button>
-              </div>
-            </div>
-          {{/each}}
-        {{else}}
-          <p class="text-muted text-center">No past games ⌛</p>
-        {{/if}}
-      </div>
-    </div>
-  </section>
-
-  {{!-- Gym Bookings --}}
-  <section class="w-100 mb-5">
-    <h3 class="text-primary text-center mb-4">🏋️ Gym Bookings</h3>
-    <div class="row justify-content-center">
-      <div class="col-md-6">
-        <h5 class="text-center mb-3">Future Sessions</h5>
-        {{#if futureGymBookings.length}}
-          {{#each futureGymBookings}}
-            <div class="card mb-4 text-center shadow-sm">
-              <div class="card-body">
-                <h5 class="card-title fw-semibold">{{this.title}}</h5>
-                <p class="card-text text-muted">{{formatDate this.dateTime}} {{formatTime this.dateTime}}</p>
-                <a href="/gymBuddy/details/{{this._id}}" class="btn btn-outline-primary">View Session</a>
-              </div>
-            </div>
-          {{/each}}
-        {{else}}
-          <p class="text-muted text-center">No upcoming sessions 🏋️</p>
-        {{/if}}
-      </div>
-
-      <div class="col-md-6">
-        <h5 class="text-center mb-3">Past Sessions</h5>
-        {{#if pastGymBookings.length}}
-          {{#each pastGymBookings}}
-            <div class="card mb-4 text-center shadow-sm">
-              <div class="card-body">
-                <h5 class="card-title fw-semibold">{{this.title}}</h5>
-                <p class="card-text text-muted">{{formatDate this.dateTime}}</p>
-                <p class="text-muted small">Session complete ✅</p>
-              </div>
-            </div>
-          {{/each}}
-        {{else}}
-          <p class="text-muted text-center">No past sessions 💤</p>
-        {{/if}}
-      </div>
-    </div>
-  </section>
-
-  {{!-- Esports Bookings --}}
-  <section class="w-100 text-center mb-5">
-    <h3 class="text-warning">🎮 Esports Bookings</h3>
-    <p class="text-muted">Coming soon! 🚀</p>
-  </section>
-
-  {{!-- Modal + Toast --}}
-  <div id="rateModal" class="modal" tabindex="-1">
-    <div class="modal-dialog modal-dialog-centered">
-      <div class="modal-content p-4">
-        <h5 class="fw-bold text-center">⭐ Rate Your Teammates</h5>
-        <form id="rateForm" class="text-center">
-          <div id="rateFields" class="my-3"></div>
-          <div class="d-flex justify-content-center gap-3">
-            <button type="submit" class="btn btn-primary">Submit Ratings</button>
-            <button type="button" class="btn btn-secondary" id="rateCancel">Cancel</button>
           </div>
+          {{/ifCond}}
+          {{/each}}
+          <button type="submit" class="btn btn-success btn-sm mt-2">Submit Ratings</button>
         </form>
       </div>
+
     </div>
   </div>
+  {{/each}}
+  {{/if}}
 
-  <div id="toast-container" class="position-fixed bottom-0 end-0 p-3"></div>
-</main>
+  <!-- Past Gym Sessions -->
+  {{#if pastGymBookings.length}}
+  <h4>Past Gym Sessions</h4>
+  {{#each pastGymBookings}}
+  <div class="booking-card card mb-4">
+    <div class="card-body">
+      <h5 class="card-title">{{title}}</h5>
+      <p class="card-text"><strong>Date:</strong> {{formattedDateTime}}</p>
+      <p class="card-text"><strong>Gym:</strong> {{gym}}</p>
+
+      {{#ifCond players.length '>' 1}}
+      <button class="btn btn-primary btn-sm rate-players-btn" data-booking-id="{{_id}}">
+        Rate Players
+      </button>
+      {{/ifCond}}
+
+      <div id="rate-players-{{_id}}" class="rate-players-panel d-none mt-3">
+        <form class="rate-form" data-booking-id="{{_id}}">
+          {{#each players}}
+          {{#ifCond this._id '!=' ../host}}
+          <div class="mb-2">
+            <strong>{{this.username}}</strong>
+            <div class="rating-stars" data-user-id="{{this._id}}">
+              <i class="fa-regular fa-star" data-score="1"></i>
+              <i class="fa-regular fa-star" data-score="2"></i>
+              <i class="fa-regular fa-star" data-score="3"></i>
+              <i class="fa-regular fa-star" data-score="4"></i>
+              <i class="fa-regular fa-star" data-score="5"></i>
+            </div>
+          </div>
+          {{/ifCond}}
+          {{/each}}
+          <button type="submit" class="btn btn-success btn-sm mt-2">Submit Ratings</button>
+        </form>
+      </div>
+
+    </div>
+  </div>
+  {{/each}}
+  {{/if}}
+
+  <!-- Future Games and Sessions -->
+  <h4>Upcoming Games and Sessions</h4>
+  {{#each futureGameBookings}}
+  <div class="booking-card card mb-3">
+    <div class="card-body">
+      <h5 class="card-title">{{title}}</h5>
+      <p class="card-text"><strong>Date:</strong> {{formattedDateTime}}</p>
+      <p class="card-text"><strong>Venue:</strong> {{venue}}</p>
+    </div>
+  </div>
+  {{/each}}
+
+  {{#each futureGymBookings}}
+  <div class="booking-card card mb-3">
+    <div class="card-body">
+      <h5 class="card-title">{{title}}</h5>
+      <p class="card-text"><strong>Date:</strong> {{formattedDateTime}}</p>
+      <p class="card-text"><strong>Gym:</strong> {{gym}}</p>
+    </div>
+  </div>
+  {{/each}}
+
+</div>
+
+
 
 <script src="/js/bookings.js"></script>

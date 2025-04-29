@@ -5,6 +5,11 @@ import verifyToken from "../middleware/auth.js";
 import { checkString } from "../utils/helper.js";
 import Userlist from "../models/User.js";
 import mongoose from "mongoose";
+import UserProfile from "../models/userProfile.js";
+const ObjectId = mongoose.Types.ObjectId;
+
+
+
 
 const router = Router();
 
@@ -239,6 +244,8 @@ router.get("/bookings", verifyToken, async (req, res) => {
   const userId = req.user.userID;
 
   try {
+
+    console.log("userId", userId);
     const allGameBookings = await joinGameData.getJoinedGamesByUser(userId);
     const allGymBookings = await gymBuddyData.getJoinedSessionsByUser(userId);
 
@@ -250,7 +257,7 @@ router.get("/bookings", verifyToken, async (req, res) => {
           game.players.map(async (pid) => {
             const user = await Userlist.findById(pid).select("username");
             return {
-              userId: pid,
+              _id: pid.toString(),     // <- Convert ObjectId to string
               username: user ? user.username : "Unknown",
             };
           })
@@ -259,15 +266,21 @@ router.get("/bookings", verifyToken, async (req, res) => {
         return {
           ...game.toObject(),
           players: enrichedPlayers,
+          host: game.host.toString()  // <- Important: make host ID a string too
         };
       })
     );
 
+
+    console.log("allGameBookingsEnriched", allGameBookingsEnriched)
+
     const pastGameBookings = allGameBookingsEnriched.filter(
-      (game) => new Date(game.startTime) < now
+      (game) => new Date(game.endTime) < now
     );
+
+    console.log("pastGameBookings", pastGameBookings)
     const futureGameBookings = allGameBookingsEnriched.filter(
-      (game) => new Date(game.startTime) >= now
+      (game) => new Date(game.endTime) >= now
     );
 
     const pastGymBookings = allGymBookings.filter(
@@ -279,12 +292,14 @@ router.get("/bookings", verifyToken, async (req, res) => {
 
     res.render("userProfile/bookings", {
       title: "Your Bookings",
+      layout: "main",
       pastGameBookings,
       futureGameBookings,
       pastGymBookings,
       futureGymBookings,
       pastEsportsBookings: [],
       futureEsportsBookings: [],
+      currentUserId: req.user.userID,
       head: `<link rel="stylesheet" href="/css/bookings.css">`,
     });
   } catch (err) {
@@ -293,8 +308,9 @@ router.get("/bookings", verifyToken, async (req, res) => {
 });
 
 // ————— Rate Players API ——————
+
 router.post("/bookings/rate", verifyToken, async (req, res) => {
-  const raterId = req.user.userID;
+  const raterId = req.user.userID; // Ensure this is a valid ObjectId
   const { bookingId, ratings } = req.body;
 
   try {
@@ -302,25 +318,46 @@ router.post("/bookings/rate", verifyToken, async (req, res) => {
       return res.status(400).json({ error: "Missing bookingId or ratings" });
     }
 
-    const processedRatings = ratings.map((r) => {
-      if (!mongoose.Types.ObjectId.isValid(r.userId)) {
-        throw new Error(`Invalid rated user ID: ${r.userId}`);
+    for (const r of ratings) {
+      const ratedUserId = r.userId;
+      const score = r.score;
+
+      // Validate ObjectId
+      if (!ObjectId.isValid(ratedUserId)) {
+        console.error(`Invalid rated user ID: ${ratedUserId}`);
+        continue; // Skip invalid entries
       }
 
-      return {
-        bookingId: new mongoose.Types.ObjectId(bookingId),
-        ratedUserId: new mongoose.Types.ObjectId(r.userId),
-        ratingValue: r.score,
-      };
-    });
+      // Find the UserProfile of the rated user
+      const profile = await UserProfile.findOne({ userId: ratedUserId });
+      if (!profile) {
+        console.error(`No profile found for user ID: ${ratedUserId}`);
+        continue; // Skip if profile not found
+      }
 
-    await userProfileData.ratePlayers(raterId, processedRatings);
+      // Add the new rating
+      profile.ratings.push({
+        rater: new ObjectId(raterId), // Ensure rater is an ObjectId
+        score: score,
+        bookingId: new ObjectId(bookingId),
+      });
+
+      // Update rating count and average rating
+      profile.ratingCount = profile.ratings.length;
+      profile.averageRating =
+        profile.ratings.reduce((sum, rating) => sum + rating.score, 0) /
+        profile.ratingCount;
+
+      await profile.save();
+    }
+
     return res.json({ success: true });
   } catch (e) {
     console.error("Error saving ratings:", e);
-    return res.status(400).json({ error: e.message || e.toString() });
+    return res.status(500).json({ error: "An error occurred while saving ratings." });
   }
 });
+
 
 // ————— Show Rate Players Form ——————
 router.get("/bookings/rate/:bookingId", verifyToken, async (req, res) => {
@@ -361,6 +398,8 @@ router.get("/bookings/rate/:bookingId", verifyToken, async (req, res) => {
 router.get("/view/:targetUserId", verifyToken, async (req, res) => {
   try {
     const profile = await userProfileData.getProfile(req.params.targetUserId);
+
+
     const isOwn = req.params.targetUserId === req.user.userID;
     const isFollowing = profile.followers
       .map((f) => f.toString())
