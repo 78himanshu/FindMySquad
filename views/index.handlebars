@@ -220,30 +220,36 @@
       }
     })
   </script> --}}
-
-  <script>
+<script>
   document.addEventListener('DOMContentLoaded', () => {
-    const cookiee = "user_location"
-    function getCookie(x) {
-      const y = document.cookie.match(new RegExp('(^| )' + x + '=([^;]+)'))
-      return y ? decodeURIComponent(y[2]) : null;
+    const cookieName = "user_location";
+
+    function getCookie(name) {
+      const match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
+      return match ? decodeURIComponent(match[2]) : null;
     }
 
-    if (!getCookie(cookiee) && 'geolocation' in navigator) {
-      navigator.geolocation.getCurrentPosition(
-        async (position) => {
-          const { latitude, longitude } = position.coords;
-          const value = JSON.stringify({ lat: latitude, lng: longitude });
-          document.cookie = `${cookiee}=${encodeURIComponent(value)}; path=/; max-age=${60 * 60 * 24 * 7}`
-          console.log("Location stored in cookie:", value);
-        },
-        (error) => {
-          console.warn('Geolocation error:', error.message);
-        }
-      );
+    if (!getCookie(cookieName)) {
+      if ('geolocation' in navigator) {
+        navigator.geolocation.getCurrentPosition(
+          (position) => {
+            const { latitude, longitude } = position.coords;
+            const value = JSON.stringify({ lat: latitude, lng: longitude });
+            document.cookie = `${cookieName}=${encodeURIComponent(value)}; path=/; max-age=${60 * 60 * 24 * 7}`;
+            console.log("Location stored from user permission:", value);
+          },
+          (error) => {
+            console.warn('User denied or geolocation error:', error.message);
+          }
+        );
+      } else {
+        console.warn('Geolocation not supported by browser.');
+      }
     }
-  })
+  });
 </script>
+
+
 
 </body>
 
