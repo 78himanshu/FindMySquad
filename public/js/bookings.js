@@ -92,3 +92,80 @@ document.addEventListener("DOMContentLoaded", () => {
     setTimeout(() => toast.remove(), delay);
   }
 });
+
+
+
+document.addEventListener('DOMContentLoaded', () => {
+  // Toggle rate player panel
+  document.querySelectorAll('.rate-players-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const bookingId = btn.dataset.bookingId;
+      const panel = document.getElementById(`rate-players-${bookingId}`);
+      panel.classList.toggle('d-none');
+    });
+  });
+
+  // Handle stars click
+  document.querySelectorAll('.rating-stars').forEach(stars => {
+    stars.addEventListener('click', (e) => {
+      if (e.target.matches('i')) {
+        const score = parseInt(e.target.dataset.score);
+        const allStars = stars.querySelectorAll('i');
+        allStars.forEach((star, idx) => {
+          if (idx < score) {
+            star.classList.remove('fa-regular');
+            star.classList.add('fa-solid');
+          } else {
+            star.classList.add('fa-regular');
+            star.classList.remove('fa-solid');
+          }
+        });
+        stars.dataset.selectedScore = score;
+      }
+    });
+  });
+
+  // Handle submit rating
+  document.querySelectorAll('.rate-form').forEach(form => {
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const bookingId = form.dataset.bookingId;
+      const ratings = [];
+
+      form.querySelectorAll('.rating-stars').forEach(starDiv => {
+        const score = parseInt(starDiv.dataset.selectedScore || 0);
+        if (score > 0) {
+          ratings.push({
+            userId: starDiv.dataset.userId,
+            score
+          });
+        }
+      });
+
+      if (ratings.length === 0) {
+        alert('Please rate at least one player.');
+        return;
+      }
+
+      try {
+        const res = await fetch('/profile/bookings/rate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ bookingId, ratings })
+        });
+
+        const data = await res.json();
+        if (data.success) {
+          alert('✅ Ratings submitted successfully!');
+          form.closest('.rate-players-panel').classList.add('d-none');
+        } else {
+          throw new Error(data.error || 'Something went wrong');
+        }
+      } catch (err) {
+        alert(`❌ ${err.message}`);
+      }
+    });
+  });
+});
+
