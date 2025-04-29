@@ -1,6 +1,8 @@
 // 🛠 FIX 1: Import mongoose and get ObjectId properly
 import mongoose from "mongoose";
 const { ObjectId } = mongoose.Types;
+import { geocodeCity } from '../utils/geocode.js';
+
 
 import UserProfile from "../models/userProfile.js";
 import { checkString } from "../utils/helper.js";
@@ -11,6 +13,13 @@ export const createProfile = async (userId, data) => {
   const existing = await UserProfile.findOne({ userId });
   if (existing) throw "Profile already exists";
   // Validation (can add validateProfileData(data) here if you want)
+
+  if (data.city) {
+    const geoLocation = await geocodeCity(data.city);
+    if (geoLocation) {
+      data.geoLocation = geoLocation;
+    }
+  }
 
   const newProfile = new UserProfile({ userId, ...data });
   await newProfile.save();

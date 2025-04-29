@@ -103,7 +103,21 @@ const userProfileSchema = new mongoose.Schema({
     ],
     default: []
   },
-  createdAt: { type: Date, default: Date.now }
+  createdAt: { type: Date, default: Date.now },
+  city: { type: String, required: true },
+  phoneNumber: { type: String, required: true },
+  geoLocation: {
+    type: {
+      type: String,
+      enum: ['Point'],
+      required: true
+    },
+    coordinates: {
+      type: [Number],
+      required: true
+    }
+  }
 });
 
+userProfileSchema.index({ geoLocation: '2dsphere' });
 export default mongoose.model('UserProfile', userProfileSchema);

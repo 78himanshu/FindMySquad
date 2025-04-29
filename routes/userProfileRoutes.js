@@ -7,6 +7,7 @@ import Userlist from "../models/User.js";
 import mongoose from "mongoose";
 import UserProfile from "../models/userProfile.js";
 const ObjectId = mongoose.Types.ObjectId;
+//import { geocodeCity } from '../utils/geocode.js';
 
 
 
@@ -37,7 +38,9 @@ router
         sportsInterests,
         gymPreferences,
         gamingInterests,
-        location,
+        city,
+        phoneNumber,
+        //geoLocation
       } = req.body;
 
       console.log(">>>", req.body);
@@ -68,6 +71,8 @@ router
         checkString(interest, "gamingInterests")
       );
 
+      //const geoLocation = await geocodeCity(city);
+
       let profileData = {
         profile: {
           firstName,
@@ -79,6 +84,9 @@ router
         sportsInterests,
         gymPreferences,
         gamingInterests,
+        city,
+        phoneNumber,
+        //geoLocation
       };
 
       const profile = await userProfileData.createProfile(
