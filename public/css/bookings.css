@@ -84,18 +84,31 @@ hr {
   }
 }
 
-.rating-stars i {
+.stars {
+  display: inline-block;
+}
+
+.stars i {
   cursor: pointer;
-  font-size: 24px;
-  color: lightgray;
+  font-size: 1.25rem;
+  color: #ccc;
 }
 
-.rating-stars i.fa-solid {
-  color: gold;
+.stars i.selected {
+  color: #f7c600;
 }
 
-.rate-players-panel {
-  background: #f9f9f9;
-  padding: 10px;
-  border-radius: 8px;
+.stars.disabled i {
+  pointer-events: none;
+  opacity: 0.6;
+}
+
+.rating-section {
+  padding: 5px 0;
+  border-bottom: 1px solid #eee;
+}
+
+.player-link {
+  display: block;
+  font-weight: 600;
 }

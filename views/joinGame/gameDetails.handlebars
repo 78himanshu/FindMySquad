@@ -5,64 +5,65 @@
     <p><strong>Sport:</strong> {{game.sport}}</p>
     <p><strong>Venue:</strong> {{game.venue}}</p>
     <p><strong>Location:</strong> {{game.location}}</p>
-    <p><strong>Date & Time:</strong> 
-      {{formatDate game.startTime}} | 
+    <p><strong>Date & Time:</strong>
+      {{formatDate game.startTime}} |
       {{formatTime game.startTime}} – {{formatTime game.endTime}}
-    </p>    
+    </p>
     <p><strong>Description:</strong> {{game.description}}</p>
     <p><strong>Players:</strong> {{game.playersGoing}} / {{game.playersRequired}}</p>
 
-<p><strong>Hosted By:</strong> 
-<a href="/profile/view/{{game.host._id}}" class="host-link">{{game.host.username}}</a>
-</p>
+    <p><strong>Hosted By:</strong>
+      <a href="/profile/view/{{game.host._id}}" class="host-link">{{game.host.username}}</a>
+    </p>
 
-{{#if joinedPlayers.length}}
-  <p><strong>Players Joined:</strong></p>
-  <ul>
-    {{#each joinedPlayers}}
+    {{#if joinedPlayers.length}}
+    <p><strong>Players Joined:</strong></p>
+    <ul>
+      {{#each joinedPlayers}}
       <li>
-<a href="/profile/view/{{this._id}}" class="player-link">{{this.username}}</a>
+        <a href="/profile/userview/{{this._id}}" class="player-link">{{this.username}}</a>
       </li>
-    {{/each}}
-  </ul>
-{{/if}}
+      {{/each}}
+    </ul>
+    {{/if}}
 
 
 
   </div>
 
   {{#if error}}
-    <div class="error-message" style="color: red; background: #fbe9e9; padding: 10px; border: 1px solid #ff0000; margin-bottom: 10px;">
-      {{error}}
-    </div>
+  <div class="error-message"
+    style="color: red; background: #fbe9e9; padding: 10px; border: 1px solid #ff0000; margin-bottom: 10px;">
+    {{error}}
+  </div>
   {{/if}}
 
   <div class="action-btn" style="margin-top: 20px;">
     {{#if isLoggedIn}}
-      {{#if (eq userId hostId)}}
-        <!-- Host actions -->
-        <a href="/host/edit/{{game._id}}" class="btn btn-warning" style="margin-right: 10px;">Edit</a>
-        <form action="/host/delete/{{game._id}}" method="POST" style="display:inline;">
-          <button type="submit" class="btn btn-danger">Delete</button>
-        </form>
-      {{else if hasJoined}}
-        <!-- Joined user can leave -->
-        <form method="POST" action="/join/leave/{{game._id}}">
-          <button type="submit" class="btn btn-secondary">Leave Game</button>
-        </form>
-      {{else if (gte (length game.players) game.playersRequired)}}
-        <!-- Session full and not joined -->
-        <p class="full-session">🚫 Session is Full</p>
-      {{else}}
-        <!-- Available to join -->
-        <form method="POST" action="/join">
-          <input type="hidden" name="gameId" value="{{game._id}}">
-          <button type="submit" class="btn btn-primary">Join Game</button>
-        </form>
-      {{/if}}
+    {{#if (eq userId hostId)}}
+    <!-- Host actions -->
+    <a href="/host/edit/{{game._id}}" class="btn btn-warning" style="margin-right: 10px;">Edit</a>
+    <form action="/host/delete/{{game._id}}" method="POST" style="display:inline;">
+      <button type="submit" class="btn btn-danger">Delete</button>
+    </form>
+    {{else if hasJoined}}
+    <!-- Joined user can leave -->
+    <form method="POST" action="/join/leave/{{game._id}}">
+      <button type="submit" class="btn btn-secondary">Leave Game</button>
+    </form>
+    {{else if (gte (length game.players) game.playersRequired)}}
+    <!-- Session full and not joined -->
+    <p class="full-session">🚫 Session is Full</p>
     {{else}}
-      <!-- Not logged in -->
-      <a href="/login?redirect=/join/{{game._id}}" class="btn btn-secondary">Login to Join</a>
+    <!-- Available to join -->
+    <form method="POST" action="/join">
+      <input type="hidden" name="gameId" value="{{game._id}}">
+      <button type="submit" class="btn btn-primary">Join Game</button>
+    </form>
+    {{/if}}
+    {{else}}
+    <!-- Not logged in -->
+    <a href="/login?redirect=/join/{{game._id}}" class="btn btn-secondary">Login to Join</a>
     {{/if}}
   </div>
 </main>

@@ -85,7 +85,24 @@ const hbs = exphbs.create({
         default:
           return options.inverse(this);
       }
+    },
+    range: (from, to) => {
+      let result = [];
+      for (let i = from; i <= to; i++) {
+        result.push(i);
+      }
+      return result;
+    },
+    lte: (a, b) => a <= b,
+    object: (...args) => {
+      const options = args.pop();
+      return args.reduce((acc, val, i) => {
+        if (i % 2 === 0) acc[val] = args[i + 1];
+        return acc;
+      }, {});
     }
+
+
   },
 });
 
