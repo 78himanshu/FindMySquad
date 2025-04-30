@@ -62,7 +62,7 @@ const games = [
   });
 
   // 2. Route to show tournaments for a specific game
-router.get('/:gameName', async (req, res) => {
+router.get('/game/:gameName', async (req, res) => {
   try {
     const gameName = decodeURIComponent(req.params.gameName);
     const allTournaments = await Tournament.find({ game: gameName })
@@ -113,149 +113,106 @@ allTournaments.forEach(t => {
   }
 });
 
+// Show Register Team Page
 router.get('/:tournamentId/register-team', requireAuth, async (req, res) => {
-  try {
-    if (!req.user || !req.user.userId) {
-      return res.status(401).send('Unauthorized: User info missing');
+  const tournament = await Tournament.findById(req.params.tournamentId)
+    .populate('teams.players', 'username')
+    .populate('creator', 'username');
+  if (!tournament) return res.status(404).send('Tournament not found.');
+
+  const userId = req.user.userId.toString();
+  const playersPerTeam = parseInt(tournament.format[0], 10);
+
+  // 1) Creator?
+  const isCreator = tournament.creator._id.toString() === userId;
+
+  // 2) Already in a team?
+  let isAlreadyInTeam = false;
+  let isTeamLeader = false;
+  let userTeam = null;
+  for (const team of tournament.teams) {
+    if (team.players.some(p => p._id.toString() === userId)) {
+      isAlreadyInTeam = true;
+      userTeam = team;
+      // leader is first in array
+      isTeamLeader = team.players[0]._id.toString() === userId;
+      break;
     }
-
-    // console.log(">>>>>",req.user);
-
-    const tournament = await Tournament.findById(req.params.tournamentId)
-      .populate('teams.players', 'username')  // safe populate
-      .populate('creator', 'username');        // populate creator
-
-    // console.log(">>>>>",tournament);
-
-    if (!tournament) {
-      return res.status(404).send('Tournament not found.');
-    }
-
-    const playersPerTeam = parseInt(tournament.format[0]);
-
-    // console.log("playersPerTeam",playersPerTeam)
-    const userId = req.user.userId.toString();  // force userId to string once here
-
-    // console.log("userId>>>",userId)
-
-    // SAFELY check if the user is the creator
-    let isCreator = false;
-    if (tournament.creator && tournament.creator._id) {
-      isCreator = tournament.creator._id === userId;
-    }
-
-    // console.log("=====>>>>>")
-
-    // SAFELY check if already in a team
-    let isAlreadyInTeam = false;
-    let userTeam = null;
-    for (const team of tournament.teams) {
-      // console.log("><><><>",team)
-      for (const player of team.players) {
-        // console.log("<<<>>>",player)
-        const playerId = player._id ? player._id : player;
-        if (playerId === userId) {
-          isAlreadyInTeam = true;
-          userTeam = team;
-          break;
-        }
-      }
-      if (isAlreadyInTeam) break;
-    }
-
-    res.render('egaming/registerTeam', {
-      tournament,
-      playersPerTeam,
-      isCreator,
-      isAlreadyInTeam,
-      userTeam,
-      backgroundImage: getGameImage(tournament.game)
-    });
-  } catch (err) {
-    console.error(err);
-    res.status(500).send('Server error');
   }
+
+  return res.render('egaming/registerTeam', {
+    tournament,
+    playersPerTeam: parseInt(tournament.format[0], 10),
+    userId,
+    isCreator,
+    isAlreadyInTeam,
+    isTeamLeader,
+    userTeam,
+    backgroundImage: getGameImage(tournament.game)
+  });
 });
+
 
 
 
 // 4. Route: POST -> Register a team
 router.post('/:tournamentId/register-team', requireAuth, async (req, res) => {
-  try {
-    const { teamName, joinTeamId, action } = req.body;
+  const { action, teamName,teamDescription, joinTeamId } = req.body;
+  const tournament = await Tournament.findById(req.params.tournamentId).populate('creator');
+  if (!tournament) return res.status(404).send('Tournament not found.');
 
-    console.log("===>>>",req.body)
-    const tournament = await Tournament.findById(req.params.tournamentId)
-      .populate('creator');
-      
-      console.log("===>>>",tournament)
+  const userId = req.user.userId.toString();
+  const playersPerTeam = parseInt(tournament.format[0], 10);
 
-    if (!tournament) {
-      return res.status(404).send('Tournament not found');
-    }
-
-    const playersPerTeam = parseInt(tournament.format[0]);
-    if (isNaN(playersPerTeam) || playersPerTeam < 1) {
-      return res.status(400).send('Invalid team format');
-    }
-
-    console.log("===>>>",playersPerTeam)
-
-
-    const userId = req.user.userId;
-
-    console.log("userId",userId)
-    // Prevent tournament creator from joining
-    if (tournament.creator && tournament.creator._id === userId) {
-      return res.status(403).send('You cannot register a team for your own tournament.');
-    }
-
-    // Check if user already in any team
-    const alreadyInTeam = tournament.teams.some(team =>
-      team.players.some(playerId => playerId === userId.toString())
-    );    
-
-    console.log(alreadyInTeam,"alreadyInTeam")
-    if (alreadyInTeam) {
-      return res.status(400).send('You are already part of a team.');
-    }
-
-    if (action === 'create') {
-      if (!teamName || teamName.trim().length < 2) {
-        return res.status(400).send('Team name must be at least 2 characters.');
-      }
-      const normalizedName = teamName.trim().toLowerCase();
-      const isDuplicate = tournament.teams.some(
-        team => team.teamName.trim().toLowerCase() === normalizedName
-      );
-      if (isDuplicate) {
-        return res.status(400).send('Team name already taken.');
-      }
-
-      tournament.teams.push({
-        teamName: teamName.trim(),
-        players: [userId]
-      });
-
-    } else if (action === 'join') {
-      const team = tournament.teams.id(joinTeamId);
-      if (!team) {
-        return res.status(404).send('Team not found.');
-      }
-      if (team.players.length >= playersPerTeam) {
-        return res.status(400).send('Team is already full.');
-      }
-
-      team.players.push(userId);
-    }
-
-    await tournament.save();
-    res.redirect(`/esports/${encodeURIComponent(tournament.game)}`);
-  } catch (err) {
-    console.error(err);
-    res.status(500).send('Server error');
+  // 1) Creator can’t register
+  if (tournament.creator._id.toString() === userId) {
+    return res.status(403).send('You created this tournament and cannot join.');
   }
+
+  // 2) Check if already in a team (leader or member)
+  const userTeam = tournament.teams.find(team =>
+    team.players.some(p => p != null && p.toString() === userId)
+  );
+  if (userTeam) {
+    const isLeader = userTeam.players[0].toString() === userId;
+    if (isLeader) {
+      return res.status(400).send('As a team leader you cannot create or join another team.');
+    }
+    return res.status(400).send('You are already part of a team in this tournament.');
+  }
+
+  // Now we’re safe to create or join:
+  if (action === 'create') {
+    if (!teamName || teamName.trim().length < 2) {
+      return res.status(400).send('Team name must be at least 2 characters.');
+    }
+    if (!teamDescription || teamDescription.trim().length < 5) {
+      return res.status(400).send('Team description must be 5–200 characters.');
+    }
+    const normalized = teamName.trim().toLowerCase();
+    if (tournament.teams.some(t => t.teamName.trim().toLowerCase() === normalized)) {
+      return res.status(400).send('Team name already taken.');
+    }
+    tournament.teams.push({
+            teamName: teamName.trim(),
+            teamDescription: teamDescription.trim(),
+            players: [userId]
+      });
+  } else if (action === 'join') {
+    const team = tournament.teams.id(joinTeamId);
+    if (!team) return res.status(404).send('Team not found.');
+    if (team.players.length >= playersPerTeam) {
+      return res.status(400).send('That team is already full.');
+    }
+    team.players.push(userId);
+  }
+
+  await tournament.save();
+  // send them back to see their new status
+  return res.redirect(`/esports/${req.params.tournamentId}/register-team`);
 });
+
+
 
 // Route: POST -> Leave Team
 router.post('/:tournamentId/leave-team', requireAuth, async (req, res) => {
@@ -267,26 +224,70 @@ router.post('/:tournamentId/leave-team', requireAuth, async (req, res) => {
 
     // Find the team the user is part of
     const team = tournament.teams.find(team =>
-      team.players.some(playerId => playerId?.toString() === userId)
+      team.players.some(p => p != null && p.toString() === userId)
     );
 
     if (!team) return res.status(400).send('You are not part of any team');
 
-   // Replace it with this:
-   team.players = team.players.filter(playerId => playerId?.toString() !== userId);
+    team.players = team.players.filter(p => p != null && p.toString() !== userId);
 
     // Remove the team if it's empty
     if (team.players.length === 0) {
-      tournament.teams = tournament.teams.filter(t => t._id.toString() !== team._id.toString());
+      tournament.teams = tournament.teams.filter(t =>
+            t._id.toString() !== team._id.toString()
+          );
     }
 
     await tournament.save();
-    res.redirect(`/esports/${encodeURIComponent(tournament.game)}`);
+    res.redirect(`/esports/${req.params.tournamentId}/register-team`);
   } catch (err) {
     console.error(err);
     res.status(500).send('Server error');
   }
 });
 
+// Remove a member from any team
+router.post('/:tournamentId/team/:teamId/remove-member', requireAuth, async (req, res) => {
+  const { tournamentId, teamId } = req.params;
+  const { memberId } = req.body;
+  const tournament = await Tournament.findById(tournamentId);
+  if (!tournament) return res.status(404).send('Tournament not found');
+  const userId = req.user.userId.toString();
+
+  // locate the team
+  const team = tournament.teams.id(teamId);
+  if (!team) return res.status(404).send('Team not found');
+
+  // only creator or that team’s leader can remove
+  const isCreator = tournament.creator.toString() === userId;
+  const isLeader  = team.players[0].toString() === userId;
+  if (!isCreator && !isLeader) return res.status(403).send('Forbidden');
+
+  // remove the member
+  team.players = team.players.filter(p => p.toString() !== memberId);
+  await tournament.save();
+  res.redirect(`/esports/${tournamentId}/register-team`);
+});
+
+// Disband (delete) an entire team
+router.post('/:tournamentId/team/:teamId/disband', requireAuth, async (req, res) => {
+  const { tournamentId, teamId } = req.params;
+  const tournament = await Tournament.findById(tournamentId);
+  if (!tournament) return res.status(404).send('Tournament not found');
+  const userId = req.user.userId.toString();
+
+  const team = tournament.teams.id(teamId);
+  if (!team) return res.status(404).send('Team not found');
+
+  // only creator or that team’s leader
+  const isCreator = tournament.creator.toString() === userId;
+  const isLeader  = team.players[0].toString() === userId;
+  if (!isCreator && !isLeader) return res.status(403).send('Forbidden');
+
+  // remove the team
+  tournament.teams = tournament.teams.filter(t => t._id.toString() !== teamId);
+  await tournament.save();
+  res.redirect(`/esports/${tournamentId}/register-team`);
+});
 
 export default router;

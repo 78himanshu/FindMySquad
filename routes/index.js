@@ -40,7 +40,6 @@ const configRoutesFunction = (app) => {
 
   // Host games routes
   app.use("/host", hostGamesRoutes);
-  app.use('/esports', esportsRoutes);
   app.use('/tournaments', tournamentRoutes);
   app.use("/gymBuddy", gymBuddyRoutes);
   //Join game routes

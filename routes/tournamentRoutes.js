@@ -47,50 +47,89 @@ router.get('/create', requireAuth, (req, res) => {
   "Rocket League",
   "Apex Legends"
 ];
-
+const minDate = new Date().toISOString().split('T')[0];
+res.render('egaming/createTournament', {
+  games: esportsGames,
+  username: req.user?.username,
+  minDate
+});
   res.render('egaming/createTournament', {
     games: esportsGames,
     username: req.user?.username
   });
 });
-
 // POST: Handle Form Submission
 router.post('/create', requireAuth, async (req, res) => {
-  const { game, format, date, time, description, skillLevel, maxTeams, total, first, second, third } = req.body;
-
-  if (Number(first) + Number(second) + Number(third) !== Number(total)) {
-    return res.status(400).send("1st + 2nd + 3rd must equal total prize pool.");
-  }
-
-  if (Number(third) > Number(second)) {
-    return res.status(400).send("3rd prize must be less than or equal to 2nd prize.");
-  }
-
-  if (Number(maxTeams) > 100) {
-    return res.status(400).send("Max teams cannot exceed 100.");
-  }
-  console.log("USER:", req.user);
-
-
   try {
+    let {
+      game,
+      format,
+      date,
+      startTime,
+      endTime,
+      description,
+      skillLevel,
+      maxTeams,
+      prizeDescription
+    } = req.body;
+
+    // trim
+    prizeDescription = prizeDescription?.trim();
+
+    // 1) Prize Description: 5–50 chars
+    if (
+      !prizeDescription ||
+      prizeDescription.length < 5 ||
+      prizeDescription.length > 50
+    ) {
+      return res
+        .status(400)
+        .send('Prize Description must be between 5 and 50 characters.');
+    }
+
+    // 2) Date cannot be in the past
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const chosen = new Date(date);
+    if (chosen < today) {
+      return res.status(400).send('Date cannot be in the past.');
+    }
+
+    // 3) Start/end times: start < end
+    if (!startTime || !endTime || startTime >= endTime) {
+      return res
+        .status(400)
+        .send('Start time must be before end time.');
+    }
+
+    // 4) Max teams between 1 and 100
+    maxTeams = parseInt(maxTeams, 10);
+    if (isNaN(maxTeams) || maxTeams < 1 || maxTeams > 100) {
+      return res
+        .status(400)
+        .send('Max teams must be between 1 and 100.');
+    }
+
+    // create and save
     const tournament = new Tournament({
       creator: req.user.userID,
       game,
       format,
       date,
-      time,
+      startTime,
+      endTime,
       description,
       skillLevel,
       maxTeams,
-      teams:[],
-      prizePool: { total, first, second, third }
+      teams: [],
+      prizeDescription
     });
 
     await tournament.save();
     res.redirect('/esports');
   } catch (err) {
     console.error(err);
-    res.status(500).send("Server Error");
+    res.status(500).send('Server Error');
   }
 });
 

@@ -41,22 +41,23 @@
 <main class="container py-5">
   <h2 class="mb-4">Create Your Own Tournament</h2>
 
-  <form action="/tournaments/create" method="POST">
+  <form id="createTournamentForm" action="/tournaments/create" method="POST" novalidate>
     <!-- Game Selection -->
     <div class="mb-3">
       <label class="form-label">Game</label>
       <select name="game" class="form-control" required>
+        <option disabled selected value="">Select a game</option>
         {{#each games}}
-        <option value="{{this}}">{{this}}</option>
+          <option value="{{this}}">{{this}}</option>
         {{/each}}
       </select>
     </div>
 
-    <!-- Format Dropdown -->
+    <!-- Format -->
     <div class="mb-3">
-    <label class="form-label">Format</label>
+      <label class="form-label">Format</label>
       <select name="format" class="form-control" required>
-        <option disabled selected>Select Format</option>
+        <option disabled selected value="">Select format</option>
         <option value="1v1">1v1</option>
         <option value="2v2">2v2</option>
         <option value="3v3">3v3</option>
@@ -65,16 +66,21 @@
       </select>
     </div>
 
+    <!-- Date -->
+    <div class="mb-3">
+      <label class="form-label">Date</label>
+      <input id="tournamentDate" type="date" name="date" class="form-control" required>
+    </div>
 
-    <!-- Date and Time -->
+    <!-- Start & End Time -->
     <div class="row">
       <div class="col-md-6 mb-3">
-        <label class="form-label">Date</label>
-        <input type="date" name="date" class="form-control" required>
+        <label class="form-label">Start Time</label>
+        <input id="startTime" type="time" name="startTime" class="form-control" required>
       </div>
       <div class="col-md-6 mb-3">
-        <label class="form-label">Time</label>
-        <input type="time" name="time" class="form-control" required>
+        <label class="form-label">End Time</label>
+        <input id="endTime" type="time" name="endTime" class="form-control" required>
       </div>
     </div>
 
@@ -82,7 +88,7 @@
     <div class="mb-3">
       <label class="form-label">Skill Level</label>
       <select name="skillLevel" class="form-control" required>
-        <option disabled selected>Choose a level</option>
+        <option disabled selected value="">Choose a level</option>
         <option>Novice 1</option>
         <option>Novice 2</option>
         <option>Novice 3</option>
@@ -101,35 +107,41 @@
       <input type="number" name="maxTeams" class="form-control" min="1" max="100" required>
     </div>
 
-    <!-- Description -->
+    <!-- Tournament Description -->
     <div class="mb-3">
-      <label class="form-label">Description (optional)</label>
-      <textarea name="description" class="form-control" rows="3"></textarea>
+      <label class="form-label">Tournament Description</label>
+      <textarea name="description" class="form-control" rows="3"
+        minlength="10" maxlength="200" placeholder="Describe your tournament..." required></textarea>
     </div>
 
-    <!-- Prize Pool -->
-    <h5 class="mt-4">Prize Pool Breakdown</h5>
-
-    <div class="row">
-      <div class="col-md-3 mb-3">
-        <label class="form-label">1st Place</label>
-        <input type="number" name="first" class="form-control" required>
-      </div>
-      <div class="col-md-3 mb-3">
-        <label class="form-label">2nd Place</label>
-        <input type="number" name="second" class="form-control" required>
-      </div>
-      <div class="col-md-3 mb-3">
-        <label class="form-label">3rd Place</label>
-        <input type="number" name="third" class="form-control" required>
-      </div>
-      <div class="col-md-3 mb-3">
-        <label class="form-label">Total Prize Pool</label>
-        <input type="number" name="total" class="form-control" required>
-      </div>
+    <!-- Prize Description -->
+    <div class="mb-3">
+      <label class="form-label">Prize Details (5–50 chars)</label>
+      <textarea name="prizeDescription" class="form-control" rows="2"
+        minlength="5" maxlength="50" placeholder="e.g. '1st: $100, 2nd: $50, 3rd: $25'" required></textarea>
     </div>
 
     <!-- Submit -->
     <button type="submit" class="btn btn-primary mt-3">Create Tournament</button>
   </form>
 </main>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const dateInput = document.getElementById('tournamentDate');
+    const today = new Date().toISOString().split('T')[0];
+    dateInput.min = today;
+
+    const form = document.getElementById('createTournamentForm');
+    form.addEventListener('submit', (e) => {
+      const start = document.getElementById('startTime').value;
+      const end = document.getElementById('endTime').value;
+      if (start >= end) {
+        e.preventDefault();
+        alert('Start time must be before end time.');
+      }
+    });
+  });
+</script>
+</body>
+</html>
