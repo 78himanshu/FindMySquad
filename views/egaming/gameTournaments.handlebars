@@ -37,6 +37,14 @@
     <div class="banner-overlay"></div>
     <div class="banner-text">
       <h1>{{gameName}}</h1>
+      <div class="banner-prize mt-2 px-3 py-1 bg-primary text-light rounded">
+        Prize: 
+        {{#if tournaments.length}}
+          {{tournaments.[0].prizeDescription}}
+        {{else}}
+          N/A
+        {{/if}}
+      </div>
     </div>
   </div>
 
@@ -46,7 +54,7 @@
     {{#if tournaments.length}}
       <div class="d-flex flex-column gap-4">
         {{#each tournaments}}
-          {{#unless this.hasStarted}} <!-- Only render if it hasn't started -->
+          {{#unless this.hasEnded}}
           <div class="tournament-card bg-dark text-light p-4 rounded shadow position-relative">
               {{#if this.isOngoing}}
                 <div class="badge bg-warning text-dark position-absolute top-0 end-0 m-3 px-3 py-2 fw-bold">
@@ -57,9 +65,14 @@
 
             <div>
               <h4 class="fw-bold mb-3">{{this.format}}</h4>
-              <p class="mb-1"><strong>Date & Time:</strong> {{formatDate this.date}} at {{formatTime this.time}}</p>
+              <p class="mb-1">
+                  <strong>Date &amp; Time:</strong>
+                  {{formatDate this.date}}
+                  from {{formatTime this.startTime}}
+                  to   {{formatTime this.endTime}}
+                </p>
               <p class="mb-1"><strong>Skill Level:</strong> {{this.skillLevel}}</p>
-              <p class="mb-1"><strong>Prize Pool:</strong> ${{this.prizePool.total}}</p>
+              <p class="mb-1"><strong>Prize Pool:</strong> ${{this.prizeDescription}}</p>
               <p class="mb-1"><strong>Created By:</strong> {{this.creator.username}}</p>
               <p class="mb-1"><strong>Team Size:</strong> {{this.format}}</p>
             </div>

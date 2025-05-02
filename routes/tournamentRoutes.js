@@ -50,13 +50,9 @@ router.get('/create', requireAuth, (req, res) => {
 const minDate = new Date().toISOString().split('T')[0];
 res.render('egaming/createTournament', {
   games: esportsGames,
-  username: req.user?.username,
+  username: req.user.username,
   minDate
 });
-  res.render('egaming/createTournament', {
-    games: esportsGames,
-    username: req.user?.username
-  });
 });
 // POST: Handle Form Submission
 router.post('/create', requireAuth, async (req, res) => {
@@ -74,6 +70,7 @@ router.post('/create', requireAuth, async (req, res) => {
     } = req.body;
 
     // trim
+    description = description?.trim();
     prizeDescription = prizeDescription?.trim();
 
     // 1) Prize Description: 5–50 chars
@@ -112,7 +109,7 @@ router.post('/create', requireAuth, async (req, res) => {
 
     // create and save
     const tournament = new Tournament({
-      creator: req.user.userID,
+      creator: req.user.userId,
       game,
       format,
       date,
@@ -121,8 +118,8 @@ router.post('/create', requireAuth, async (req, res) => {
       description,
       skillLevel,
       maxTeams,
-      teams: [],
-      prizeDescription
+      prizeDescription,
+      teams: []
     });
 
     await tournament.save();

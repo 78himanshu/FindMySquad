@@ -61,49 +61,50 @@ const games = [
     });
   });
 
-  // 2. Route to show tournaments for a specific game
+// 2. Route to show tournaments for a specific game
 router.get('/game/:gameName', async (req, res) => {
   try {
     const gameName = decodeURIComponent(req.params.gameName);
+    // pull in creator.username, sorted by date
     const allTournaments = await Tournament.find({ game: gameName })
-  .populate('creator', 'username')
-  .sort({ date: 1 });
+      .populate('creator', 'username')
+      .sort({ date: 1 });
 
-const now = new Date();
-const upcomingTournaments = [];
-const pastTournaments = [];
-let highestPrize = 0;
+    const now = new Date();
+    const upcomingTournaments = [];  // includes future + ongoing
+    const pastTournaments     = [];  // fully ended
+    let highestPrize          = 0;
 
-allTournaments.forEach(t => {
-  // Combine date + time to create full datetime object
-  const dateStr = t.date.toISOString().split('T')[0];
-  const tournamentDateTime = new Date(`${dateStr}T${t.time}`);
+    allTournaments.forEach(t => {
+      // build full Date objects for start & end
+      const dateStr       = t.date.toISOString().split('T')[0];
+      const startDateTime = new Date(`${dateStr}T${t.startTime}`);
+      const endDateTime   = new Date(`${dateStr}T${t.endTime}`);
 
-  // Calculate flags
-  const hasStarted = tournamentDateTime <= now;
-  const isSameHour = tournamentDateTime.getHours() === now.getHours() &&
-                     tournamentDateTime.getDate() === now.getDate() &&
-                     tournamentDateTime.getMonth() === now.getMonth() &&
-                     tournamentDateTime.getFullYear() === now.getFullYear();
+      // determine state
+      const hasStarted = now >= startDateTime;
+      const hasEnded   = now  >  endDateTime;
+      const isOngoing  = hasStarted && !hasEnded;
 
-  t.hasStarted = hasStarted;
-  t.isOngoing = isSameHour;
+      // attach flags for template
+      t.hasStarted = hasStarted;
+      t.hasEnded   = hasEnded;
+      t.isOngoing  = isOngoing;
 
-  if (!hasStarted) {
-    upcomingTournaments.push(t);
-    highestPrize = Math.max(highestPrize, t.prizePool?.total || 0);
-  } else {
-    pastTournaments.push(t);
-  }
-});
-
-    
+      if (hasEnded) {
+        pastTournaments.push(t);
+      } else {
+        upcomingTournaments.push(t);
+        // only consider prize from non‐ended tournaments
+        highestPrize = Math.max(highestPrize, t.prizePool?.total || 0);
+      }
+    });
 
     res.render('egaming/gameTournaments', {
-      title: gameName,
+      title:         gameName,
       gameName,
       backgroundImage: getGameImage(gameName),
-      tournaments: upcomingTournaments,
+      tournaments:     upcomingTournaments,
       pastTournaments,
       highestPrize
     });
@@ -112,6 +113,7 @@ allTournaments.forEach(t => {
     res.status(500).send('Server error');
   }
 });
+
 
 // Show Register Team Page
 router.get('/:tournamentId/register-team', requireAuth, async (req, res) => {
@@ -195,7 +197,7 @@ router.post('/:tournamentId/register-team', requireAuth, async (req, res) => {
     }
     tournament.teams.push({
             teamName: teamName.trim(),
-            teamDescription: teamDescription.trim(),
+            description: teamDescription.trim(),
             players: [userId]
       });
   } else if (action === 'join') {

@@ -40,12 +40,13 @@
     {{#each tournament.teams}}
       <div class="card mb-4 p-3">
         <h4>Team: {{this.teamName}}</h4>
+        <p class="fst-italic">{{this.teamDescription}}</p>
         <ul class="list-group mb-2">
           {{#each this.players}}
             <li class="list-group-item d-flex justify-content-between align-items-center">
               {{this.username}}
               <form
-                action="/esports/{{tournament._id}}/team/{{@../index}}/remove-member"
+                action="/esports/{{../tournament._id}}/team/{{../this._id}}/remove-member"
                 method="POST"
                 style="margin:0;"
               >
@@ -56,7 +57,7 @@
           {{/each}}
         </ul>
         <form
-          action="/esports/{{tournament._id}}/team/{{@index}}/disband"
+          action="/esports/{{tournament._id}}/team/{{this._id}}/disband"
           method="POST"
         >
           <button class="btn btn-warning">Disband Team</button>
@@ -68,6 +69,7 @@
   {{else if isTeamLeader}}
     <div class="card mb-4 p-3">
       <h4>Your Team: {{userTeam.teamName}}</h4>
+      <p class="fst-italic">{{userTeam.teamDescription}}</p>
       <ul class="list-group mb-2">
         {{#each userTeam.players}}
           <li class="list-group-item d-flex justify-content-between align-items-center">
@@ -130,10 +132,13 @@
           </div>
           <div class="mb-3">
             <label for="teamDescription" class="form-label fw-bold">Team Description</label>
-            <textarea name="teamDescription" id="teamDescription"
-             class="form-control"
-             required minlength="5" maxlength="200"
-             placeholder="Describe your team..."></textarea>
+            <textarea
+              name="teamDescription"
+              id="teamDescription"
+              class="form-control"
+              required minlength="5" maxlength="200"
+              placeholder="Describe your team..."
+            ></textarea>
           </div>
           <button class="btn btn-primary w-100">Register Team</button>
         </form>
