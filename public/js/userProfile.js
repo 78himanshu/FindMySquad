@@ -1,4 +1,3 @@
-
 document.addEventListener("DOMContentLoaded", () => {
   const form = document.getElementById("editProfileForm");
 
@@ -20,11 +19,12 @@ document.addEventListener("DOMContentLoaded", () => {
     const city = form.city.value.trim();
     const phoneNumber = form.phoneNumber.value.trim();
 
-
     // 1) Name checks: letters only, 1–50
     const nameRe = /^[A-Za-z]{1,50}$/;
-    if (!nameRe.test(firstName)) showError("firstNameError", "First name 1–50 letters");
-    if (!nameRe.test(lastName)) showError("lastNameError", "Last name 1–50 letters");
+    if (!nameRe.test(firstName))
+      showError("firstNameError", "First name 1–50 letters");
+    if (!nameRe.test(lastName))
+      showError("lastNameError", "Last name 1–50 letters");
 
     // 2) Gender
     if (!gender) showError("genderError", "Select a gender");
@@ -32,15 +32,15 @@ document.addEventListener("DOMContentLoaded", () => {
     // 3) Bio ≤ 300 chars
     if (bio.length > 300) showError("bioError", "Bio max 300 characters");
 
-
     // 5) City/State letters + spaces
     const locRe = /^[A-Za-z\s]{1,100}$/;
-    if (city && !locRe.test(city)) showError("cityError", "City only letters/spaces");
-
+    if (city && !locRe.test(city))
+      showError("cityError", "City only letters/spaces");
 
     // 6) Phone number: 10 digits
     const phoneRe = /^\d{10}$/;
-    if (phoneNumber && !phoneRe.test(phoneNumber)) showError("phoneError", "Phone number 10 digits");
+    if (phoneNumber && !phoneRe.test(phoneNumber))
+      showError("phoneError", "Phone number 10 digits");
 
     if (!isValid) return;
 
@@ -56,7 +56,7 @@ document.addEventListener("DOMContentLoaded", () => {
         credentials: "include",
         body: JSON.stringify({
           profile: { firstName, lastName, gender, bio, phoneNumber },
-          location: { city }
+          location: { city },
         }),
       });
 
@@ -78,42 +78,43 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   function clearErrors() {
-    document.querySelectorAll(".form-text.text-danger").forEach(el => (el.textContent = ""));
+    document
+      .querySelectorAll(".form-text.text-danger")
+      .forEach((el) => (el.textContent = ""));
   }
 });
 
-
-const followBtn = document.getElementById('followBtn');
+const followBtn = document.getElementById("followBtn");
 if (followBtn) {
-  followBtn.addEventListener('click', async () => {
+  followBtn.addEventListener("click", async () => {
     const targetId = followBtn.dataset.userId;
-    const isFollowing = followBtn.dataset.following === 'true';
-    const action = isFollowing ? 'unfollow' : 'follow';
+    const isFollowing = followBtn.dataset.following === "true";
+    const action = isFollowing ? "unfollow" : "follow";
 
     try {
       const res = await fetch(`/profile/${action}/${targetId}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include'
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
       });
       const json = await res.json();
-      if (!res.ok) throw new Error(json.error || 'Failed to update follow status');
+      if (!res.ok)
+        throw new Error(json.error || "Failed to update follow status");
 
       // Toggle UI
       followBtn.dataset.following = (!isFollowing).toString();
-      followBtn.textContent = isFollowing ? 'Follow' : 'Following';
-      followBtn.classList.toggle('btn-primary');
-      followBtn.classList.toggle('btn-outline-primary');
+      followBtn.textContent = isFollowing ? "Follow" : "Following";
+      followBtn.classList.toggle("btn-primary");
+      followBtn.classList.toggle("btn-outline-primary");
 
       // Update follower count
-      const countEl = document.getElementById('followersCount');
+      const countEl = document.getElementById("followersCount");
       if (countEl) countEl.textContent = json.followersCount;
     } catch (err) {
       alert(err.message);
     }
   });
 }
-
 
 // Reuse your existing toast helper from auth.js:
 function showToast(message, type = "info", duration = 5000) {
@@ -135,5 +136,3 @@ function showToast(message, type = "info", duration = 5000) {
     toast.remove();
   };
 }
-
-
