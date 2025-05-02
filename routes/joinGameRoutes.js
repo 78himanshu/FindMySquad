@@ -105,11 +105,12 @@ router
         (a, b) => new Date(a.startTime) - new Date(b.startTime)
       );
 
+      // only for upcoming dates.
       const plainAllGames = upcomingGames.map((x) => x.toObject());
 
       const plainRecommendation =
         recommendation.length > 0
-          ? recommendation.map((x) => x.toObject())
+          ? upcomingGames.map((x) => x.toObject())
           : [];
 
       res.render("joinGame/joinGameForm", {
