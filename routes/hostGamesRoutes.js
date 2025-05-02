@@ -3,6 +3,7 @@ const router = Router();
 import { hostGameData } from "../data/index.js";
 import { checkString, checkNumber } from "../utils/helper.js";
 import requireAuth from "../middleware/auth.js";
+import axios from "axios";
 
 router
   .route("/")
@@ -22,6 +23,7 @@ router
     x.host = req.user.userID;
     x.playersRequired = Number(x.playersRequired);
     x.costPerHead = Number(x.costPerHead);
+
     // for date + times into Date objects
     const gameDate = new Date(x.gameDate);
     const [startHours, startMinutes] = x.startTime.split(":");
@@ -38,6 +40,10 @@ router
       return res
         .status(400)
         .json({ error: "End time must be after start time" });
+    }
+
+    if (x.startTime < new Date()) {
+      return res.status(400).json({ error: "Cannot host games in the past." });
     }
 
     if (!x || Object.keys(x).length === 0) {
@@ -86,6 +92,26 @@ router
       return res.status(400).json({ error: e.message });
     }
     try {
+      const apiKey = process.env.GOOGLE_MAPS_API_KEY;
+      const encodedLoc = encodeURIComponent(x.location);
+      const geoRes = await axios.get(
+        `https://maps.googleapis.com/maps/api/geocode/json?address=${encodedLoc}&key=${apiKey}`
+      );
+      console.log("Geocode API result:", geoRes.data);
+      if (
+        !geoRes.data ||
+        !geoRes.data.results ||
+        !geoRes.data.results[0]?.geometry?.location
+      ) {
+        return res.status(400).json({ error: "Invalid address entered." });
+      }
+      const { lat, lng } = geoRes.data.results[0].geometry.location;
+      const formattedAddress = geoRes.data.results[0].formatted_address;
+      const geoLocation = {
+        type: "Point",
+        coordinates: [lng, lat]
+      };
+      x.location = formattedAddress;
       const newGame = await hostGameData.createGame(
         x.title,
         x.sport,
@@ -97,7 +123,8 @@ router
         x.costPerHead,
         x.skillLevel,
         x.host,
-        x.location
+        x.location,
+        geoLocation
       );
       console.log(" Game created:", newGame);
       return res.redirect("/host/success");
@@ -106,23 +133,104 @@ router
     }
   });
 
-router.route("/success").get((req, res) => {
-  res.render("hostGame/hostGameSuccess", {
-    title: "Game Hosted!",
-    layout: "main",
-    head: `<link rel="stylesheet" href="/css/hostGame.css">`,
+router
+  .route("/success")
+  .get((req, res) => {
+    res.render("hostGame/hostGameSuccess", {
+      title: "Game Hosted!",
+      layout: "main",
+      head: `<link rel="stylesheet" href="/css/hostGame.css">`,
+    });
   });
+
+router
+  .route("/form")
+  .get(requireAuth, (req, res) => {
+    const hostId = req.user.userID;
+    res.render("hostGame/hostGameForm", {
+      hostId,
+      title: "Host a Game",
+      layout: "main",
+      head: `
+          <link rel="stylesheet" href="/css/hostGame.css">
+        `,
+    });
+  });
+
+
+
+// Edit Game Form
+router.get("/edit/:id", requireAuth, async (req, res) => {
+  try {
+    const game = await hostGameData.getGameById(req.params.id);
+
+    if (!game) {
+      return res.status(404).render("error", { error: "Game not found" });
+    }
+
+    // Host Check: Only allow host to edit
+    if (game.host.toString() !== req.user.userID) {
+      return res.status(403).render("error", { error: "Unauthorized access" });
+    }
+
+    res.render("hostGame/editGameForm", {
+      game: game.toObject(),
+      hostId: req.user.userID,
+      title: "Edit Game",
+      layout: "main",
+      head: `<link rel="stylesheet" href="/css/hostGame.css">`,
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).render("error", { error: "Server Error" });
+  }
 });
 
-router.route("/form").get(requireAuth, (req, res) => {
-  const hostId = req.user.userID;
-  res.render("hostGame/hostGameForm", {
-    hostId,
-    title: "Host a Game",
-    layout: "main",
-    head: `
-        <link rel="stylesheet" href="/css/hostGame.css">
-      `,
-  });
+// Handle Edit Submission
+router.post("/edit/:id", requireAuth, async (req, res) => {
+  try {
+    const updates = req.body;
+
+    const gameDate = new Date(updates.gameDate);
+    const [startHours, startMinutes] = updates.startTime.split(":");
+    const [endHours, endMinutes] = updates.endTime.split(":");
+
+    updates.startTime = new Date(gameDate);
+    updates.startTime.setHours(startHours, startMinutes);
+    updates.endTime = new Date(gameDate);
+    updates.endTime.setHours(endHours, endMinutes);
+
+    if (updates.startTime >= updates.endTime) {
+      return res.status(400).send("End time must be after start time");
+    }
+
+    await hostGameData.updateGame(req.params.id, updates, req.user.userID);
+    res.redirect("/join");
+  } catch (err) {
+    res.status(400).send(err.message);
+  }
+});
+
+router.post("/delete/:id", requireAuth, async (req, res) => {
+  try {
+    const gameId = req.params.id;
+    const userId = req.user.userID;
+    const game = await hostGameData.getGameById(gameId);
+
+    if (!game) {
+      return res.status(404).send("Game not found.");
+    }
+
+    if (game.host.toString() !== userId) {
+      return res
+        .status(403)
+        .send("You are not authorized to delete this game.");
+    }
+
+    await hostGameData.deleteGame(gameId);
+    res.redirect("/join");
+  } catch (e) {
+    res.status(500).send(e.message);
+  }
 });
 export default router;

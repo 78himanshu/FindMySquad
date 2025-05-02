@@ -1,0 +1,140 @@
+<div class="container my-4">
+  <h2 class="mb-4 text-center">Your Bookings</h2>
+
+  <!-- Past Games -->
+  {{#if pastGameBookings.length}}
+  <h4 class="mb-3">Past Games</h4>
+  <div class="row g-4">
+    {{#each pastGameBookings}}
+    <div class="col-md-6 col-lg-4">
+      <div class="card h-100 shadow-sm">
+        <div class="card-body">
+          <h5 class="card-title">{{title}}</h5>
+          <p class="card-text"><strong>Date:</strong> {{formattedDateTime}}</p>
+          <p class="card-text"><strong>Venue:</strong> {{venue}}</p>
+
+          {{#ifCond players.length '>' 1}}
+          <button class="btn btn-primary btn-sm mb-2 rate-players-btn" data-booking-id="{{_id}}">
+            Rate Players
+          </button>
+          {{/ifCond}}
+
+          <div id="rate-players-{{_id}}" class="rate-players-panel d-none">
+            <form class="rate-form" data-booking-id="{{_id}}">
+              {{#each players}}
+              {{#ifCond this._id '!=' ../host}}
+              <div class="rating-section mb-2">
+                <a href="/profile/userview/{{_id}}"
+                  class="d-block mb-1 fw-semibold text-decoration-none text-dark">{{username}}</a>
+                <div class="stars {{#if hasBeenRated}}disabled{{/if}}" data-user-id="{{_id}}"
+                  data-rated="{{hasBeenRated}}">
+                  {{#each (range 1 5)}}
+                  <i class="bi bi-star-fill star {{#if (lte this ../ratedScore)}}selected{{/if}}"
+                    data-score="{{this}}"></i>
+                  {{/each}}
+                </div>
+
+                {{#if hasBeenRated}}
+                <input type="hidden" name="ratings[]" value='{{json (object "userId" _id "score" ratedScore)}}' />
+                {{/if}}
+              </div>
+              {{/ifCond}}
+              {{/each}}
+
+              <button type="submit" class="btn btn-success btn-sm">Submit Ratings</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+    {{/each}}
+  </div>
+  {{/if}}
+
+  <!-- Past Gym Sessions -->
+  {{#if pastGymBookings.length}}
+  <h4 class="mt-5 mb-3">Past Gym Sessions</h4>
+  <div class="row g-4">
+    {{#each pastGymBookings}}
+    <div class="col-md-6 col-lg-4">
+      <div class="card h-100 shadow-sm">
+        <div class="card-body">
+          <h5 class="card-title">{{title}}</h5>
+          <p class="card-text"><strong>Date:</strong> {{formattedDateTime}}</p>
+          <p class="card-text"><strong>Gym:</strong> {{gym}}</p>
+
+          {{#ifCond players.length '>' 1}}
+          <button class="btn btn-primary btn-sm mb-2 rate-players-btn" data-booking-id="{{_id}}">
+            Rate Players
+          </button>
+          {{/ifCond}}
+
+          <div id="rate-players-{{_id}}" class="rate-players-panel d-none">
+            <form class="rate-form" data-booking-id="{{_id}}">
+              {{#each players}}
+              {{#ifCond this._id '!=' ../host}}
+              <div class="rating-section mb-2">
+                <a href="/profile/userview/{{_id}}"
+                  class="d-block mb-1 fw-semibold text-decoration-none text-dark">{{username}}</a>
+                <div class="stars {{#if hasBeenRated}}disabled{{/if}}" data-user-id="{{_id}}"
+                  data-rated="{{hasBeenRated}}">
+                  {{#each (range 1 5)}}
+                  <i class="bi bi-star-fill star {{#if (lte this ../ratedScore)}}selected{{/if}}"
+                    data-score="{{this}}"></i>
+                  {{/each}}
+                </div>
+
+                {{#if hasBeenRated}}
+                <input type="hidden" name="ratings[]" value='{{json (object "userId" _id "score" ratedScore)}}' />
+                {{/if}}
+              </div>
+              {{/ifCond}}
+              {{/each}}
+
+              <button type="submit" class="btn btn-success btn-sm">Submit Ratings</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+    {{/each}}
+  </div>
+  {{/if}}
+
+  <!-- Future Games and Sessions -->
+  {{#if futureGameBookings.length}}
+  <h4 class="mt-5 mb-3">Upcoming Games</h4>
+  <div class="row g-4">
+    {{#each futureGameBookings}}
+    <div class="col-md-6 col-lg-4">
+      <div class="card h-100 shadow-sm">
+        <div class="card-body">
+          <h5 class="card-title">{{title}}</h5>
+          <p class="card-text"><strong>Date:</strong> {{formattedDateTime}}</p>
+          <p class="card-text"><strong>Venue:</strong> {{venue}}</p>
+        </div>
+      </div>
+    </div>
+    {{/each}}
+  </div>
+  {{/if}}
+
+  {{#if futureGymBookings.length}}
+  <h4 class="mt-5 mb-3">Upcoming Gym Sessions</h4>
+  <div class="row g-4">
+    {{#each futureGymBookings}}
+    <div class="col-md-6 col-lg-4">
+      <div class="card h-100 shadow-sm">
+        <div class="card-body">
+          <h5 class="card-title">{{title}}</h5>
+          <p class="card-text"><strong>Date:</strong> {{formattedDateTime}}</p>
+          <p class="card-text"><strong>Gym:</strong> {{gym}}</p>
+        </div>
+      </div>
+    </div>
+    {{/each}}
+  </div>
+  {{/if}}
+</div>
+
+<script src="/js/bookings.js"></script>

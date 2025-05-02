@@ -56,7 +56,9 @@
           <div class="modal-content">
             <span class="close" onclick="closeModal('{{this._id}}')">&times;</span>
             <h2>{{this.title}}</h2>
-            <p><strong>Hosted By:</strong> {{this.hostedBy.username}}</p>
+            <p><strong>Hosted By:</strong> 
+              <a href="/profile/view/{{this.hostedBy._id}}" class="host-link">{{this.hostedBy.username}}</a>
+            </p>
             <p><strong>Gym:</strong> {{this.gym}}</p>
             <p><strong>Description:</strong> {{this.description}}</p>
             <p><strong>Location:</strong> {{this.gymlocation}}</p>
@@ -69,7 +71,7 @@
                     <p><strong>Attending:</strong></p>
                 <ul>
                 {{#each this.members}}
-                <li>{{this.username}}</li>
+        <a href="/profile/userview/{{this._id}}" class="player-link">{{this.username}}</a>
                 {{/each}}
             </ul>
             {{else}}

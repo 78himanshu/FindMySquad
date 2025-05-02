@@ -1,7 +1,7 @@
 import Userlist from "../models/User.js";
 import { ObjectId } from "mongodb";
 import { checkNumber, checkString } from "../utils/helper.js";
-import UserProfile from '../models/userProfile.js'; // adjust path as needed
+import UserProfile from "../models/userProfile.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 
@@ -28,22 +28,24 @@ export const login = async (email, password) => {
   const user = await Userlist.findOne({ email: trimmedemail });
   console.log("user", user);
 
-  if (!user) throw new Error("EMAIL_NOT_FOUND");
+  if (!user) throw new Error("Invalid email or password. Please try again.");
 
   const isMatch = await bcrypt.compare(trimmedpassword, user.password);
-  if (!isMatch) throw new Error("Wrong Password !");
+  if (!isMatch) throw new Error("Invalid email or password. Please try again.");
 
   const userProfile = await UserProfile.findOne({ userId: user._id });
-  console.log("userProfile", userProfile)
+  console.log("userProfile", userProfile);
 
-  const profilePic = userProfile?.avatar || "/images/default-avatar.png";
+  const profilePic =
+    userProfile?.profile?.avatar || "/images/default-avatar.png";
 
   const token = jwt.sign(
     {
-      userId:  user._id.toString(),
+      userId: user._id.toString(),
       username: user.username,
       profilePic,
-    }, process.env.JWT_SECRET,
+    },
+    process.env.JWT_SECRET,
     { expiresIn: "2h" }
   );
 
@@ -53,9 +55,10 @@ export const login = async (email, password) => {
       id: user._id,
       username: user.username,
       email: user.email,
-      "profileCompleted": user.profileCompleted,
-      profilePic
+      profileCompleted: user.profileCompleted,
+      profilePic,
     },
+    profilePic,
   };
 };
 
@@ -89,14 +92,15 @@ export const signup = async (username, email, password) => {
   }
 
   const existingUser = await Userlist.findOne({ email: trimmedemail });
-  console.log("existingUser", existingUser)
-  if (existingUser) throw new Error("An account with this email address already exists");
+  console.log("existingUser", existingUser);
+  if (existingUser)
+    throw new Error("An account with this email address already exists");
 
   const hashedPassword = await bcrypt.hash(trimmedpassword, saltRounds);
   const newUser = new Userlist({
     username: trimmeduserName,
     email: trimmedemail,
-    password: hashedPassword
+    password: hashedPassword,
   });
   try {
     await newUser.save();
@@ -107,7 +111,7 @@ export const signup = async (username, email, password) => {
     throw new Error("Signup failed. Please try again.");
   }
 
-  console.log("newUser", newUser)
+  console.log("newUser", newUser);
 
   return newUser;
 };

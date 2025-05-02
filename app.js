@@ -9,12 +9,17 @@ import exphbs from "express-handlebars";
 import fs from "fs";
 import cookieParser from "cookie-parser";
 import jwt from "jsonwebtoken";
-import gymBuddyRoutes from './routes/gymBuddyRoutes.js';
-import tournamentRoutes from './routes/tournamentRoutes.js';
+import gymBuddyRoutes from "./routes/gymBuddyRoutes.js";
+import hostGameRoutes from "./routes/hostGamesRoutes.js";
+
+// Handlebars prototype access (to fix _id issues in Handlebars)
+import { allowInsecurePrototypeAccess } from "@handlebars/allow-prototype-access";
+import Handlebars from "handlebars";
 import configRoutesFunction from "./routes/index.js";
 import "./utils/handlebarsHelper.js";
-import { allowInsecurePrototypeAccess } from '@handlebars/allow-prototype-access';
-import esportsRoutes from './routes/esports.js';
+import esportsRoutes from "./routes/esports.js";
+
+import userProfileRoutes from "./routes/userProfileRoutes.js";
 
 // Fix __dirname issue in ES Modules
 const __filename = fileURLToPath(import.meta.url);
@@ -25,18 +30,7 @@ dotenv.config({ path: path.resolve(__dirname, ".env") });
 
 const app = express();
 
-// Connect to MongoDB
 connectDB();
-
-// // Handlebars configuration
-// const hbs = exphbs.create({
-//   defaultLayout: false,
-//   extname: ".handlebars",
-//   helpers: {
-//     // Add any custom helpers here if needed
-//   },
-// });
-
 
 // Handlebars setup with eq helper
 const hbs = exphbs.create({
@@ -46,10 +40,18 @@ const hbs = exphbs.create({
     allowProtoPropertiesByDefault: true,
     allowProtoMethodsByDefault: true,
   },
+  handlebars: allowInsecurePrototypeAccess(Handlebars),
   helpers: {
     eq: (a, b) => a === b,
-    gt: (a, b) => a > b, 
+    gt: (a, b) => a > b,
+    gte: (a, b) => a >= b,
+    lt: (a, b) => a < b,
+    lte: (a, b) => a <= b,
+    length: (array) => (Array.isArray(array) ? array.length : 0),
+    includes: (arr, val) => Array.isArray(arr) && arr.includes(val.toString()),
     json: (context) => JSON.stringify(context, null, 2),
+    encodeURI: (str) => encodeURIComponent(str), // ✅ FIXED: added helper
+
     formatDate: (datetime) => {
       if (!datetime) return "";
       return new Date(datetime).toLocaleDateString("en-US", {
@@ -59,21 +61,77 @@ const hbs = exphbs.create({
         day: "numeric",
       });
     },
-    formatTime: (time24) => {  
-      if (!time24) return '';
-      const [hourStr, minuteStr] = time24.split(':');
-      let hour = parseInt(hourStr, 10);
-      const minute = parseInt(minuteStr, 10);
-      const ampm = hour >= 12 ? 'PM' : 'AM';
-      hour = hour % 12 || 12;
-      return `${hour}:${minute.toString().padStart(2, '0')} ${ampm}`;
+
+    formatTime: (timeVal) => {
+      if (!timeVal) return "";
+
+      let hour, minute;
+
+      if (typeof timeVal === "string" && timeVal.includes(":")) {
+        [hour, minute] = timeVal.split(":");
+        hour = parseInt(hour, 10);
+        minute = parseInt(minute, 10);
+      } else if (timeVal instanceof Date || !isNaN(Date.parse(timeVal))) {
+        const dateObj = new Date(timeVal);
+        hour = dateObj.getHours();
+        minute = dateObj.getMinutes();
+      } else {
+        return "";
+      }
+
+      const ampm = hour >= 12 ? "PM" : "AM";
+      const formattedHour = hour % 12 || 12;
+      return `${formattedHour}:${minute.toString().padStart(2, "0")} ${ampm}`;
     },
-    encodeURI: (str) => {
-      return encodeURIComponent(str);
-    }
+
+    formatDateInput: (datetime) => {
+      if (!datetime) return "";
+      const date = new Date(datetime);
+      return date.toISOString().split("T")[0];
+    },
+
+    formatTimeInput: (datetime) => {
+      if (!datetime) return "";
+      const date = new Date(datetime);
+      return date.toTimeString().slice(0, 5); // "HH:mm"
+    },
+
+    ifCond: function (v1, operator, v2, options) {
+      switch (operator) {
+        case "!=":
+          return v1 != v2 ? options.fn(this) : options.inverse(this);
+        case "==":
+          return v1 == v2 ? options.fn(this) : options.inverse(this);
+        case ">":
+          return v1 > v2 ? options.fn(this) : options.inverse(this);
+        case "<":
+          return v1 < v2 ? options.fn(this) : options.inverse(this);
+        case ">=":
+          return v1 >= v2 ? options.fn(this) : options.inverse(this);
+        case "<=":
+          return v1 <= v2 ? options.fn(this) : options.inverse(this);
+        default:
+          return options.inverse(this);
+      }
+    },
+
+    range: (from, to) => {
+      let result = [];
+      for (let i = from; i <= to; i++) {
+        result.push(i);
+      }
+      return result;
+    },
+
+    object: (...args) => {
+      const options = args.pop();
+      return args.reduce((acc, val, i) => {
+        if (i % 2 === 0) acc[val] = args[i + 1];
+        return acc;
+      }, {});
+    },
   },
-})
-// hbs.registerPartials(path.join(__dirname, 'views/partials'));
+});
 
 app.engine("handlebars", hbs.engine);
 app.set("view engine", "handlebars");
@@ -107,32 +165,36 @@ app.use((req, res, next) => {
         res.clearCookie("token");
         res.locals.isLoggedIn = false;
         res.locals.username = null;
+        res.locals.profilePic = "/images/default-avatar.png"; // fallback
         return next();
       }
 
-      req.user = {
-        userId: decoded.userId,  
-        username: decoded.username,
-        profilePic: decoded.profilePic
-      };
+      req.user = decoded;
       res.locals.isLoggedIn = true;
       res.locals.username = decoded.username;
+      res.locals.profilePic =
+        decoded.profilePic || "/images/default-avatar.png"; // ✅ ADD THIS
     } catch (err) {
       res.locals.isLoggedIn = false;
       res.locals.username = null;
+      res.locals.profilePic = "/images/default-avatar.png"; // fallback
       res.clearCookie("token");
     }
   } else {
     res.locals.isLoggedIn = false;
     res.locals.username = null;
+    res.locals.profilePic = "/images/default-avatar.png"; // fallback
   }
 
   next();
 });
+
 // Routes
 configRoutesFunction(app);
-app.use('/gymBuddy', gymBuddyRoutes);
-app.use('/esports', esportsRoutes);
+app.use("/host", hostGameRoutes);
+app.use("/gymBuddy", gymBuddyRoutes);
+app.use("/esports", esportsRoutes);
+app.use("/join", esportsRoutes);
 
 // 404 Handler (must come after routes but before error handler)
 app.use((req, res, next) => {

@@ -3,7 +3,6 @@
   <div class="game-tabs">
     <button class="tab-button" onclick="showSection('calendar')">Calendar</button>
     <button class="tab-button active" onclick="showSection('mySports')">My Sports</button>
-    <button class="tab-button" onclick="showSection('otherSports')">Other Sports</button>
   </div>
 
   <!-- Calendar Section -->
@@ -15,9 +14,54 @@
 
   <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.css" rel="stylesheet" />
 
+  <div id="game-map" style="height: 400px; margin-bottom: 20px;"></div>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const mapContainer = document.getElementById('game-map');
+      if (!mapContainer) return;
+
+      // Default coordinates: NYC
+      let defaultLat = 40.7128;
+      let defaultLng = -74.0060;
+      const cookieMatch = document.cookie.match(/user_location=([^;]+)/);
+        if (cookieMatch) {
+          try {
+            const loc = JSON.parse(decodeURIComponent(cookieMatch[1]));
+            if (loc.lat && loc.lng) {
+              defaultLat = loc.lat;
+              defaultLng = loc.lng;
+            }
+          } catch (e) {
+            console.warn('Could not parse location cookie');
+          }
+        }
+
+      const map = L.map('game-map').setView([defaultLat, defaultLng], 12);
+
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap contributors'
+      }).addTo(map);
+
+      // Games are passed in via Handlebars
+      const games = {{{json allGames}}};
+
+      games.forEach(game => {
+        if (game.geoLocation && game.geoLocation.coordinates) {
+          const [lng, lat] = game.geoLocation.coordinates;
+          L.marker([lat, lng]).addTo(map)
+            .bindPopup(`<strong>${game.title}</strong><br>${game.sport}<br><a href="/join/${game._id}">View Game</a>`);
+        }
+      });
+    });
+  </script>
+
+
+
   <!-- My Sports Section (default visible) -->
   <section id="mySports" class="tab-content" style="display: block;">
-    {{#if isLoggedIn}}
       <section>
         <h2 class="section-heading">Recommended Games</h2>
         {{#if recommendedGames.length}}
@@ -44,8 +88,8 @@
           </div>
         {{/if}}
       </section>
-    {{/if}}
 
+    <!-- All Games -->
     <section>
       <h2 class="section-heading">All Games</h2>
       <div class="game-grid">
@@ -59,17 +103,34 @@
                 Date: {{formatDate this.startTime}} |
                 Time: {{formatTime this.startTime}} - {{formatTime this.endTime}}
               </p>
+              {{#if this.host.username}}
+                <p>Hosted By: {{this.host.username}}</p>
+              {{/if}}
             </a>
+
+            {{#if (eq ../hostId this.host._id)}}
+              <!-- Host: Edit/Delete buttons -->
+              <a href="/host/edit/{{this._id}}" class="btn btn-warning">Edit</a>
+              <form action="/host/delete/{{this._id}}" method="POST" style="display:inline;" onsubmit="return confirm('Are you sure you want to delete this game?')">
+                <button type="submit" class="btn btn-danger">Delete</button>
+              </form>
+            {{else}}
+              {{#if (includes ../joinedGameIdStrings this._id)}}
+                <!-- Already joined -->
+                <form action="/join/leave/{{this._id}}" method="POST">
+                  <button type="submit" class="btn btn-secondary">Leave</button>
+                </form>
+              {{else if (gte (length this.players) this.playersRequired)}}
+                <!-- Session full and not joined -->
+                <p class="full-session">🚫 Session is Full</p>
+              {{/if}}
+            {{/if}}
           </div>
         {{/each}}
       </div>
     </section>
   </section>
 
-  <section id="otherSports" class="tab-content" style="display: none;">
-    <h3>Other Sports Filter</h3>
-    <p>Filter and discover new activities from other categories.</p>
-  </section>
 
   <!-- JS Scripts -->
   <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js"></script>

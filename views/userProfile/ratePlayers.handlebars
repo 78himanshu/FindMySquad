@@ -1,0 +1,26 @@
+<div class="container my-5">
+  <h2 class="fw-semibold mb-4">⭐ Rate Your Teammates</h2>
+
+<button class="btn btn-primary btn-rate"
+    data-booking-id="{{bookingId}}"
+    data-players='{{json teammates}}'>
+    Open Rating Modal
+  </button>
+
+  <!-- Modal for Rating -->
+<div id="rateModal" style="display:none;">
+  <form id="rateForm">
+    <div id="rateFields"></div>
+    <div class="mt-3">
+      <button type="submit" class="btn btn-success">Submit Ratings</button>
+      <button type="button" id="rateCancel" class="btn btn-secondary">Cancel</button>
+    </div>
+  </form>
+</div>
+
+  <div id="toast-container"></div>
+
+</div>
+
+<!-- Important: DO NOT write any JS here manually -->
+<script src="/js/bookings.js"></script>

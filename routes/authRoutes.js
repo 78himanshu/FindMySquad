@@ -2,7 +2,6 @@ import { Router } from "express";
 const router = Router();
 import { authUserData } from "../data/index.js";
 import { checkString } from "../utils/helper.js";
-import jwt from "jsonwebtoken";
 
 router
   .route("/signup")
@@ -42,25 +41,11 @@ router
 
       console.log("newUser", newUser);
 
-      // console.log("==>>", newUser)
-
-      // if(!newUser){
-      //   return
-      // }
-
-      // const token = jwt.sign(
-      //   { userId: newUser._id, username: newUser.username },
-      //   process.env.JWT_SECRET,
-      //   { expiresIn: "1h" }
-      // );
-
-      // res.cookie("token", token, {
-      //   httpOnly: true,
-      //   secure: process.env.NODE_ENV === "production",
-      //   maxAge: 3600000,
-      // });
-
-      return res.status(200).json({ message: "Signup successful", newUser });
+      // Redirect to add profile page
+      return res.status(200).json({
+        message: "Signup successful",
+        redirect: "/login?success=Account created successfully. Please login.",
+      });
     } catch (error) {
       return res.status(400).json({ error: error.message || "Signup failed" });
     }
@@ -73,6 +58,7 @@ router
       title: "Login",
       layout: "main",
       error: req.query.error,
+      redirect: req.query.redirect || "",
       head: `
         <link rel="stylesheet" href="/css/login.css">
         <link rel="stylesheet" href="/css/styles.css">
@@ -93,25 +79,39 @@ router
       checkString(email, "email");
       checkString(password, "password");
 
-      const { token, user } = await authUserData.login(email, password);
+      const { token, user, profilePic } = await authUserData.login(
+        email,
+        password
+      );
+
+      console.log(token, user, profilePic);
 
       res.cookie("token", token, {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
         maxAge: 3600000,
       });
-      res.cookie("user", JSON.stringify(user), {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        maxAge: 3600000,
-      });
+      res.cookie(
+        "user",
+        JSON.stringify({
+          username: user.username,
+          profilePic: profilePic,
+        }),
+        {
+          httpOnly: false,
+          maxAge: 3600000,
+        }
+      );
 
-      // const nextPage = user.profileCompleted ? "./" : "/addprofile";
-      const redirectTo = req.body.redirect || "/";
+      let redirectTo = redirect || "/";
 
-      res.status(200).json({
+      if (!user.profileCompleted) {
+        redirectTo = "/profile/addprofile";
+      }
+
+      return res.status(200).json({
         message: "Login successful",
-        token,
+        redirect: redirectTo,
         user: {
           id: user._id,
           username: user.username,
@@ -119,12 +119,11 @@ router
           profileCompleted: user.profileCompleted,
           profilepic: user.profilePic || "/images/default-avatar.png",
         },
-        // nextPage
-        redirect: redirect || "/", // Included redirect in the response
       });
     } catch (error) {
-      // console.error("Login error:", error);
-      return res.status(400).json({ error: error.message || "Login failed" });
+      return res.status(400).json({
+        error: error.message || "Invalid email or password. Please try again.",
+      });
     }
   });
 
