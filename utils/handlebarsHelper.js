@@ -16,3 +16,35 @@ handlebars.registerHelper("gte", function (a, b) {
 });
 
 export default hbsInstance;
+
+import Handlebars from "handlebars";
+
+Handlebars.registerHelper('isStartingSoon', function(date) {
+  const eventTime = new Date(date).getTime();
+  const now = Date.now();
+  const diff = eventTime - now;
+  return diff > 0 && diff < (24 * 60 * 60 * 1000); // within 24 hours
+});
+
+Handlebars.registerHelper('timeUntil', function(date) {
+  const eventTime = new Date(date).getTime();
+  const now = Date.now();
+  let diff = eventTime - now;
+
+  if (diff <= 0) return "Started";
+
+  const hours = Math.floor(diff / (1000 * 60 * 60));
+  diff -= hours * 60 * 60 * 1000;
+  const minutes = Math.floor(diff / (1000 * 60));
+
+  if (hours > 0) {
+    return `${hours}H ${minutes}M`;
+  } else {
+    return `${minutes}M`;
+  }
+});
+
+
+Handlebars.registerHelper('lt', function (a, b) {
+  return a < b;
+});

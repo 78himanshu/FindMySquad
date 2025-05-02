@@ -4,75 +4,69 @@
 <head>
   <title>{{title}} - FindMySquad</title>
   <link rel="stylesheet" href="/css/styles.css">
+  <link rel="stylesheet" href="/css/gameTournaments.css">
+  <link rel="icon" href="/images/favicon.png" type="image/png">
+
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/css/bootstrap.min.css" rel="stylesheet"
     integrity="sha384-SgOJa3DmI69IUzQ2PVdRZhwQ+dy64/BUtbMJw1MZ8t5HZApcHrRKUc4W0kG879m7" crossorigin="anonymous">
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" />
+
   {{{head}}}
 </head>
 
 <body>
-  {{!-- <header class="navbar"> --}}
-    {{!-- <div class="logo">FindMySquad</div> --}}
-    {{!-- <nav class="nav-buttons">
-      {{#if isLoggedIn}}
-      <span>Hi, {{username}}</span>
-      <button onclick="location.href='/profile/view'">Profile</button>
-      <button onclick="location.href='/logout'">Logout</button>
-      {{else}}
-      <button onclick="location.href='/login'">Login</button>
-      <button onclick="location.href='/signup'">Sign Up</button>
-      {{/if}}
-    </nav> --}}
-    <nav class="navbar navbar-expand-lg navbar-light bg-light px-4">
-      <div class="container-fluid">
-        <!-- Logo -->
-        <a class="navbar-brand fw-bold" href="/">FindMySquad</a>
+  <nav class="navbar navbar-expand-lg navbar-light bg-light px-4">
+    <div class="container-fluid">
+      <!-- Logo -->
+      <a class="navbar-brand" href="/">
+        <img src="/images/navlogo.png" alt="FindMySquad Logo" height="40" />
+      </a>
 
-        <!-- Toggler (hamburger) -->
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent"
-          aria-controls="navbarContent" aria-expanded="false" aria-label="Toggle navigation">
-          <span class="navbar-toggler-icon"></span>
-        </button>
+      <!-- Toggler (hamburger) -->
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent"
+        aria-controls="navbarContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
 
         <!-- Collapsible nav content -->
         <div class="collapse navbar-collapse" id="navbarContent">
           <!-- Left nav buttons -->
-          <ul class="align-items-center justify-content-center m-auto mb-2 mb-lg-0 me-auto navbar-nav gap-3">
+          <ul class="align-items-center justify-content-center m-auto mb-2 mb-lg-0 me-auto navbar-nav">
             <a href="/join"><button class="btn btn-outline-primary">Join</button></a>
             <a href="/host"><button class="btn btn-outline-primary">Host</button></a>
-            <a href="#"><button class="btn btn-outline-primary">Book</button></a>
+            <a href="/esports"><button class="btn btn-outline-primary">Esports</button></a>
             <a href="/gymBuddy"><button class="btn btn-outline-primary">gymBuddy</button></a>
 
-          </ul>
+        </ul>
 
-          <!-- Right auth buttons -->
-          <div class="d-flex gap-2">
-            {{#if isLoggedIn}}
-            <a href="/profile/view" class="d-flex navpic_xyz align-items-center gap-2 text-decoration-none text-dark">
-              <img src="{{profilepic}}" alt="profile" class="rounded-circle" width="40" height="40">
-              <span class="fw-semibold">{{username}}</span>
-            </a>
+        <!-- Right auth buttons -->
+        <div class="d-flex gap-2">
+          {{#if isLoggedIn}}
+          <a href="/profile/view" class="d-flex navpic_xyz align-items-center gap-2 text-decoration-none text-dark">
+            <img src="{{#if profilePic}}{{profilePic}}{{else}}/images/default-avatar.png{{/if}}" alt="Profile Pic"
+              class="rounded-circle" width="40" height="40" />
+            <span class="fw-semibold">{{username}}</span>
+          </a>
 
-            <button class="btn btn-outline-danger" onclick="window.location='/logout'">Logout</button>
-            {{else}}
-            <button class="btn btn-outline-primary" onclick="window.location='/login'">Login</button>
-            <button class="btn btn-primary" onclick="window.location='/signup'">Signup</button>
-            {{/if}}
-          </div>
+          <button class="btn btn-outline-danger" onclick="window.location='/logout'">Logout</button>
+          {{else}}
+          <button class="btn btn-outline-primary" onclick="window.location='/login'">Login</button>
+          <button class="btn btn-primary" onclick="window.location='/signup'">Signup</button>
+          {{/if}}
         </div>
       </div>
-    </nav>
-    {{!--
-  </header> --}}
+    </div>
+  </nav>
 
+  {{{body}}}
 
-  <main class="container py-5">
-    {{{body}}}
-  </main>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/js/bootstrap.bundle.min.js"
     integrity="sha384-k6d4wzSIapyDyv1kpU366/PK5hCdSbCRGRCMv+eplOQJWyd1fbcAu9OCUj5zNLiq"
     crossorigin="anonymous"></script>
+
 
 
 </body>

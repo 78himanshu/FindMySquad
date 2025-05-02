@@ -30,17 +30,27 @@ export default async function requireAuth(req, res, next) {
       userID: decoded.userId, // Required by routes
       username: decoded.username, // Optional
     };
-    //  ✅ Pass user info to Handlebars
-    // const userCookie = req.cookies.user;
-    // if (userCookie) {
-    //   const userData = JSON.parse(userCookie);
-    //   res.locals.isLoggedIn = true;
-    //   res.locals.username = userData.username || '';
-    //   res.locals.profilePic = userData.profilePic || '/images/default-avatar.png';
-    // } else {
-    //   res.locals.isLoggedIn = false;
-    // }
 
+    // ✅ Pass user info to Handlebars
+    const userCookie = req.cookies.user;
+
+    if (userCookie) {
+      const userData = JSON.parse(userCookie);
+      res.locals.isLoggedIn = true;
+      res.locals.username = userData.username || "";
+      res.locals.profilePic =
+        userData.profilePic || "/images/default-avatar.png";
+    } else {
+      res.locals.isLoggedIn = true;
+      res.locals.username = decoded.username || "";
+      res.locals.profilePic = "/images/default-avatar.png"; // fallback
+    }
+
+    // console.log("✅ Middleware:", {
+    //   isLoggedIn: res.locals.isLoggedIn,
+    //   username: res.locals.username,
+    //   profilePic: res.locals.profilePic
+    // });
 
     next();
   } catch (err) {

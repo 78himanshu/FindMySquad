@@ -17,8 +17,9 @@ import { allowInsecurePrototypeAccess } from "@handlebars/allow-prototype-access
 import Handlebars from "handlebars";
 import configRoutesFunction from "./routes/index.js";
 import "./utils/handlebarsHelper.js";
+import esportsRoutes from "./routes/esports.js";
 
-import userProfileRoutes from './routes/userProfileRoutes.js';
+import userProfileRoutes from "./routes/userProfileRoutes.js";
 
 // Fix __dirname issue in ES Modules
 const __filename = fileURLToPath(import.meta.url);
@@ -35,13 +36,22 @@ connectDB();
 const hbs = exphbs.create({
   defaultLayout: false,
   extname: ".handlebars",
+  runtimeOptions: {
+    allowProtoPropertiesByDefault: true,
+    allowProtoMethodsByDefault: true,
+  },
   handlebars: allowInsecurePrototypeAccess(Handlebars),
   helpers: {
     eq: (a, b) => a === b,
+    gt: (a, b) => a > b,
     gte: (a, b) => a >= b,
+    lt: (a, b) => a < b,
+    lte: (a, b) => a <= b,
     length: (array) => (Array.isArray(array) ? array.length : 0),
     includes: (arr, val) => Array.isArray(arr) && arr.includes(val.toString()),
     json: (context) => JSON.stringify(context, null, 2),
+    encodeURI: (str) => encodeURIComponent(str), // ✅ FIXED: added helper
+
     formatDate: (datetime) => {
       if (!datetime) return "";
       return new Date(datetime).toLocaleDateString("en-US", {
@@ -51,22 +61,74 @@ const hbs = exphbs.create({
         day: "numeric",
       });
     },
-    formatTime: (datetime) => {
-      if (!datetime) return "";
-      return new Date(datetime).toLocaleTimeString("en-US", {
-        hour: "2-digit",
-        minute: "2-digit",
-      });
+
+    formatTime: (timeVal) => {
+      if (!timeVal) return "";
+
+      let hour, minute;
+
+      if (typeof timeVal === "string" && timeVal.includes(":")) {
+        [hour, minute] = timeVal.split(":");
+        hour = parseInt(hour, 10);
+        minute = parseInt(minute, 10);
+      } else if (timeVal instanceof Date || !isNaN(Date.parse(timeVal))) {
+        const dateObj = new Date(timeVal);
+        hour = dateObj.getHours();
+        minute = dateObj.getMinutes();
+      } else {
+        return "";
+      }
+
+      const ampm = hour >= 12 ? "PM" : "AM";
+      const formattedHour = hour % 12 || 12;
+      return `${formattedHour}:${minute.toString().padStart(2, "0")} ${ampm}`;
     },
+
     formatDateInput: (datetime) => {
       if (!datetime) return "";
       const date = new Date(datetime);
-      return date.toISOString().split("T")[0]; // yyyy-mm-dd
+      return date.toISOString().split("T")[0];
     },
+
     formatTimeInput: (datetime) => {
       if (!datetime) return "";
       const date = new Date(datetime);
-      return date.toTimeString().slice(0, 5); // hh:mm
+      return date.toTimeString().slice(0, 5); // "HH:mm"
+    },
+
+    ifCond: function (v1, operator, v2, options) {
+      switch (operator) {
+        case "!=":
+          return v1 != v2 ? options.fn(this) : options.inverse(this);
+        case "==":
+          return v1 == v2 ? options.fn(this) : options.inverse(this);
+        case ">":
+          return v1 > v2 ? options.fn(this) : options.inverse(this);
+        case "<":
+          return v1 < v2 ? options.fn(this) : options.inverse(this);
+        case ">=":
+          return v1 >= v2 ? options.fn(this) : options.inverse(this);
+        case "<=":
+          return v1 <= v2 ? options.fn(this) : options.inverse(this);
+        default:
+          return options.inverse(this);
+      }
+    },
+
+    range: (from, to) => {
+      let result = [];
+      for (let i = from; i <= to; i++) {
+        result.push(i);
+      }
+      return result;
+    },
+
+    object: (...args) => {
+      const options = args.pop();
+      return args.reduce((acc, val, i) => {
+        if (i % 2 === 0) acc[val] = args[i + 1];
+        return acc;
+      }, {});
     },
   },
 });
@@ -92,26 +154,36 @@ app.use((req, res, next) => {
     try {
       const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
+      if (!decoded.userId) {
+        res.clearCookie("token");
+        res.locals.isLoggedIn = false;
+        return res.status(401).send("Unauthorized: User info missing");
+      }
+
       // Invalidate token if it's older than server boot time
       if (decoded.iat * 1000 < serverBootTime) {
         res.clearCookie("token");
         res.locals.isLoggedIn = false;
         res.locals.username = null;
+        res.locals.profilePic = "/images/default-avatar.png"; // fallback
         return next();
       }
 
-      req.user = decoded; // this line is the key
+      req.user = decoded;
       res.locals.isLoggedIn = true;
       res.locals.username = decoded.username;
-      req.user = decoded;
+      res.locals.profilePic =
+        decoded.profilePic || "/images/default-avatar.png"; // ✅ ADD THIS
     } catch (err) {
       res.locals.isLoggedIn = false;
       res.locals.username = null;
+      res.locals.profilePic = "/images/default-avatar.png"; // fallback
       res.clearCookie("token");
     }
   } else {
     res.locals.isLoggedIn = false;
     res.locals.username = null;
+    res.locals.profilePic = "/images/default-avatar.png"; // fallback
   }
 
   next();
@@ -121,6 +193,8 @@ app.use((req, res, next) => {
 configRoutesFunction(app);
 app.use("/host", hostGameRoutes);
 app.use("/gymBuddy", gymBuddyRoutes);
+app.use("/esports", esportsRoutes);
+app.use("/join", esportsRoutes);
 
 // 404 Handler (must come after routes but before error handler)
 app.use((req, res, next) => {
