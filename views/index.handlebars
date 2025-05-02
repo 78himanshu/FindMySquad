@@ -17,65 +17,7 @@
 </head>
 
 <body>
-  {{!-- <nav class="navbar">
-    <div class="logo">FindMySquad</div>
-    <div class="nav-buttons">
-      <a href="/join"><button>Join</button></a>
-      <a href="/host"><button>Host</button></a>
-      <button>Book</button>
-    </div>
-    <div class="auth-buttons">
-      {{#if isLoggedIn}} <!-- If user is logged in -->
-      <button disabled>👋 Welcome, {{username}}!</button>
-      <button onclick="window.location='/logout'">Logout</button>
-      <button onclick="location.href='/profile/view'">Profile</button>
 
-      {{else}} <!-- If user is NOT logged in -->
-      <button onclick="window.location='/login'">Login</button>
-      <button onclick="window.location='/signup'">Signup</button>
-      {{/if}}
-    </div>
-  </nav> --}}
-
-  {{!-- <nav class="navbar navbar-expand-lg navbar-light bg-light px-4">
-    <div class="container-fluid">
-      <!-- Logo -->
-      <a class="navbar-brand fw-bold" href="/">FindMySquad</a>
-
-      <!-- Toggler (hamburger) -->
-      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent"
-        aria-controls="navbarContent" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-      </button>
-
-      <!-- Collapsible nav content -->
-      <div class="collapse navbar-collapse" id="navbarContent">
-        <!-- Left nav buttons -->
-        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-          <li class="nav-item">
-            <button class="btn btn-outline-primary me-2">Join</button>
-          </li>
-          <li class="nav-item">
-            <button class="btn btn-outline-primary me-2">Host</button>
-          </li>
-          <li class="nav-item">
-            <button class="btn btn-outline-primary">Book</button>
-          </li>
-        </ul>
-
-        <!-- Right auth buttons -->
-        <div class="d-flex gap-2">
-          {{#if isLoggedIn}}
-          <button class="btn btn-secondary" disabled>👋 Welcome, {{username}}!</button>
-          <button class="btn btn-outline-danger" onclick="window.location='/logout'">Logout</button>
-          {{else}}
-          <button class="btn btn-outline-primary" onclick="window.location='/login'">Login</button>
-          <button class="btn btn-primary" onclick="window.location='/signup'">Signup</button>
-          {{/if}}
-        </div>
-      </div>
-    </div>
-  </nav> --}}
 
 
   {{#if success}}
@@ -101,63 +43,64 @@
   </section>
 
 
-<section class="discover-games-section">
-  {{!-- <div class="container py-4">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-      <h2 class="fw-bold">Discover Games</h2>
-      <a href="/join" class="btn btn-outline-primary btn-sm">See All Games</a>
-    </div>
-
-{{#if recentGames.length}}
-  <div class="row">
-    {{#each recentGames}}
-      <div class="card">
-        <h5>{{this.title}}</h5>
-        <p>{{this.sport}} at {{this.location}}</p>
-        <p>{{formatDate this.startTime}} {{formatTime this.startTime}} - {{formatTime this.endTime}}</p>
-        <a href="/join/{{this._id}}" class="btn btn-primary">Join</a>
+  <section class="discover-games-section">
+    {{!-- <div class="container py-4">
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="fw-bold">Discover Games</h2>
+        <a href="/join" class="btn btn-outline-primary btn-sm">See All Games</a>
       </div>
-    {{/each}}
-  </div>
-{{else}}
-  <div>No upcoming games found.</div>
-{{/if}}
-  </div> --}}
 
-<div class="container py-4"></div>
+      {{#if recentGames.length}}
+      <div class="row">
+        {{#each recentGames}}
+        <div class="card">
+          <h5>{{this.title}}</h5>
+          <p>{{this.sport}} at {{this.location}}</p>
+          <p>{{formatDate this.startTime}} {{formatTime this.startTime}} - {{formatTime this.endTime}}</p>
+          <a href="/join/{{this._id}}" class="btn btn-primary">Join</a>
+        </div>
+        {{/each}}
+      </div>
+      {{else}}
+      <div>No upcoming games found.</div>
+      {{/if}}
+    </div> --}}
+
+    <div class="container py-4"></div>
     <div class="d-flex justify-content-between align-items-center mb-4">
       <h2 class="fw-bold">Discover Games</h2>
       <a href="/join" class="btn btn-outline-primary btn-sm">See All Games</a>
     </div>
 
     {{#if recentGames.length}}
-      <div class="discover-scroll-container">
-        <div class="discover-scroll-wrapper">
-          {{#each recentGames}}
-            <div class="discover-card">
-              <div class="card-content">
-                <h5 class="card-title">{{this.title}}</h5>
-                <p class="card-text">{{this.sport}} | {{this.location}}</p>
-                <p class="card-text">{{formatDate this.startTime}} | {{formatTime this.startTime}} - {{formatTime this.endTime}}</p>
-                <a href="/join/{{this._id}}" class="btn btn-primary btn-sm mt-2">Join</a>
-              </div>
-            </div>
-          {{/each}}
+    <div class="discover-scroll-container">
+      <div class="discover-scroll-wrapper">
+        {{#each recentGames}}
+        <div class="discover-card">
+          <div class="card-content">
+            <h5 class="card-title">{{this.title}}</h5>
+            <p class="card-text">{{this.sport}} | {{this.location}}</p>
+            <p class="card-text">{{formatDate this.startTime}} | {{formatTime this.startTime}} - {{formatTime
+              this.endTime}}</p>
+            <a href="/join/{{this._id}}" class="btn btn-primary btn-sm mt-2">Join</a>
+          </div>
         </div>
+        {{/each}}
       </div>
+    </div>
     {{else}}
-      <div class="alert alert-warning" role="alert">
-        No upcoming games found. <a href="/host/form" class="alert-link">Host one now!</a>
-      </div>
+    <div class="alert alert-warning" role="alert">
+      No upcoming games found. <a href="/host/form" class="alert-link">Host one now!</a>
+    </div>
     {{/if}}
-  </div>
+    </div>
 
 
 
 
 
 
-</section>
+  </section>
 
 
 
@@ -189,11 +132,12 @@
     crossorigin="anonymous"></script>
 
 
-  {{!-- <script>
+  {{!--
+  <script>
     document.addEventListener('DOMContentLoaded', () => {
-      const cookiee="user_location"
-      function getCookie(x){
-        const y= document.cookie.match(new RegExp('(^| )' + x + '=([^;]+)'))
+      const cookiee = "user_location"
+      function getCookie(x) {
+        const y = document.cookie.match(new RegExp('(^| )' + x + '=([^;]+)'))
         return y ? decodeURIComponent(y[2]) : null;
       }
 
@@ -220,34 +164,34 @@
       }
     })
   </script> --}}
-<script>
-  document.addEventListener('DOMContentLoaded', () => {
-    const cookieName = "user_location";
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const cookieName = "user_location";
 
-    function getCookie(name) {
-      const match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
-      return match ? decodeURIComponent(match[2]) : null;
-    }
-
-    if (!getCookie(cookieName)) {
-      if ('geolocation' in navigator) {
-        navigator.geolocation.getCurrentPosition(
-          (position) => {
-            const { latitude, longitude } = position.coords;
-            const value = JSON.stringify({ lat: latitude, lng: longitude });
-            document.cookie = `${cookieName}=${encodeURIComponent(value)}; path=/; max-age=${60 * 60 * 24 * 7}`;
-            console.log("Location stored from user permission:", value);
-          },
-          (error) => {
-            console.warn('User denied or geolocation error:', error.message);
-          }
-        );
-      } else {
-        console.warn('Geolocation not supported by browser.');
+      function getCookie(name) {
+        const match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
+        return match ? decodeURIComponent(match[2]) : null;
       }
-    }
-  });
-</script>
+
+      if (!getCookie(cookieName)) {
+        if ('geolocation' in navigator) {
+          navigator.geolocation.getCurrentPosition(
+            (position) => {
+              const { latitude, longitude } = position.coords;
+              const value = JSON.stringify({ lat: latitude, lng: longitude });
+              document.cookie = `${cookieName}=${encodeURIComponent(value)}; path=/; max-age=${60 * 60 * 24 * 7}`;
+              console.log("Location stored from user permission:", value);
+            },
+            (error) => {
+              console.warn('User denied or geolocation error:', error.message);
+            }
+          );
+        } else {
+          console.warn('Geolocation not supported by browser.');
+        }
+      }
+    });
+  </script>
 
 
 

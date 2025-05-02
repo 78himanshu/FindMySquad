@@ -103,13 +103,36 @@ router
   })
   .put(verifyToken, async (req, res) => {
     try {
-      const updated = await userProfileData.updateProfile(
-        req.user.userID,
-        req.body
-      );
-      res.status(200).json(updated);
-    } catch (e) {
-      res.status(400).json({ error: e.toString() });
+      const userId = req.user.userID;
+      const { profile, location } = req.body;
+
+      if (!userId || !profile) {
+        return res.status(400).json({ error: "Missing data" });
+      }
+
+      const updateData = {
+        profile: {
+          firstName: profile.firstName?.trim(),
+          lastName: profile.lastName?.trim(),
+          bio: profile.bio?.trim(),
+          gender: profile.gender || "",
+        },
+        phoneNumber: profile.phoneNumber || "",
+        location: {
+          city: location?.city?.trim() || "",
+          // You can extend this to include state, zipCode, etc.
+        },
+      };
+      const updated = await userProfileData.updateProfile(userId, updateData);
+
+      if (!updated) {
+        return res.status(404).json({ error: "Profile not updated" });
+      }
+
+      return res.json({ success: true, message: "Profile updated", data: updated });
+    } catch (err) {
+      console.error("Edit profile error:", err);
+      res.status(500).json({ error: "Server error" });
     }
   })
   .delete(verifyToken, async (req, res) => {
@@ -135,6 +158,7 @@ router.route("/view").get(verifyToken, async (req, res) => {
       layout: "main",
       firstName: profile.profile.firstName,
       lastName: profile.profile.lastName,
+      gender: profile.profile.gender,
       email: profile.userId.email,
       username: profile.userId.username,
       userId: profile.userId._id,
@@ -149,6 +173,7 @@ router.route("/view").get(verifyToken, async (req, res) => {
       following: profile.following,
       averageRating: profile.averageRating,
       ratingCount: profile.ratingCount,
+      phoneNumber: profile.phoneNumber,
       isOwn, // 👈 pass true
       isFollowing, // 👈 pass false
       head: `<link rel="stylesheet" href="/css/userProfile.css">`,

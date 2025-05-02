@@ -49,6 +49,8 @@ export const updateProfile = async (userId, data) => {
     { $set: data },
     { new: true }
   );
+
+  console.log("data updates controller", data);
   if (!updated) throw "Profile not found";
   return updated;
 };

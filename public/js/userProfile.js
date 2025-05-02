@@ -17,10 +17,9 @@ document.addEventListener("DOMContentLoaded", () => {
     const lastName = form.lastName.value.trim();
     const gender = form.gender.value;
     const bio = form.bio.value.trim();
-    const avatar = form.avatar.value.trim();
     const city = form.city.value.trim();
-    const state = form.state.value.trim();
-    const zip = form.zipCode.value.trim();
+    const phoneNumber = form.phoneNumber.value.trim();
+
 
     // 1) Name checks: letters only, 1–50
     const nameRe = /^[A-Za-z]{1,50}$/;
@@ -33,19 +32,15 @@ document.addEventListener("DOMContentLoaded", () => {
     // 3) Bio ≤ 300 chars
     if (bio.length > 300) showError("bioError", "Bio max 300 characters");
 
-    // 4) Avatar URL
-    if (avatar) {
-      try { new URL(avatar); }
-      catch { showError("avatarError", "Invalid URL"); }
-    }
 
     // 5) City/State letters + spaces
     const locRe = /^[A-Za-z\s]{1,100}$/;
     if (city && !locRe.test(city)) showError("cityError", "City only letters/spaces");
-    if (state && !locRe.test(state)) showError("stateError", "State only letters/spaces");
 
-    // 6) Zip 5 digits
-    if (zip && !/^\d{5}$/.test(zip)) showError("zipCodeError", "Zip must be 5 digits");
+
+    // 6) Phone number: 10 digits
+    const phoneRe = /^\d{10}$/;
+    if (phoneNumber && !phoneRe.test(phoneNumber)) showError("phoneError", "Phone number 10 digits");
 
     if (!isValid) return;
 
@@ -55,17 +50,19 @@ document.addEventListener("DOMContentLoaded", () => {
     submitBtn.textContent = "Saving...";
 
     try {
-      const res = await fetch("/profile/edit", {
-        method: "POST",
+      const res = await fetch("/profile/", {
+        method: "PUT",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
         body: JSON.stringify({
-          profile: { firstName, lastName, gender, bio, avatar },
-          location: { city, state, zipCode: zip }
+          profile: { firstName, lastName, gender, bio, phoneNumber },
+          location: { city }
         }),
       });
 
       const data = await res.json();
+
+      console.log("data", data);
       if (!res.ok) {
         showToast(data.error || "Update failed", "error");
       } else {
