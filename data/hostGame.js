@@ -131,3 +131,12 @@ export async function deleteGame(gameId) {
   if (!gameId) throw new Error("Game ID is required");
   await Game.findByIdAndDelete(gameId);
 }
+
+export const upcomingGames = async () => {
+
+  const upcomingGames = await Game.find({
+    startTime: { $gte: new Date() } // games starting now or in future
+  }).sort({ startTime: 1 });
+
+  return upcomingGames;
+}
