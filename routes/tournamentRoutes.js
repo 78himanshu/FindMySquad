@@ -49,6 +49,8 @@ router.get('/create', requireAuth, (req, res) => {
 ];
 const minDate = new Date().toISOString().split('T')[0];
 res.render('egaming/createTournament', {
+  layout: 'main',
+  title:  'Create Tournament',
   games: esportsGames,
   username: req.user.username,
   minDate
