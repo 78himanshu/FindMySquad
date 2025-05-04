@@ -10,7 +10,6 @@ import cookieParser from "cookie-parser";
 import jwt from "jsonwebtoken";
 import gymBuddyRoutes from "./routes/gymBuddyRoutes.js";
 import hostGameRoutes from "./routes/hostGamesRoutes.js";
-
 // Handlebars prototype access (to fix _id issues in Handlebars)
 import { allowInsecurePrototypeAccess } from "@handlebars/allow-prototype-access";
 import Handlebars from "handlebars";
@@ -190,14 +189,12 @@ app.use((req, res, next) => {
 
   next();
 });
-
 // Routes
 configRoutesFunction(app);
 app.use("/host", hostGameRoutes);
 app.use("/gymBuddy", gymBuddyRoutes);
 app.use("/esports", esportsRoutes);
 app.use("/join", esportsRoutes);
-
 // 404 Handler (must come after routes but before error handler)
 app.use((req, res, next) => {
   console.log("404 Handler triggered for:", req.originalUrl);

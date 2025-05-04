@@ -74,7 +74,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         setTimeout(() => {
           if (data.redirect) {
-            window.location.href = data.redirect; // ✅ redirect to /profile/addprofile
+            window.location.href = data.redirect; // redirect to /profile/addprofile
           } else {
             window.location.href = "/login"; // fallback
           }

@@ -100,6 +100,7 @@ router.get('/game/:gameName', async (req, res) => {
         highestPrize = Math.max(highestPrize, t.prizePool?.total || 0);
       }
     });
+    const justCreated = req.query.tournamentCreated === '1';
 
     res.render('egaming/gameTournaments', {
       title:         gameName,
@@ -108,7 +109,8 @@ router.get('/game/:gameName', async (req, res) => {
       backgroundImage: getGameImage(gameName),
       tournaments:     upcomingTournaments,
       pastTournaments,
-      highestPrize
+      highestPrize,
+      justCreated
     });
   } catch (err) {
     console.error(err);
