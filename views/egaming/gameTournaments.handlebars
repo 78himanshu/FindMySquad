@@ -69,3 +69,13 @@
     {{/if}}
   </div>
 </main>
+
+{{#if justCreated}}
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    // fire the same toast you use on login
+    showToast('Tournament created successfully!', 'success');
+  });
+</script>
+{{/if}}
+

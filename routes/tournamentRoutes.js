@@ -125,7 +125,10 @@ router.post('/create', requireAuth, async (req, res) => {
     });
 
     await tournament.save();
-    res.redirect('/esports');
+    return res.redirect(
+      `/esports/game/${encodeURIComponent(game)}` +
+      `?tournamentCreated=1`
+    );
   } catch (err) {
     console.error(err);
     res.status(500).send('Server Error');
