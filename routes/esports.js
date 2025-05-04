@@ -57,6 +57,7 @@ const games = [
   router.get('/', (req, res) => {
     res.render('egaming/esports', {
       title: 'Esports',
+      layout: 'main',
       games: games
     });
   });
