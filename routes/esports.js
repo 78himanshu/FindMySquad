@@ -145,6 +145,8 @@ router.get('/:tournamentId/register-team', requireAuth, async (req, res) => {
 
   return res.render('egaming/registerTeam', {
     tournament,
+    layout: 'main',
+    title: 'Register Team',
     playersPerTeam: parseInt(tournament.format[0], 10),
     userId,
     isCreator,
