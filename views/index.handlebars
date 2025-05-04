@@ -51,60 +51,74 @@
         <h2 class="fw-bold">Discover Games</h2>
         <a href="/join" class="btn btn-outline-primary btn-sm">See All Games</a>
       </div>
+      <p class="text-muted mb-4">Join a game or host your own. Find players nearby and enjoy the game!</p>
 
-      <div class="row flex-nowrap overflow-auto" style="gap: 1rem;">
-        {{#each upcomingGames}}
-        <div class="col-12 col-sm-6 col-md-4 col-lg-3">
-          <div class="card h-100 shadow-sm border rounded p-3">
+      <div class="position-relative">
+        <button class="scroll-btn left" onclick="scrollGames(-1)">
+          <i class="fas fa-chevron-left"></i>
+        </button>
 
-            <div class="d-flex justify-content-between align-items-center mb-2">
-              <h5 class="mb-0 fw-semibold">{{title}}</h5>
-              <span class="badge bg-success">{{sport}}</span>
-            </div>
+        <div id="gameCarousel" class="game-scroll-wrapper d-flex gap-3">
+          {{#each upcomingGames}}
+          <div class="game-card shadow-sm p-3 bg-white rounded">
+            <!-- your card content here -->
+            <div class=" h-100  p-3">
 
-            {{#if (eq players.length playersRequired)}}
-            <span class="badge bg-success mb-2">BOOKED</span>
-            {{else if (eq (subtract playersRequired players.length) 1)}}
-            <span class="badge bg-warning text-dark mb-2">🚀 Only 1 Slot</span>
-            {{/if}}
+              <div class="d-flex justify-content-between align-items-center mb-2">
+                <h5 class="mb-0 fw-semibold">{{title}}</h5>
+                <span class="badge bg-success">{{sport}}</span>
+              </div>
 
-            <p class="mb-1 text-muted"><i class="bi bi-geo-alt me-1"></i> {{location}}</p>
-            <p class="mb-1 text-muted"><i class="bi bi-building me-1"></i> <strong>Venue:</strong> {{venue}}</p>
-
-            <p class="mb-1">
-              <i class="bi bi-calendar-event me-1"></i>
-              <strong>Date:</strong> {{formatDate startTime}}
-            </p>
-            <p class="mb-1">
-              <i class="bi bi-clock me-1"></i>
-              <strong>Time:</strong> {{formatTime startTime}} - {{formatTime endTime}}
-            </p>
-
-            <p class="mb-1">
-              <i class="bi bi-people-fill me-1"></i>
-              <strong>Players:</strong> {{players.length}} / {{playersRequired}}
-            </p>
-
-            <p class="mb-1">
-              <i class="bi bi-stars me-1"></i>
-              <strong>Skills:</strong> {{skillLevel}}
-            </p>
-
-            <p class="mb-2">
-              <i class="bi bi-cash me-1"></i>
-              <strong>Cost:</strong>
-              {{#if (eq costPerHead 0)}}
-              <span class="badge bg-primary">Free</span>
-              {{else}}
-              <span class="badge bg-warning text-dark">$ {{costPerHead}}</span>
+              {{#if (eq players.length playersRequired)}}
+              <span class="badge bg-success mb-2">BOOKED</span>
+              {{else if (eq (subtract playersRequired players.length) 1)}}
+              <span class="badge bg-warning text-dark mb-2">🚀 Only 1 Slot</span>
               {{/if}}
-            </p>
 
-            <a href="/join/{{_id}}" class="btn btn-outline-success w-100">View Details</a>
+              <p class="mb-1 text-muted location"><i class="bi bi-geo-alt me-1"></i> {{location}}</p>
+              <p class="mb-1 text-muted venue"><i class="bi bi-building me-1"></i> <strong>Venue:</strong> {{venue}}</p>
+
+              <p class="mb-1">
+                <i class="bi bi-calendar-event me-1"></i>
+                <strong>Date:</strong> {{formatDate startTime}}
+              </p>
+              <p class="mb-1">
+                <i class="bi bi-clock me-1"></i>
+                <strong>Time:</strong> {{formatTime startTime}} - {{formatTime endTime}}
+              </p>
+
+              <p class="mb-1">
+                <i class="bi bi-people-fill me-1"></i>
+                <strong>Players:</strong> {{players.length}} / {{playersRequired}}
+              </p>
+
+              <p class="mb-1">
+                <i class="bi bi-stars me-1"></i>
+                <strong>Skills:</strong> {{skillLevel}}
+              </p>
+
+              <p class="mb-2">
+                <i class="bi bi-cash me-1"></i>
+                <strong>Cost:</strong>
+                {{#if (eq costPerHead 0)}}
+                <span class="badge bg-primary">Free</span>
+                {{else}}
+                <span class="badge bg-warning text-dark">$ {{costPerHead}}</span>
+                {{/if}}
+              </p>
+
+              <a href="/join/{{_id}}" class="btn btn-outline-success w-100">View Details</a>
+            </div>
           </div>
+          {{/each}}
         </div>
-        {{/each}}
+
+        <button class="scroll-btn right" onclick="scrollGames(1)">
+          <i class="fas fa-chevron-right"></i>
+        </button>
       </div>
+
+
     </div>
 
 
@@ -169,10 +183,13 @@
     integrity="sha384-k6d4wzSIapyDyv1kpU366/PK5hCdSbCRGRCMv+eplOQJWyd1fbcAu9OCUj5zNLiq"
     crossorigin="anonymous"></script>
   <script>
-    function slideGames(direction) {
-      const container = document.getElementById("gameSlider");
-      const scrollAmount = container.querySelector('.game-card')?.offsetWidth || 300;
-      container.scrollBy({ left: direction * scrollAmount, behavior: "smooth" });
+    function scrollGames(direction) {
+      const container = document.getElementById("gameCarousel");
+      const scrollAmount = container.offsetWidth * 0.85;
+      container.scrollBy({
+        left: direction * scrollAmount,
+        behavior: 'smooth'
+      });
     }
   </script>
 

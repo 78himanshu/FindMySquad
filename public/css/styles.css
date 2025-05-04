@@ -478,15 +478,16 @@ label.btn.active {
 }
 
 .game-scroll-wrapper {
+  overflow-x: auto;
+  -ms-overflow-style: none;
+  /* IE and Edge */
   scrollbar-width: none;
   /* Firefox */
-  -ms-overflow-style: none;
-  /* IE/Edge */
 }
 
 .game-scroll-wrapper::-webkit-scrollbar {
   display: none;
-  /* Chrome/Safari */
+  /* Chrome, Safari and Opera */
 }
 
 .game-card {
@@ -555,6 +556,58 @@ label.btn.active {
 
 
 
+#gameCarousel {
+  overflow-x: auto;
+  scroll-behavior: smooth;
+  scrollbar-width: none;
+  /* Firefox */
+  -ms-overflow-style: none;
+  /* IE 10+ */
+}
+
+#gameCarousel::-webkit-scrollbar {
+  display: none;
+  /* Chrome, Safari, Opera */
+}
+
+.location,
+.venue {
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.scroll-btn {
+  position: absolute;
+  top: 40%;
+  transform: translateY(-50%);
+  background-color: white;
+  border: none;
+  border-radius: 50%;
+  width: 35px;
+  height: 35px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.scroll-btn.left {
+  left: -15px;
+}
+
+.scroll-btn.right {
+  right: -15px;
+}
+
+.scroll-btn i {
+  font-size: 1.2rem;
+  color: #333;
+}
+
+
 .game-scroll-wrapper {
   display: flex;
   overflow-x: auto;
@@ -573,7 +626,9 @@ label.btn.active {
   padding: 1.2rem;
   scroll-snap-align: start;
   transition: transform 0.2s ease;
-  min-width: 250px;
+  min-width: 280px;
+  max-width: 300px;
+  flex: 0 0 a
 }
 
 .game-card:hover {
