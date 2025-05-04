@@ -235,6 +235,7 @@ router.get("/:id", async (req, res) => {
       joinedPlayers,
       joinedGameIdStrings,
       error: req.query.error || null,
+      username: req.user?.username || null, // ✅ ADD THIS LINE
       layout: "main",
       head: `<link rel="stylesheet" href="/css/joinGame.css">`,
     });

@@ -102,3 +102,26 @@
     color: #fff;
   }
   
+/* for chat message  */
+  .chat-box {
+    border: 1px solid #ccc;
+    height: 250px;
+    overflow-y: auto;
+    padding: 10px;
+    background-color: #fafafa;
+    margin-bottom: 10px;
+  }
+
+  #chatForm {
+    display: flex;
+    gap: 10px;
+  }
+
+  #chatForm input {
+    flex-grow: 1;
+    padding: 6px;
+  }
+
+  #chatForm button {
+    padding: 6px 10px;
+  }
