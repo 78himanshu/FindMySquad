@@ -50,7 +50,7 @@ const hbs = exphbs.create({
     length: (array) => (Array.isArray(array) ? array.length : 0),
     includes: (arr, val) => Array.isArray(arr) && arr.includes(val.toString()),
     json: (context) => JSON.stringify(context, null, 2),
-    encodeURI: (str) => encodeURIComponent(str), // ✅ FIXED: added helper
+    encodeURI: (str) => encodeURIComponent(str), //  FIXED: added helper
 
     formatDate: (datetime) => {
       if (!datetime) return "";
