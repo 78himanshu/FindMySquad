@@ -103,6 +103,7 @@ router.get('/game/:gameName', async (req, res) => {
     res.render('egaming/gameTournaments', {
       title:         gameName,
       gameName,
+      layout: 'main',
       backgroundImage: getGameImage(gameName),
       tournaments:     upcomingTournaments,
       pastTournaments,
