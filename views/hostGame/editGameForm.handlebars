@@ -5,15 +5,17 @@
 
     <select name="sport">
       <option value="">Select Sport</option>
-      <option value="Football" {{#if (eq game.sport "Football")}}selected{{/if}}>Football</option>
+      <option value="Soccer" {{#if (eq game.sport "Soccer")}}selected{{/if}}>Soccer</option>
       <option value="Basketball" {{#if (eq game.sport "Basketball")}}selected{{/if}}>Basketball</option>
-      <option value="Volleyball" {{#if (eq game.sport "Volleyball")}}selected{{/if}}>Volleyball</option>
-      <option value="Tennis" {{#if (eq game.sport "Tennis")}}selected{{/if}}>Tennis</option>
-      <option value="Badminton" {{#if (eq game.sport "Badminton")}}selected{{/if}}>Badminton</option>
-      <option value="Cricket" {{#if (eq game.sport "Cricket")}}selected{{/if}}>Cricket</option>
-      <option value="Table Tennis" {{#if (eq game.sport "Table Tennis")}}selected{{/if}}>Table Tennis</option>
       <option value="Baseball" {{#if (eq game.sport "Baseball")}}selected{{/if}}>Baseball</option>
-      <option value="Hockey" {{#if (eq game.sport "Hockey")}}selected{{/if}}>Hockey</option>
+      <option value="Tennis" {{#if (eq game.sport "Tennis")}}selected{{/if}}>Tennis</option>
+      <option value="Swimming" {{#if (eq game.sport "Swimming")}}selected{{/if}}>Swimming</option>
+      <option value="Running" {{#if (eq game.sport "Running")}}selected{{/if}}>Running</option>
+      <option value="Cycling" {{#if (eq game.sport "Table Cycling")}}selected{{/if}}>Cycling</option>
+      <option value="Hiking" {{#if (eq game.sport "Hiking")}}selected{{/if}}>Hiking</option>
+      <option value="Golf" {{#if (eq game.sport "Golf")}}selected{{/if}}>Golf</option>
+      <option value="Volleyball" {{#if (eq game.sport "Volleyball")}}selected{{/if}}>Volleyball</option>
+
     </select>
 
     <input type="text" name="venue" placeholder="Venue" value="{{game.venue}}" />
