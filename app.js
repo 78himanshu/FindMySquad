@@ -52,6 +52,11 @@ const hbs = exphbs.create({
     json: (context) => JSON.stringify(context, null, 2),
     encodeURI: (str) => encodeURIComponent(str),
 
+    array: (...args) => {
+      // Handlebars passes its options object as the last arg—drop it
+      return args.slice(0, -1);
+    },
+
     formatDate: (datetime) => {
       if (!datetime) return "";
       return new Date(datetime).toLocaleDateString("en-US", {
@@ -175,6 +180,7 @@ app.use((req, res, next) => {
       res.locals.username = decoded.username;
       res.locals.profilePic =
         decoded.profilePic || "/images/default-avatar.png";
+      res.locals.userId      = decoded.userId;
     } catch (err) {
       res.locals.isLoggedIn = false;
       res.locals.username = null;

@@ -58,80 +58,99 @@ res.render('egaming/createTournament', {
 });
 // POST: Handle Form Submission
 router.post('/create', requireAuth, async (req, res) => {
-  try {
-    let {
+    const {
       game,
       format,
       date,
       startTime,
       endTime,
-      description,
+      description: rawDescription,
       skillLevel,
-      maxTeams,
-      prizeDescription
+      maxTeams: rawMaxTeams,
+      prizeDescription: rawPrizeDescription
     } = req.body;
 
     // trim
-    description = description?.trim();
-    prizeDescription = prizeDescription?.trim();
+    const description     = rawDescription?.trim()     || '';
+    const prizeDescription = rawPrizeDescription?.trim() || '';
+    const maxTeams        = parseInt(rawMaxTeams, 10);
+
+    // collect formData to re-populate on HTML errors
+    const formData = {
+    game, format, date,
+    startTime, endTime,
+    description, skillLevel,
+    maxTeams: rawMaxTeams,
+    prizeDescription
+    };
+
+     // helper to return HTML render or JSON error
+      function respondError(msg) {
+        return res.format({
+          html: () => res.status(400).render('tournaments/create', { 
+            error: msg,
+            formData 
+          }),
+          json: () => res.status(400).json({ error: msg })
+        });
+  }
 
     // 1) Prize Description: 5–50 chars
-    if (
-      !prizeDescription ||
-      prizeDescription.length < 5 ||
-      prizeDescription.length > 50
-    ) {
-      return res
-        .status(400)
-        .send('Prize Description must be between 5 and 50 characters.');
+    if (!prizeDescription || prizeDescription.length < 5 || prizeDescription.length > 50) {
+    return respondError('Prize Description must be between 5 and 50 characters.');
     }
 
     // 2) Date cannot be in the past
     const today = new Date();
     today.setHours(0, 0, 0, 0);
-    const chosen = new Date(date);
-    if (chosen < today) {
-      return res.status(400).send('Date cannot be in the past.');
+    const [y,m,d]    = date.split('-').map(Number);
+    const chosenDate = new Date(y, m-1, d);
+    if (chosenDate < today) {
+      return respondError('Date cannot be in the past.');
     }
 
-    // 3) Start/end times: start < end
-    if (!startTime || !endTime || startTime >= endTime) {
-      return res
-        .status(400)
-        .send('Start time must be before end time.');
+    // 3) Build full Date objects for start/end
+    const [sh, smin]   = startTime.split(':').map(Number);
+    const [eh, emin]   = endTime.split(':').map(Number);
+    const startDateTime= new Date(y, m-1, d, sh, smin);
+    const endDateTime  = new Date(y, m-1, d, eh, emin);
+    const now          = new Date();
+
+    // 4) Cannot start before now
+    if (startDateTime < now) {
+      return respondError('Start time cannot be in the past.');
     }
 
-    // 4) Max teams between 1 and 100
-    maxTeams = parseInt(maxTeams, 10);
+    // 5) End after start
+    if (endDateTime <= startDateTime) {
+      return respondError('End time must be after start time.');
+    }
+
+    // 6) Max teams
     if (isNaN(maxTeams) || maxTeams < 1 || maxTeams > 100) {
-      return res
-        .status(400)
-        .send('Max teams must be between 1 and 100.');
+      return respondError('Max teams must be between 1 and 100.');
     }
 
-    // create and save
-    const tournament = new Tournament({
-      creator: req.user.userId,
+    // all validations passed → create
+  try {
+    await Tournament.create({
+      creator:         req.user.userId,
       game,
       format,
-      date,
+      date:            startDateTime,
       startTime,
       endTime,
       description,
       skillLevel,
       maxTeams,
       prizeDescription,
-      teams: []
+      teams:           []
     });
-
-    await tournament.save();
     return res.redirect(
-      `/esports/game/${encodeURIComponent(game)}` +
-      `?tournamentCreated=1`
+      `/esports/game/${encodeURIComponent(game)}?tournamentCreated=1`
     );
   } catch (err) {
-    console.error(err);
-    res.status(500).send('Server Error');
+    return next(err);
   }
 });
 

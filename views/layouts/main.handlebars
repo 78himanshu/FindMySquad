@@ -63,9 +63,10 @@
 
   {{{body}}}
   <div
-  id="toast-container"
-  data-success="{{success}}{{#unless success}}{{#if justCreated}}Tournament created successfully!{{/if}}{{/unless}}"
-  class="position-fixed bottom-0 end-0 p-3"
+   id="toast-container"
+    data-success="{{success}}{{#unless success}}{{#if justCreated}}Tournament created successfully!{{/if}}{{#if justDeleted}}Tournament deleted successfully!{{/if}}{{/unless}}"
+    data-error="{{error}}"
+    class="position-fixed bottom-0 end-0 p-3"
 ></div>
 <script src="/js/auth.js"></script>
 
@@ -76,6 +77,38 @@
     integrity="sha384-k6d4wzSIapyDyv1kpU366/PK5hCdSbCRGRCMv+eplOQJWyd1fbcAu9OCUj5zNLiq"
     crossorigin="anonymous"></script>
 
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const container = document.getElementById('toast-container');
+      // trim so that whitespace-only doesn't count
+      const success = container.dataset.success?.trim();
+      const error   = container.dataset.error?.trim();
+
+      function showToast(message, type) {
+        const toastEl = document.createElement('div');
+        toastEl.className = `toast align-items-center text-bg-${type} border-0 mb-2`;
+        toastEl.setAttribute('role', 'alert');
+        toastEl.setAttribute('aria-live', 'assertive');
+        toastEl.setAttribute('aria-atomic', 'true');
+        toastEl.innerHTML = `
+          <div class="d-flex">
+            <div class="toast-body">${message}</div>
+            <button
+              type="button"
+              class="btn-close btn-close-white me-2 m-auto"
+              data-bs-dismiss="toast"
+              aria-label="Close"
+            ></button>
+          </div>
+        `;
+        container.appendChild(toastEl);
+        new bootstrap.Toast(toastEl, { delay: 5000 }).show();
+      }
+
+      if (success) showToast(success, 'success');
+      if (error)   showToast(error,   'danger');
+    });
+</script>
 
 </body>
 
