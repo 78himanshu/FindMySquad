@@ -6,32 +6,24 @@ import authRoutes from "./authRoutes.js";
 import userProfileRoutes from "./userProfileRoutes.js";  // <-- ADD THIS
 import esportsRoutes from './esports.js';
 import jwt from "jsonwebtoken";
-import User from "../models/User.js"; 
+import User from "../models/User.js";
 import gymBuddyRoutes from './gymBuddyRoutes.js';
 import tournamentRoutes from './tournamentRoutes.js';
+import { hostGameData } from "../data/index.js";
 
 const configRoutesFunction = (app) => {
-  // Authentication middleware (runs before all routes)
-  //   app.use(async (req, res, next) => {
-  //     try {
-  //       const token = req.cookies?.token;
-  //       if (token) {
-  //         const decoded = jwt.verify(token, process.env.JWT_SECRET);
-  //         req.user = await User.findById(decoded.userId);
-  //       }
-  //     } catch (err) {
-  //       console.error('Authentication error:', err);
-  //     }
-  //     next();
-  //   });
 
   // Base route - simplified since we're using middleware
-  app.get("/", (req, res) => {
+  app.get("/", async (req, res) => {
     console.log("req,", req.user);
+    const upcomingGames = await hostGameData.upcomingGames();
+    console.log("upcomingGames", upcomingGames);
+
     res.render("index", {
       title: "FindMySquad",
       user: req.user || null,
       layout: "main",
+      upcomingGames: upcomingGames
     });
   });
 

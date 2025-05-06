@@ -133,6 +133,7 @@ const hbs = exphbs.create({
         return acc;
       }, {});
     },
+    subtract: (a, b) => a - b
   },
 });
 

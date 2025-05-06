@@ -42,16 +42,38 @@ export const getProfile = async (userId) => {
 };
 
 export const updateProfile = async (userId, data) => {
-  const updated = await UserProfile.findOneAndUpdate(
+  const update = {};
+
+  if (data.profile) {
+    if (data.profile.firstName) update["profile.firstName"] = data.profile.firstName.trim();
+    if (data.profile.lastName) update["profile.lastName"] = data.profile.lastName.trim();
+    if (data.profile.gender) update["profile.gender"] = data.profile.gender.trim();
+    if (data.profile.bio) update["profile.bio"] = data.profile.bio.trim();
+  }
+
+  if (data.location && data.location.city) {
+    update["location.city"] = data.location.city.trim();
+  }
+
+  if (data.phoneNumber) {
+    update["phoneNumber"] = data.phoneNumber.trim();
+  }
+
+  if (Object.keys(update).length === 0) {
+    throw new Error("No valid fields provided for update.");
+  }
+
+  const updatedProfile = await UserProfile.findOneAndUpdate(
     { userId },
-    { $set: data },
+    { $set: update },
     { new: true }
   );
 
-  console.log("data updates controller", data);
-  if (!updated) throw "Profile not found";
-  return updated;
+  if (!updatedProfile) throw new Error("Profile not found");
+
+  return updatedProfile;
 };
+
 
 export const deleteProfile = async (userId) => {
   const deleted = await UserProfile.findOneAndDelete({ userId });

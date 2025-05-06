@@ -60,79 +60,131 @@
 
 
   <section class="discover-games-section">
-    {{!-- <div class="container py-4">
+
+
+    <div class="container ">
       <div class="d-flex justify-content-between align-items-center mb-4">
         <h2 class="fw-bold">Discover Games</h2>
         <a href="/join" class="btn btn-outline-primary btn-sm">See All Games</a>
       </div>
+      <p class="text-muted mb-4">Join a game or host your own. Find players nearby and enjoy the game!</p>
 
-      {{#if recentGames.length}}
-      <div class="row">
-        {{#each recentGames}}
-        <div class="card">
-          <h5>{{this.title}}</h5>
-          <p>{{this.sport}} at {{this.location}}</p>
-          <p>{{formatDate this.startTime}} {{formatTime this.startTime}} - {{formatTime this.endTime}}</p>
-          <a href="/join/{{this._id}}" class="btn btn-primary">Join</a>
-        </div>
-        {{/each}}
-      </div>
-      {{else}}
-      <div>No upcoming games found.</div>
-      {{/if}}
-    </div> --}}
+      <div class="position-relative">
+        <button class="scroll-btn left" onclick="scrollGames(-1)">
+          <i class="fas fa-chevron-left"></i>
+        </button>
 
-    <div class="container py-4"></div>
-    <div class="d-flex justify-content-between align-items-center mb-4">
-      <h2 class="fw-bold">Discover Games</h2>
-      <a href="/join" class="btn btn-outline-primary btn-sm">See All Games</a>
-    </div>
+        <div id="gameCarousel" class="game-scroll-wrapper d-flex gap-3">
+          {{#each upcomingGames}}
+          <div class="game-card shadow-sm p-3 bg-white rounded">
+            <!-- your card content here -->
+            <div class=" h-100  p-3">
 
-    {{#if recentGames.length}}
-    <div class="discover-scroll-container">
-      <div class="discover-scroll-wrapper">
-        {{#each recentGames}}
-        <div class="discover-card">
-          <div class="card-content">
-            <h5 class="card-title">{{this.title}}</h5>
-            <p class="card-text">{{this.sport}} | {{this.location}}</p>
-            <p class="card-text">{{formatDate this.startTime}} | {{formatTime this.startTime}} - {{formatTime
-              this.endTime}}</p>
-            <a href="/join/{{this._id}}" class="btn btn-primary btn-sm mt-2">Join</a>
+              <div class="d-flex justify-content-between align-items-center mb-2">
+                <h5 class="mb-0 fw-semibold">{{title}}</h5>
+                <span class="badge bg-success">{{sport}}</span>
+              </div>
+
+              {{#if (eq players.length playersRequired)}}
+              <span class="badge bg-success mb-2">BOOKED</span>
+              {{else if (eq (subtract playersRequired players.length) 1)}}
+              <span class="badge bg-warning text-dark mb-2">🚀 Only 1 Slot</span>
+              {{/if}}
+
+              <p class="mb-1 text-muted location"><i class="bi bi-geo-alt me-1"></i> {{location}}</p>
+              <p class="mb-1 text-muted venue"><i class="bi bi-building me-1"></i> <strong>Venue:</strong> {{venue}}</p>
+
+              <p class="mb-1">
+                <i class="bi bi-calendar-event me-1"></i>
+                <strong>Date:</strong> {{formatDate startTime}}
+              </p>
+              <p class="mb-1">
+                <i class="bi bi-clock me-1"></i>
+                <strong>Time:</strong> {{formatTime startTime}} - {{formatTime endTime}}
+              </p>
+
+              <p class="mb-1">
+                <i class="bi bi-people-fill me-1"></i>
+                <strong>Players:</strong> {{players.length}} / {{playersRequired}}
+              </p>
+
+              <p class="mb-1">
+                <i class="bi bi-stars me-1"></i>
+                <strong>Skills:</strong> {{skillLevel}}
+              </p>
+
+              <p class="mb-2">
+                <i class="bi bi-cash me-1"></i>
+                <strong>Cost:</strong>
+                {{#if (eq costPerHead 0)}}
+                <span class="badge bg-primary">Free</span>
+                {{else}}
+                <span class="badge bg-warning text-dark">$ {{costPerHead}}</span>
+                {{/if}}
+              </p>
+
+              <a href="/join/{{_id}}" class="btn btn-outline-success w-100">View Details</a>
+            </div>
           </div>
+          {{/each}}
         </div>
-        {{/each}}
+
+        <button class="scroll-btn right" onclick="scrollGames(1)">
+          <i class="fas fa-chevron-right"></i>
+        </button>
       </div>
-    </div>
-    {{else}}
-    <div class="alert alert-warning" role="alert">
-      No upcoming games found. <a href="/host/form" class="alert-link">Host one now!</a>
-    </div>
-    {{/if}}
-    </div>
 
 
-
+    </div>
 
 
 
   </section>
 
 
+  <footer class="footer bg-dark text-light py-4 mt-5">
+    <div class="container">
+      <div class="row align-items-center">
 
-  <footer>
-    <nav>
-      <div class="nav-links-container">
-        <ul class="nav-links">
-          {{#each footerLinks}}
-          <li><a href="{{this.url}}">{{this.name}}</a></li>
-          {{/each}}
-        </ul>
+        <div class="col-md-4 text-center text-md-start mb-3 mb-md-0">
+          <a href="/" class="navbar-brand text-light fs-4 fw-bold">FindMySquad</a>
+          <p class="mb-0 small">Find Players & Gym Buddies Nearby</p>
+        </div>
+
+
+        <div class="col-md-4 text-center mb-3 mb-md-0">
+          <ul class="list-inline mb-0">
+            <li class="list-inline-item mx-2"><a href="/join" class="text-light text-decoration-none">Join</a></li>
+            <li class="list-inline-item mx-2"><a href="/host" class="text-light text-decoration-none">Host</a></li>
+            <li class="list-inline-item mx-2"><a href="/gymBuddy" class="text-light text-decoration-none">GymBuddy</a>
+            </li>
+            <li class="list-inline-item mx-2"><a href="/profile/view"
+                class="text-light text-decoration-none">Profile</a></li>
+          </ul>
+        </div>
+
+
+        <div class="col-md-4 text-center text-md-end">
+          <a href="#" class="text-light me-3"><i class="fab fa-instagram"></i></a>
+          <a href="#" class="text-light me-3"><i class="fab fa-twitter"></i></a>
+          <a href="#" class="text-light"><i class="fab fa-linkedin-in"></i></a>
+        </div>
       </div>
-    </nav>
-    <p>Copyright &#169; {{currentYear}} FindMySquad. All Rights
-      Reserved.</p>
+
+      <hr class="bg-light my-3" />
+
+      <div class="text-center small">
+        Made with ❤️, way too much ☕, and some 3AM bug-fixes — by <strong>The Debug Ninjas</strong>:Aakash, Aditya,
+        Himanshu, Jitesh,
+        and Yash.
+      </div>
+
+      <div class="text-center small">
+        &copy; {{currentYear}} FindMySquad. All Rights Reserved.
+      </div>
+    </div>
   </footer>
+
 
   <script>
     function logout() {
@@ -146,40 +198,17 @@
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/js/bootstrap.bundle.min.js"
     integrity="sha384-k6d4wzSIapyDyv1kpU366/PK5hCdSbCRGRCMv+eplOQJWyd1fbcAu9OCUj5zNLiq"
     crossorigin="anonymous"></script>
-
-
-  {{!--
   <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      const cookiee = "user_location"
-      function getCookie(x) {
-        const y = document.cookie.match(new RegExp('(^| )' + x + '=([^;]+)'))
-        return y ? decodeURIComponent(y[2]) : null;
-      }
+    function scrollGames(direction) {
+      const container = document.getElementById("gameCarousel");
+      const scrollAmount = container.offsetWidth * 0.85;
+      container.scrollBy({
+        left: direction * scrollAmount,
+        behavior: 'smooth'
+      });
+    }
+  </script>
 
-      if (!getCookie(cookiee) && 'geolocation' in navigator) {
-        navigator.geolocation.getCurrentPosition(
-          async (position) => {
-            const { latitude, longitude } = position.coords;
-            const value = JSON.stringify({ lat: latitude, lng: longitude });
-
-            // You can auto-fill hidden fields or display the coordinates
-
-            document.cookie = `${cookiee}=${encodeURIComponent(value)}; path=/; max-age=${60 * 60 * 24 * 7}`
-            console.log("Location stored in cookie:", value);
-
-            // OPTIONAL: Use a reverse geocoding API to get the city/address
-            // let locationResponse = await fetch(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${latitude}&longitude=${longitude}&localityLanguage=en`);
-            // let locationData = await locationResponse.json();
-            // console.log("City:", locationData.city);
-          },
-          (error) => {
-            console.warn('Geolocation error:', error.message);
-          }
-        );
-      }
-    })
-  </script> --}}
   <script>
     document.addEventListener('DOMContentLoaded', () => {
       const cookieName = "user_location";

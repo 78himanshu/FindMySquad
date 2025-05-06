@@ -151,3 +151,12 @@ export async function deleteGame(gameId,userID) {
   await updateKarmaPoints(userID, -15);
   await Game.findByIdAndDelete(gameId);
 }
+
+export const upcomingGames = async () => {
+
+  const upcomingGames = await Game.find({
+    startTime: { $gte: new Date() } // games starting now or in future
+  }).sort({ startTime: 1 });
+
+  return upcomingGames;
+}
