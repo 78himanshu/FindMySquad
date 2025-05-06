@@ -1,85 +1,9 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <title>Esports - FindMySquad</title>
-  <link rel="stylesheet" href="/css/styles.css">
-  <link rel="stylesheet" href="/css/bootstrap-lite.css">
-  <style>
-    .game-card {
-      border-radius: 12px;
-      overflow: hidden;
-      position: relative;
-      height: 300px;
-      background-size: cover;
-      background-position: center;
-      transition: transform 0.3s ease;
-    }
 
-    .game-card:hover {
-      transform: scale(1.03);
-    }
+<main class="container py-5">
+  <h1 class="text-center mb-4">Esports Games</h1>
 
-    .game-overlay {
-      position: absolute;
-      bottom: 0;
-      width: 100%;
-      padding: 1rem;
-      background: rgba(0, 0, 0, 0.7);
-      color: white;
-      font-weight: bold;
-      text-align: center;
-    }
-  </style>
-</head>
-<body>
-
-<nav class="navbar bg-light px-4">
-  <div class="container-fluid d-flex justify-content-between align-items-center flex-nowrap w-100">
-
-    <!-- LEFT SECTION -->
-    <div class="d-flex align-items-center gap-3">
-      <a class="navbar-brand fw-bold" href="/">FindMySquad</a>
-
-      <div class="dropdown">
-        <button class="btn btn-outline-primary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-          Tournaments
-        </button>
-        <ul class="dropdown-menu">
-          <li><a class="dropdown-item" href="/tournaments/create">Create Your Own Tournament</a></li>
-        </ul>
-      </div>
-    </div>
-
-    <!-- CENTER SECTION -->
-    <div class="d-flex align-items-center gap-3 mx-auto">
-      <a href="/join" class="btn btn-outline-primary text-decoration-none">Join</a>
-      <a href="/host" class="btn btn-outline-primary text-decoration-none">Host</a>
-      <a href="/esports" class="btn btn-outline-primary text-decoration-none">Esports</a>
-      <a href="/gymBuddy" class="btn btn-outline-primary text-decoration-none">GymBuddy</a>
-    </div>
-
-    <!-- RIGHT SECTION -->
-    <div class="d-flex align-items-center gap-2">
-      {{#if isLoggedIn}}
-        <a href="/profile/view" class="d-flex align-items-center gap-2 text-decoration-none text-dark">
-          <img src="{{profilePic}}" alt="profile" class="rounded-circle" width="32" height="32">
-          <span class="fw-semibold">{{username}}</span>
-        </a>
-        <a href="/logout" class="btn btn-outline-danger">Logout</a>
-      {{else}}
-        <a href="/login" class="btn btn-outline-primary text-decoration-none">Login</a>
-        <a href="/signup" class="btn btn-primary text-decoration-none">Signup</a>
-      {{/if}}
-    </div>
-
-  </div>
-</nav>
-
-  <main class="container py-5">
-    <h1 class="text-center mb-4">Esports Games</h1>
-
-    <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4">
-      {{#each games}}
+  <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4">
+    {{#each games}}
       <div class="col">
         <a href="/esports/game/{{encodeURI this.title}}" class="text-decoration-none text-light">
           <div class="game-card" style="background-image: url('{{this.image}}');">
@@ -90,12 +14,12 @@
           </div>
         </a>
       </div>
-      {{/each}}
-    </div>
-  </main>
+    {{/each}}
+  </div>
+</main>
 
-  <script src="/js/bootstrap.bundle.min.js"></script>
-  <script>
+<script src="/js/bootstrap.bundle.min.js"></script>
+<script>
   document.addEventListener('DOMContentLoaded', function () {
     const toggles = document.querySelectorAll('.dropdown-toggle');
     toggles.forEach(function (toggle) {
@@ -107,6 +31,3 @@
     });
   });
 </script>
-
-</body>
-</html>

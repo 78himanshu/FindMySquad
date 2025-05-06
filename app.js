@@ -6,7 +6,6 @@ import path from "path";
 import { fileURLToPath } from "url";
 import connectDB from "./config/mongoConnections.js";
 import exphbs from "express-handlebars";
-import fs from "fs";
 import cookieParser from "cookie-parser";
 import jwt from "jsonwebtoken";
 import gymBuddyRoutes from "./routes/gymBuddyRoutes.js";
@@ -20,8 +19,10 @@ import Handlebars from "handlebars";
 import configRoutesFunction from "./routes/index.js";
 import "./utils/handlebarsHelper.js";
 import esportsRoutes from "./routes/esports.js";
-
-import userProfileRoutes from "./routes/userProfileRoutes.js";
+import http from "http";
+import { Server } from "socket.io";
+import Game from "./models/hostGame.js";
+import ChatMessage from "./models/ChatMessage.js";
 
 // Fix __dirname issue in ES Modules
 const __filename = fileURLToPath(import.meta.url);
@@ -53,7 +54,12 @@ const hbs = exphbs.create({
     length: (array) => (Array.isArray(array) ? array.length : 0),
     includes: (arr, val) => Array.isArray(arr) && arr.includes(val.toString()),
     json: (context) => JSON.stringify(context, null, 2),
-    encodeURI: (str) => encodeURIComponent(str), // ✅ FIXED: added helper
+    encodeURI: (str) => encodeURIComponent(str),
+
+    array: (...args) => {
+      // Handlebars passes its options object as the last arg—drop it
+      return args.slice(0, -1);
+    },
 
     formatDate: (datetime) => {
       if (!datetime) return "";
@@ -177,7 +183,8 @@ app.use((req, res, next) => {
       res.locals.isLoggedIn = true;
       res.locals.username = decoded.username;
       res.locals.profilePic =
-        decoded.profilePic || "/images/default-avatar.png"; // ✅ ADD THIS
+        decoded.profilePic || "/images/default-avatar.png";
+      res.locals.userId      = decoded.userId;
     } catch (err) {
       res.locals.isLoggedIn = false;
       res.locals.username = null;
@@ -192,7 +199,6 @@ app.use((req, res, next) => {
 
   next();
 });
-
 // Routes
 configRoutesFunction(app);
 app.use("/host", hostGameRoutes);
@@ -200,7 +206,6 @@ app.use("/gymBuddy", gymBuddyRoutes);
 app.use("/leaderboard", leaderboardRoutes);
 app.use("/esports", esportsRoutes);
 app.use("/join", esportsRoutes);
-
 // 404 Handler (must come after routes but before error handler)
 app.use((req, res, next) => {
   console.log("404 Handler triggered for:", req.originalUrl);
@@ -222,8 +227,116 @@ app.use((err, req, res, next) => {
   });
 });
 
+// for chat-message for joined game
+// Create HTTP server and bind it to Express app
+const server = http.createServer(app);
+
+// Initialize Socket.IO server with open CORS policy
+const io = new Server(server, {
+  cors: {
+    origin: "*", // Adjust as needed for production
+  },
+});
+
+// Attach Socket.IO instance to app for external use
+app.set("io", io);
+
+// Store active chat sessions by game ID
+const activeChats = {}; // { gameId: { sockets: Set, endTime: Number } }
+
+// Handle socket connections
+io.on("connection", (socket) => {
+  console.log("User connected to Socket.IO:", socket.id);
+
+  // User attempts to join a chat room for a specific game
+  socket.on("joinGameChat", async ({ gameId, userId }) => {
+    try {
+      const game = await Game.findById(gameId);
+      if (!game) {
+        socket.emit("chatClosed", "Game not found.");
+        return;
+      }
+
+      const now = Date.now();
+      const end = new Date(game.endTime).getTime();
+
+      // If the current time is past the game's end, disallow chat
+      if (now > end) {
+        socket.emit("chatClosed", "This chat has ended.");
+        return;
+      }
+
+      // Join the room for this game
+      socket.join(gameId);
+      console.log(`User ${userId} joined chat room for game ${gameId}`);
+
+      // Load chat history and send to the newly joined client
+      const pastMessages = await ChatMessage.find({ gameId })
+        .sort({ timestamp: 1 })
+        .lean();
+
+      socket.emit("previousMessages", pastMessages);
+
+      // Track and timeout the room if it's not already active
+      if (!activeChats[gameId]) {
+        activeChats[gameId] = {
+          sockets: new Set(),
+          endTime: end,
+        };
+
+        const msRemaining = end - now;
+        setTimeout(() => {
+          io.to(gameId).emit("chatClosed", "This chat has ended.");
+          io.socketsLeave(gameId);
+          delete activeChats[gameId];
+          console.log(`Chat room ${gameId} closed due to timeout`);
+        }, msRemaining);
+      }
+
+      activeChats[gameId].sockets.add(socket.id);
+    } catch (err) {
+      console.error("Error handling joinGameChat:", err);
+      socket.emit("chatClosed", "An error occurred while joining the chat.");
+    }
+  });
+
+  // Handle new messages sent by users
+  socket.on("sendMessage", async ({ gameId, username, message }) => {
+    const now = Date.now();
+    const chatEnd = activeChats[gameId]?.endTime;
+
+    const messageData = {
+      username,
+      message,
+      time: new Date(now).toLocaleTimeString([], {
+        hour: "2-digit",
+        minute: "2-digit",
+      }),
+    };
+
+    if (chatEnd && now < chatEnd) {
+      io.to(gameId).emit("receiveMessage", messageData);
+      console.log(`Message from ${username} in ${gameId}: ${message}`);
+
+      // Store in DB
+      try {
+        await ChatMessage.create({
+          gameId,
+          username,
+          message,
+          timestamp: new Date(now),
+        });
+      } catch (err) {
+        console.error("Failed to save message:", err);
+      }
+    } else {
+      socket.emit("chatClosed", "This chat has ended.");
+    }
+  });
+});
+
 // Start server
 const PORT = process.env.PORT || 8080;
-app.listen(PORT, () => {
+server.listen(PORT, () => {
   console.log(`🚀 Server is running on http://localhost:${PORT}`);
 });

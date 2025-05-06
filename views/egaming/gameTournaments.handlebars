@@ -1,44 +1,14 @@
-<link rel="stylesheet" href="/css/gameTournaments.css">
-<link rel="stylesheet" href="/css/styles.css">
-<link rel="stylesheet" href="/css/bootstrap-lite.css">
-<nav class="navbar bg-light px-4">
-  <div class="container-fluid d-flex justify-content-between align-items-center">
-
-    <!-- LEFT SECTION: Brand -->
-    <a class="navbar-brand fw-bold" href="/">FindMySquad</a>
-
-    <!-- CENTER SECTION: Navigation Links -->
-    <div class="d-flex justify-content-center flex-grow-1 gap-3">
-      <a href="/join" class="btn btn-outline-primary text-decoration-none">Join</a>
-      <a href="/host" class="btn btn-outline-primary text-decoration-none">Host</a>
-      <a href="/esports" class="btn btn-outline-primary text-decoration-none">Esports</a>
-      <a href="/gymBuddy" class="btn btn-outline-primary text-decoration-none">GymBuddy</a>
-    </div>
-
-    <!-- RIGHT SECTION: User Info -->
-    <div class="d-flex align-items-center gap-2">
-      {{#if isLoggedIn}}
-        <a href="/profile/view" class="d-flex align-items-center gap-2 text-decoration-none text-dark">
-          <img src="{{profilePic}}" alt="profile" class="rounded-circle" width="32" height="32">
-          <span class="fw-semibold">{{username}}</span>
-        </a>
-        <a href="/logout" class="btn btn-outline-danger">Logout</a>
-      {{else}}
-        <a href="/login" class="btn btn-outline-primary text-decoration-none">Login</a>
-        <a href="/signup" class="btn btn-primary text-decoration-none">Signup</a>
-      {{/if}}
-    </div>
-
-  </div>
-</nav>
 <main class="container-fluid p-0">
   <!-- Game Banner -->
-  <div class="game-banner" style="background: url('{{backgroundImage}}') center center / cover no-repeat;">
+  <div
+    class="game-banner"
+    style="background: url('{{backgroundImage}}') center center / cover no-repeat;"
+  >
     <div class="banner-overlay"></div>
     <div class="banner-text">
       <h1>{{gameName}}</h1>
       <div class="banner-prize mt-2 px-3 py-1 bg-primary text-light rounded">
-        Prize: 
+        Prize:
         {{#if tournaments.length}}
           {{tournaments.[0].prizeDescription}}
         {{else}}
@@ -46,6 +16,12 @@
         {{/if}}
       </div>
     </div>
+
+    <!-- Create Tournament Button -->
+    <a
+      href="/tournaments/create"
+      class="btn btn-success position-absolute bottom-0 end-0 m-4"
+    >Create Tournament</a>
   </div>
 
   <div class="container py-5">
@@ -54,40 +30,63 @@
     {{#if tournaments.length}}
       <div class="d-flex flex-column gap-4">
         {{#each tournaments}}
+          {{!-- Only show if not fully ended --}}
           {{#unless this.hasEnded}}
-          <div class="tournament-card bg-dark text-light p-4 rounded shadow position-relative">
+            <div class="tournament-card bg-dark text-light p-4 rounded shadow position-relative">
+
+              {{!-- “Started” badge --}}
               {{#if this.isOngoing}}
-                <div class="badge bg-warning text-dark position-absolute top-0 end-0 m-3 px-3 py-2 fw-bold">
-                Tournament Started
+                <div
+                  class="badge bg-warning text-dark position-absolute top-0 end-0 m-3 px-3 py-2 fw-bold"
+                >Tournament Started</div>
+              {{/if}}
+
+              <div class="d-flex flex-column flex-md-row align-items-center justify-content-between">
+                <div>
+                  <h4 class="fw-bold mb-3">{{this.format}}</h4>
+                  <p class="mb-1">
+                    <strong>Date &amp; Time:</strong>
+                    {{formatDate this.date}}
+                    from {{formatTime this.startTime}}
+                    to {{formatTime this.endTime}}
+                  </p>
+                  <p class="mb-1"><strong>Skill Level:</strong> {{this.skillLevel}}</p>
+                  <p class="mb-1"><strong>Prize Pool:</strong> {{this.prizeDescription}}</p>
+                  <p class="mb-1"><strong>Created By:</strong> {{this.creator.username}}</p>
+                  <p class="mb-1"><strong>Team Size:</strong> {{this.format}}</p>
                 </div>
-              {{/if}}
-            <div class="d-flex flex-column flex-md-row align-items-center justify-content-between">
 
-            <div>
-              <h4 class="fw-bold mb-3">{{this.format}}</h4>
-              <p class="mb-1">
-                  <strong>Date &amp; Time:</strong>
-                  {{formatDate this.date}}
-                  from {{formatTime this.startTime}}
-                  to   {{formatTime this.endTime}}
-                </p>
-              <p class="mb-1"><strong>Skill Level:</strong> {{this.skillLevel}}</p>
-              <p class="mb-1"><strong>Prize Pool:</strong> ${{this.prizeDescription}}</p>
-              <p class="mb-1"><strong>Created By:</strong> {{this.creator.username}}</p>
-              <p class="mb-1"><strong>Team Size:</strong> {{this.format}}</p>
+                <div class="text-center mt-3 mt-md-0">
+                  {{!-- 1) Ongoing tournaments always just a grey “Ongoing” --}}
+                  {{#if this.isOngoing}}
+                    <button class="btn btn-secondary" disabled>Ongoing</button>
+
+                  {{!-- 2) Future tournaments: if creator → Edit + Delete --}}
+                  {{else if this.isCreator}}
+                    <a
+                      href="/esports/{{this._id}}/register-team"
+                      class="btn btn-primary me-2"
+                    >Edit</a>
+                    <form
+                      action="/esports/{{this._id}}/delete"
+                      method="POST"
+                      style="display:inline-block;"
+                      onsubmit="return confirm('Are you sure you want to delete this tournament?');"
+                    >
+                      <button type="submit" class="btn btn-danger">Delete</button>
+                    </form>
+
+                  {{!-- 3) Future tournaments: others → Enroll --}}
+                  {{else}}
+                    <a
+                      href="/esports/{{this._id}}/register-team"
+                      class="btn btn-success"
+                    >Enroll</a>
+                  {{/if}}
+                </div>
+              </div>
             </div>
-
-            <div class="text-center mt-3 mt-md-0">
-              {{#if this.isOngoing}}
-                <button class="btn btn-secondary" disabled>Ongoing</button>
-              {{else}}
-                  <a href="/esports/{{this._id}}/register-team" class="btn btn-success">Enroll</a>
-              {{/if}}
-            </div>
-
-          </div>
-        </div>
-        {{/unless}}
+          {{/unless}}
         {{/each}}
       </div>
     {{else}}

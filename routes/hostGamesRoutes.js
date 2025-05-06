@@ -25,15 +25,20 @@ router
     x.costPerHead = Number(x.costPerHead);
 
     // for date + times into Date objects
-    const gameDate = new Date(x.gameDate);
-    const [startHours, startMinutes] = x.startTime.split(":");
-    const [endHours, endMinutes] = x.endTime.split(":");
+    // const gameDate = new Date(x.gameDate);
+    // const [startHours, startMinutes] = x.startTime.split(":");
+    // const [endHours, endMinutes] = x.endTime.split(":");
 
-    x.startTime = new Date(gameDate);
-    x.startTime.setHours(startHours, startMinutes);
+    // x.startTime = new Date(gameDate);
+    // x.startTime.setHours(startHours, startMinutes);
 
-    x.endTime = new Date(gameDate);
-    x.endTime.setHours(endHours, endMinutes);
+    // x.endTime = new Date(gameDate);
+    // x.endTime.setHours(endHours, endMinutes);
+
+const dateStr = x.gameDate; // format: YYYY-MM-DD
+x.startTime = new Date(`${dateStr}T${x.startTime}:00Z`);
+x.endTime = new Date(`${dateStr}T${x.endTime}:00Z`);
+
 
     // Validation for start and end time.
     if (x.startTime >= x.endTime) {
@@ -191,15 +196,34 @@ router.post("/edit/:id", requireAuth, async (req, res) => {
   try {
     const updates = req.body;
 
+    // const gameDate = new Date(updates.gameDate);
+    // const [startHours, startMinutes] = updates.startTime.split(":");
+    // const [endHours, endMinutes] = updates.endTime.split(":");
+
+    // updates.startTime = new Date(gameDate);
+    // updates.startTime.setHours(startHours, startMinutes);
+    // updates.endTime = new Date(gameDate);
+    // updates.endTime.setHours(endHours, endMinutes);
     const gameDate = new Date(updates.gameDate);
     const [startHours, startMinutes] = updates.startTime.split(":");
     const [endHours, endMinutes] = updates.endTime.split(":");
-
-    updates.startTime = new Date(gameDate);
-    updates.startTime.setHours(startHours, startMinutes);
-    updates.endTime = new Date(gameDate);
-    updates.endTime.setHours(endHours, endMinutes);
-
+    
+    updates.startTime = new Date(Date.UTC(
+      gameDate.getFullYear(),
+      gameDate.getMonth(),
+      gameDate.getDate(),
+      startHours,
+      startMinutes
+    ));
+    
+    updates.endTime = new Date(Date.UTC(
+      gameDate.getFullYear(),
+      gameDate.getMonth(),
+      gameDate.getDate(),
+      endHours,
+      endMinutes
+    ));
+        
     if (updates.startTime >= updates.endTime) {
       return res.status(400).send("End time must be after start time");
     }
