@@ -1,5 +1,3 @@
-// 🛠 FIX 1: Import mongoose and get ObjectId properly
-import mongoose from "mongoose";
 const { ObjectId } = mongoose.Types;
 import { geocodeCity } from "../utils/geocode.js";
 
