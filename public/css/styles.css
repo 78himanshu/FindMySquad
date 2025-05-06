@@ -407,3 +407,62 @@ label.btn.active {
 .host-link:hover {
   text-decoration: underline;
 }
+
+.karma-leaderboard {
+  background-color: #f5faff;
+  border: 1px solid #cce;
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+  text-align: center;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+}
+
+.karma-leaderboard h2 {
+  font-size: 1.75rem;
+  color: #1e3a8a;
+  margin-bottom: 1rem;
+  font-weight: 700;
+}
+
+.leaderboard-list {
+  list-style: none;
+  padding-left: 0;
+  margin: 0 auto;
+  max-width: 400px;
+  text-align: left;
+}
+
+.leaderboard-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  margin-bottom: 0.5rem;
+  background-color: #fff;
+  font-weight: 500;
+  transition: transform 0.2s;
+}
+
+.leaderboard-item:hover {
+  transform: scale(1.02);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+.rank-icon {
+  width: 2.5rem;
+  text-align: center;
+}
+
+.username {
+  flex-grow: 1;
+  margin-left: 0.5rem;
+  font-weight: 600;
+}
+
+.karma {
+  font-family: monospace;
+  color: #0d6efd;
+}
+

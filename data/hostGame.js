@@ -144,7 +144,8 @@ export const updateGame = async (gameId, updates, hostId) => {
   return game;
 };
 
-export async function deleteGame(gameId) {
+export async function deleteGame(gameId,userID) {
   if (!gameId) throw new Error("Game ID is required");
+  await updateKarmaPoints(userID, -15);
   await Game.findByIdAndDelete(gameId);
 }

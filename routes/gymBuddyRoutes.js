@@ -274,6 +274,8 @@ router.post("/join/:id", requireAuth, async (req, res) => {
     sessionToJoin.members.push(userId);
     sessionToJoin.currentMembers = sessionToJoin.members.length;
 
+    await updateKarmaPoints(userId, 10);
+
     await sessionToJoin.save();
 
     return res.redirect("/gymBuddy/find?success=Joined successfully");
@@ -292,6 +294,8 @@ router.post("/leave/:id", requireAuth, async (req, res) => {
 
     session.members = session.members.filter(member => member.toString() !== userId);
     session.currentMembers = session.members.length;
+    
+    await updateKarmaPoints(userId, -10);
 
     await session.save();
 

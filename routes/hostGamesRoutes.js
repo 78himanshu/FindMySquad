@@ -199,7 +199,7 @@ router.post("/delete/:id", requireAuth, async (req, res) => {
         .send("You are not authorized to delete this game.");
     }
 
-    await hostGameData.deleteGame(gameId);
+    await hostGameData.deleteGame(gameId,userId);
     res.redirect("/join");
   } catch (e) {
     res.status(500).send(e.message);

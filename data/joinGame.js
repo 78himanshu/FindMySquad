@@ -64,5 +64,7 @@ export const leaveGame = async (gameId, userId) => {
     (id) => id.toString() !== userId.toString()
   );
   game.playersGoing = game.players.length;
+
+  await updateKarmaPoints(userId, -10);
   await game.save();
 };

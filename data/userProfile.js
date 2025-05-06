@@ -1,7 +1,7 @@
 import UserProfile from '../models/userProfile.js';
 import { checkString } from '../utils/helper.js';
 import Userlist from "../models/User.js";
-
+import mongoose from 'mongoose';
 
 export const createProfile = async (userId, data) => {
 
@@ -129,3 +129,74 @@ export const unfollowUser = async (userId, targetUserId) => {
 
   return targetProfile.followers.length;
 };
+
+// export const getTopKarmaUsers = async (limit = 5) => {
+//   const topUsers = await UserProfile.find({})
+//     .sort({ karmaPoints: -1 })
+//     .limit(limit)
+//     .populate({
+//       path: 'userId',
+//       model: Userlist,
+//       select: 'username'
+//     })
+//     .lean();
+
+//   // Only return users that have a valid populated userId
+//   return topUsers
+//     .filter(user => user.userId && user.userId.username)
+//     .map(user => ({
+//       username: user.userId.username,
+//       karma: user.karmaPoints
+//     }));
+// };
+
+
+export const getTopKarmaUsers = async () => {
+  const topUsers = await UserProfile.aggregate([
+    {
+      $lookup: {
+        from: 'userlists',
+        localField: 'userId',
+        foreignField: '_id',
+        as: 'user'
+      }
+    },
+    { $unwind: "$user" },
+    {
+      $project: {
+        _id: 0,
+        firstName: "$profile.firstName",
+        lastName: "$profile.lastName",
+        karma: "$karmaPoints"
+      }
+    },
+    { $sort: { karma: -1 } },
+    { $limit: 5 }
+  ]);
+  console.log("top users are here",topUsers);
+  return topUsers;
+};
+
+// export const getTopKarmaUsers = async () => {
+//  try{
+
+//   const topUsers = await UserProfile.aggregate([
+//     {
+//       $project: {
+//         firstName: "$profile.firstName",
+//         lastName: "$profile.lastName",
+//         karma: "$karmaPoints"
+//       }
+//     },
+//     { $sort: { karma: -1 } },
+//     { $limit: 5 }
+//   ]);
+
+//   console.log("✅ Fetched topUsers in getTopKarmaUsers():", topUsers);
+//     return topUsers;
+//   } catch (err) {
+//     console.error("❌ Error in getTopKarmaUsers():", err);
+//     return [];
+//   }
+//   //return topUsers;
+// };

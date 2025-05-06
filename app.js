@@ -11,6 +11,8 @@ import cookieParser from "cookie-parser";
 import jwt from "jsonwebtoken";
 import gymBuddyRoutes from "./routes/gymBuddyRoutes.js";
 import hostGameRoutes from "./routes/hostGamesRoutes.js";
+import leaderboardRoutes from './routes/leaderboardRoutes.js';
+
 
 // Handlebars prototype access (to fix _id issues in Handlebars)
 import { allowInsecurePrototypeAccess } from "@handlebars/allow-prototype-access";
@@ -38,6 +40,8 @@ const hbs = exphbs.create({
   handlebars: allowInsecurePrototypeAccess(Handlebars),
   helpers: {
     eq: (a, b) => a === b,
+    lt: (a, b) => a < b,
+    add: (a, b) => a + b,
     gte: (a, b) => a >= b,
     length: (array) => (Array.isArray(array) ? array.length : 0),
     includes: (arr, val) => Array.isArray(arr) && arr.includes(val.toString()),
@@ -121,6 +125,7 @@ app.use((req, res, next) => {
 configRoutesFunction(app);
 app.use("/host", hostGameRoutes);
 app.use("/gymBuddy", gymBuddyRoutes);
+app.use("/leaderboard", leaderboardRoutes);
 
 // 404 Handler (must come after routes but before error handler)
 app.use((req, res, next) => {
