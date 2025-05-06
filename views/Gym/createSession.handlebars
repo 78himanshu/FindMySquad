@@ -6,10 +6,7 @@
     <h1>Create a Gym Session</h1>
     <form action="/gymBuddy/create" method="POST">
       <label for="title">Workout Title:</label>
-      <input type="text" id="title" name="title" value="{{title}}" required />
-
-      <label for="gym">Gym:</label>
-      <input type="text" id="gym" name="gym" value="{{gym}}" required />
+    <input type="text" name="title" placeholder="Title" />
 
       <label for="description">Description:</label>
       <textarea id="description" name="description">{{description}}</textarea>
@@ -29,8 +26,12 @@
     </div>
 
 
-      <label for="gymlocation">Gym Location:</label>
-      <input type="text" id="gymlocation" name="gymlocation" value="{{gymlocation}}" required />
+      <label for="gym">Gym Name:</label>
+      <input type="text" id="gym" name="gym" value="{{gym}}" required />
+
+      <label for="location">Gym Location:</label>
+      <input type="text" id="gym-location" name="gymlocation" required placeholder="Enter a Gym Location"/>
+
 
       <label for="experience">Experience:</label>
       <select name="experience" id="experience" required>
@@ -78,4 +79,27 @@
       {{/if}}
     </form>
   </main>
+
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBP-FJZsXytqUxzesnIEkrkUu4JoB1zO-M&libraries=places"></script>
+
+  <script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const input = document.getElementById('gym-location');
+    if (input) {
+      const autocomplete = new google.maps.places.Autocomplete(input, {
+        types: ['geocode'],
+        componentRestrictions: { country: "us" } // Optional: restrict to United States
+      });
+      autocomplete.addListener('place_changed', function() {
+        const place = autocomplete.getPlace();
+        console.log("Selected Place:", place);
+        if (place && place.formatted_address) {
+          input.value = place.formatted_address;
+        }
+      });
+    }
+  });
+</script>
+
   <script src="/js/createSession.js"></script>
+

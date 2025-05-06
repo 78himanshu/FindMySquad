@@ -19,20 +19,29 @@ const gymSchema = new structure({
   workoutType: {
     type: String,
     required: true,
-    enum: ["Cardio", "Body Building", "Power Lifting", "Calisthenics", "Yoga", "Other"]
+    enum: [
+      "Cardio",
+      "Body Building",
+      "Power Lifting",
+      "Calisthenics",
+      "Yoga",
+      "Other",
+    ],
   },
-  members: [{
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "User"
-  }],
+  members: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+    },
+  ],
   currentMembers: {
     type: Number,
-    default: 0
+    default: 0,
   },
   maxMembers: {
     type: Number,
     required: true,
-    enum: [1, 2, 3, 4]
+    enum: [1, 2, 3, 4],
   },
   createdAt: { type: Date, default: Date.now },
   hostedBy: {
@@ -40,6 +49,7 @@ const gymSchema = new structure({
     ref: "Userlist",
     required: true,
   },
+  players: [{ type: mongoose.Schema.Types.ObjectId, ref: "Userlist" }],
 });
 
 export default mongoose.model("Gym", gymSchema);

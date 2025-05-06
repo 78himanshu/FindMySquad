@@ -1,0 +1,131 @@
+/* Top Banner */
+.game-banner {
+    position: relative;
+    height: 400px;
+    background-size: cover;
+    background-position: center;
+  }
+  
+  .banner-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5); /* Slightly less dark */
+  }
+  
+  .banner-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    z-index: 2;
+  }
+  
+  .banner-text h1 {
+    color: white;
+    font-size: 3rem;
+    font-weight: bold;
+    text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.7); /* Add slight shadow for better readability */
+  }
+  
+  /* Tournament Card */
+  .tournament-card {
+    background-color: #bbbbbbbd; /* Lighter grey instead of #1c1c1c */
+    border: none;
+    border-radius: 12px;
+    overflow: hidden;
+    padding: 20px;
+    margin-bottom: 30px; /* Add space between cards */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 10px;
+    transition: transform 0.3s ease;
+  }
+  
+  .tournament-card:hover {
+    transform: translateY(-5px);
+  }
+  
+  /* Image if you want small thumbnails later */
+  .tournament-image {
+    background-size: cover;
+    background-position: center;
+    min-height: 200px;
+  }
+  
+  /* Prize Badge */
+  .prize-badge {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    background-color: #00c851;
+    /*color: white;*/
+    padding: 5px 12px;
+    font-weight: bold;
+    font-size: 1rem;
+    border-radius: 5px;
+    text-align: center;
+    box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.5);
+  }
+  
+  /* Enroll Button */
+  .btn-enroll {
+    background-color: #00c851;
+    border: none;
+    padding: 10px 30px;
+    font-size: 1.1rem;
+    font-weight: bold;
+    color: white;
+    border-radius: 6px;
+    text-decoration: none;
+    transition: background-color 0.3s;
+    margin-top: 15px;
+  }
+  
+  .btn-enroll:hover {
+    background-color: #007e33;
+  }
+  
+  /* General container tweaks */
+  .container {
+    padding-top: 2rem;
+    padding-bottom: 2rem;
+  }
+  
+  /* Headings */
+  h2, h4 {
+    color: black;
+  }
+  
+  /* Smaller Tournament Details */
+  .tournament-card p {
+    margin: 0.25rem 0;
+    font-size: 0.95rem;
+  }
+  
+  .prize-badge {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    background-color: #3cff64;
+    color: #000;
+    font-weight: bold;
+    font-size: 1.25rem;
+    padding: 6px 14px;
+    border-radius: 5px;
+    text-align: center;
+    box-shadow: 0px 2px 5px rgba(0,0,0,0.2);
+    z-index: 5;
+    line-height: 1.2;
+  }
+  
+  .prize-badge span {
+    font-size: 0.75rem;
+    font-weight: 600;
+  }
+  
+  

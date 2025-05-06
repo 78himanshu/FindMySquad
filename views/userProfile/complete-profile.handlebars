@@ -46,6 +46,17 @@
         </label>
     </div>
 
+    <!-- Location and phone number -->
+    <div class="row mt-4">
+    <div class="col-md-6">
+        <label for="city" class="form-label">City</label>
+        <input type="text" id="city" name="city" class="form-control" placeholder="Enter your city">
+    </div>
+    <div class="col-md-6">
+        <label for="phoneNumber" class="form-label">Phone Number</label>
+        <input type="text" id="phoneNumber" name="phoneNumber" class="form-control" placeholder="123-456-7890">
+    </div>
+    </div>
 
     <!-- Bio -->
     <textarea name="bio" id="bio" class="form-control mt-3" placeholder="Tell us about yourself..."></textarea>
@@ -196,8 +207,14 @@
         if (!gender) return showToast('Please select a gender.');
         if (!profilePic) return showToast('Please select a profile picture.');
         if (sports.length === 0) return showToast('Please select at least one sport.');
-        if (workouts.length === 0) return showToast('Please select at least one workout type.');
-        if (games.length === 0) return showToast('Please select at least one gaming interest.');
+        //if (workouts.length === 0) return showToast('Please select at least one workout type.');
+        //if (games.length === 0) return showToast('Please select at least one gaming interest.');
+
+        const city = form.city.value.trim();
+        const phoneNumber = form.phoneNumber.value.trim();
+
+        if (!city) return showToast('Please enter your city.');
+        if (!phoneNumber) return showToast('Phone number is required.');
 
         // Prepare and send the data
         const profileData = {
@@ -208,7 +225,10 @@
             bio,
             sportsInterests: sports,
             gymPreferences: workouts,
-            gamingInterests: games
+            gamingInterests: games,
+            city,
+            phoneNumber,
+            //geoLocation
         };
 
         try {
@@ -234,4 +254,15 @@
 
 </script>
 
+<script
+  src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBP-FJZsXytqUxzesnIEkrkUu4JoB1zO-M&libraries=places&callback=initAutocomplete"
+  async defer></script>
 
+<script>
+  function initAutocomplete() {
+    const input = document.getElementById('city');
+    new google.maps.places.Autocomplete(input, {
+      types: ['(cities)']
+    });
+  }
+</script>

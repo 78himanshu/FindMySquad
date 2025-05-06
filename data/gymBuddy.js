@@ -135,7 +135,6 @@ export const getAllGymSessions = async () => {
   return await Gym.find({}).populate("hostedBy", "username");
 };
 
-
 // NEW: get all gym sessions where this user is a member
 export const getJoinedSessionsByUser = async (userId) => {
   if (!ObjectId.isValid(userId)) throw "Invalid user ID";
