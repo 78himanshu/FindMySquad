@@ -50,10 +50,38 @@ router
         await Promise.all(allGames.map((game) => game.populate("host")));
         const now = new Date();
 
-        // Filter out games that are already over
-        const upcomingGames = allGames.filter((game) => {
-          return new Date(game.endTime) > now;
-        });
+        //Filter out games that are already over
+        // const upcomingGames = allGames.filter((game) => {
+        //   return new Date(game.endTime) > now;
+        // });
+
+        const upcomingGames = [];
+
+for (const game of allGames) {
+  const gameEndTime = new Date(game.endTime);
+
+  if (gameEndTime > now) {
+    // Still an upcoming game
+    upcomingGames.push(game);
+  } else {
+    // Game is over — check for karma penalty
+    const hasPlayers = game.players && game.players.length > 0;
+    const hostId = game.host.toString();
+    const onlyHost = !hasPlayers || game.players.every(p => p.toString() === hostId);
+
+    if (onlyHost) {
+      // No players joined apart from host — apply -15 karma
+      try {
+        const { updateKarmaPoints } = await import("../helpers/karmaHelper.js");
+        await updateKarmaPoints(hostId, -15);
+        console.log(`Applied -15 karma to host ${hostId} for unplayed game: ${game._id}`);
+      } catch (err) {
+        console.error("Failed to apply karma penalty for unplayed game:", err);
+      }
+    }
+  }
+}
+
 
         const plainAllGames = upcomingGames.map((g) => g.toObject());
 
