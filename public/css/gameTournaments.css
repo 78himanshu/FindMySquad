@@ -139,7 +139,7 @@ h4 {
   font-weight: 600;
 }
 
-.game-card {
+.esport-card {
   position: relative;
   width: 100%;
   aspect-ratio: 16 / 9;
@@ -155,11 +155,11 @@ h4 {
   outline: none;
 }
 
-.game-card:hover {
+.esport-card:hover {
   transform: scale(1.03);
 }
 
-.game-overlay {
+.esport-overlay {
   position: absolute;
   bottom: 0;
   width: 100%;
