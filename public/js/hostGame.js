@@ -1,4 +1,4 @@
-// for selecting custom sports for host game
+
 document.addEventListener("DOMContentLoaded", () => {
   const form = document.querySelector(".host-game-form");
   //const customSportInput = document.getElementById("customSport");
@@ -6,7 +6,14 @@ document.addEventListener("DOMContentLoaded", () => {
   const costInput = document.querySelector("input[name='costPerHead']");
   const hostId = document.querySelector("input[name='host']").value;
 
-  // Redirect to login if user not logged in
+  const showToastError = (msg) => {
+    if (typeof showToast === "function") {
+      showToast(msg, "error");
+    } else {
+      alert(msg); // fallback
+    }
+  };
+
   if (!hostId) {
     window.location.href = "/login?redirect=/host";
   }
@@ -22,50 +29,69 @@ document.addEventListener("DOMContentLoaded", () => {
   //   }
   // });
 
-  // Form validation
   form.addEventListener("submit", (e) => {
-    //Adding Validations
+    e.preventDefault();
+
     const title = form.title.value.trim();
-    const sport = form.sport.value.trim();
-    //const venue = form.venue.value.trim();
-    const location = form.location.value.trim();
-    const description = form.description.value.trim();
-    const skillLevel = form.skillLevel.value;
-    let cost = form.costPerHead.value;
-    if (cost === "") cost = "0";
-    const players = form.playersRequired.value;
-    // const gameDate = new Date(form.gameDate.value);
-    // const [sh, sm] = form.startTime.value.split(":");
-    // const [eh, em] = form.endTime.value.split(":");
-    // const startTime = new Date(gameDate)
-    // startTime.setHours(sh, sm);
-    // const endTime = new Date(gameDate)
-    // endTime.setHours(eh, em);
-    const gameDateStr = form.gameDate.value;
-    const [sh, sm] = form.startTime.value.split(":");
-    const [eh, em] = form.endTime.value.split(":");
-
-    const startDateTimeStr = `${gameDateStr}T${sh.padStart(2, "0")}:${sm.padStart(2, "0")}:00`;
-    const endDateTimeStr = `${gameDateStr}T${eh.padStart(2, "0")}:${em.padStart(2, "0")}:00`;
-
-    const startTime = new Date(startDateTimeStr);
-    const endTime = new Date(endDateTimeStr);
-    const now = new Date();
-
-    if (startTime <= now) {
-      alert("Game must be scheduled in the future.");
-      e.preventDefault();
+    if (!title) {
+      showToastError("Title is required.");
       return;
     }
+    const sport = form.sport.value;
+    if (!sport || sport === "Select") {
+      showToastError("Please select a sport.");
+      return;
+    }
+
+
+    const playersRequired = Number(form.playersRequired.value);
+    if (
+      form.playersRequired.value.trim() === "" ||
+      isNaN(playersRequired) ||
+      playersRequired <= 0
+    ) {
+      showToastError("Players Required must be a number greater than 0.");
+      return;
+    }
+
+    const costPerHead = Number(form.costPerHead.value);
+    if (
+      form.costPerHead.value.trim() === "" ||
+      isNaN(costPerHead) ||
+      costPerHead < 0
+    ) {
+      showToastError("Cost per Head must be a valid number (0 or more).");
+      return;
+    }
+
+    const gameDate = form.gameDate.value;
+    const startTime = form.startTime.value;
+    const endTime = form.endTime.value;
+
+    if (!gameDate || !startTime || !endTime) {
+      showToastError("Game date, start time, and end time are all required.");
+      return;
+    }
+
+    const start = new Date(`${gameDate}T${startTime}`);
+    let end = new Date(`${gameDate}T${endTime}`);
+
+
     if (startTime >= endTime) {
-      alert("End time must be after start time.");
-      e.preventDefault();
+      end.setDate(end.getDate() + 1);
+    }
+
+    if (start >= end) {
+      showToastError("End time must be after start time.");
       return;
     }
 
     if (!title || !sport || !location || !skillLevel || !form.gameDate.value || !form.startTime.value || !form.endTime.value) {
-      alert("Please fill in all required fields.");
-      e.preventDefault();
+      showToastError("Please fill in all required fields.");
+      return
+    }
+    if (start < new Date()) {
+      showToastError("You cannot host a game in the past.");
       return;
     }
     const allowedSports = ["Soccer", "Basketball", "Baseball", "Tennis", "Swimming", "Running", "Cycling", "Hiking", "Golf", "Volleyball"];
@@ -106,37 +132,64 @@ document.addEventListener("DOMContentLoaded", () => {
     //   return;
     // }
 
-    // if (form.costPerHead.value === "" || isNaN(form.costPerHead.value)) {
-    //   alert("Cost per Head must be a number.");
-    //   e.preventDefault();
-    //   return;
-    // }
-    // const roundedStartTime = new Date(startTime);
-    // roundedStartTime.setSeconds(0, 0);
-    
-    // if (roundedStartTime <= now) {
-    //   alert("Game must be scheduled in the future.");
-    //   e.preventDefault();
-    //   return;
-    // }
-    // if (
-    //   form.playersRequired.value === "" ||
-    //   isNaN(form.playersRequired.value)
-    // ) {
-    //   alert("Players Required must be a number.");
-    //   e.preventDefault();
-    //   return;
-    // }
-    if (cost === "" || isNaN(cost) || Number(cost) < 0) {
-      alert("Cost per Head must be a non-negative number.");
-      e.preventDefault();
+    const skillLevel = form.skillLevel.value;
+    if (!skillLevel) {
+      showToastError("Please select a skill level.");
       return;
     }
-  
-    if (players === "" || isNaN(players) || Number(players) <= 0) {
-      alert("Players Required must be a number greater than 0.");
-      e.preventDefault();
+    const location = form.location.value.trim();
+    if (!location) {
+      showToastError("Location is required.");
       return;
     }
+    const description = form.description.value.trim();
+    const wordCount = description.split(/\s+/).filter(word => word).length;
+    if (!description) {
+      showToastError("Description is required.");
+      return;
+    }
+
+    if (wordCount > 200) {
+      showToastError("Description cannot exceed 200 words.");
+      return;
+    }
+    const formData = {
+      title,
+      sport,
+      gameDate,
+      startTime,
+      endTime,
+      playersRequired,
+      costPerHead,
+      skillLevel,
+      description,
+      location,
+      host: hostId,
+      userTimeZone: Intl.DateTimeFormat().resolvedOptions().timeZone
+    };
+
+    fetch("/host", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(formData)
+    })
+      .then(async (response) => {
+        const data = await response.json();
+
+        console.log("data>>>>", data)
+        if (!response.ok) {
+          showToastError(data.error || "Failed to host the game.");
+          return;
+        }
+        // On success: redirect or show confirmation
+        window.location.href = "/host/success";
+      })
+      .catch((error) => {
+        console.error("AJAX error:", error);
+        showToastError("Something went wrong while hosting the game.");
+      });
+
   });
 });

@@ -2,13 +2,11 @@ import Game from "../models/hostGame.js";
 import { ObjectId } from "mongodb";
 import { checkNumber, checkString } from "../utils/helper.js";
 import UserProfile from "../models/userProfile.js";
-import { updateKarmaPoints } from "../utils/karmaHelper.js"; 
-
+import { updateKarmaPoints } from "../utils/karmaHelper.js";
 
 export const createGame = async (
   title,
   sport,
-  //venue,
   playersRequired,
   startTime,
   endTime,
@@ -19,30 +17,32 @@ export const createGame = async (
   location,
   geoLocation
 ) => {
+
   if (
-    !title ||
-    !sport ||
-    //!venue ||
-    !playersRequired ||
-    !startTime ||
-    !endTime ||
-    !costPerHead ||
-    !skillLevel ||
-    !host ||
-    !location
+    title === undefined ||
+    sport === undefined ||
+    playersRequired === undefined ||
+    startTime === undefined ||
+    endTime === undefined ||
+    costPerHead === undefined ||
+    skillLevel === undefined ||
+    host === undefined ||
+    location === undefined ||
+    description === undefined
   ) {
-    throw "All fields must be provided";
+    throw new Error("All fields must be provided.");
   }
-  if (!ObjectId.isValid(host)) throw "Host ID is invalid";
+
+  if (!ObjectId.isValid(host)) {
+    throw new Error("Host ID is invalid.");
+  }
+
   const trimmedTitle = checkString(title, "Title", 1);
   const trimmedSport = checkString(sport, "Sport", 1);
-  //const trimmedVenue = checkString(venue, "Venue", 1);
   const trimmedSkillLevel = checkString(skillLevel, "Skill Level", 1);
   const trimmedLocation = checkString(location, "Location", 1);
-  let trimmedDescription = "";
-  if (description) {
-    trimmedDescription = checkString(description, "Description", 1);
-  }
+  const trimmedDescription = checkString(description, "Description", 1);
+
   checkNumber(playersRequired, "Players Required", 1);
   checkNumber(costPerHead, "Cost per Head", 0);
 
@@ -66,12 +66,11 @@ export const createGame = async (
   const newGame = new Game({
     title: trimmedTitle,
     sport: trimmedSport,
-    //venue: trimmedVenue,
-    playersRequired: playersRequired,
+    playersRequired,
     startTime,
     endTime,
     description: trimmedDescription,
-    costPerHead: costPerHead,
+    costPerHead,
     skillLevel: trimmedSkillLevel,
     host,
     location: trimmedLocation,
@@ -82,23 +81,11 @@ export const createGame = async (
 
   const savedGame = await newGame.save();
 
-  // const updatedUserProfile = await UserProfile.findOneAndUpdate(
-  //   { userId: "6806c40d8e65a501855cdfa0" },
-  //   { $inc: { karmaPoints: 15 } },
-  //   { new: true }
-  // );
-
-  // if (updatedUserProfile) {
-  //   console.log("✅ Karma Points Updated:", updatedUserProfile.karmaPoints);
-  // } else {
-  //   console.error("❌ Failed to update karma points for user:", hostedBy);
-  // }
-
   await updateKarmaPoints(host, 15);
-
 
   return savedGame;
 };
+
 
 export const getAllGames = async (filters = {}) => {
   return await Game.find(filters);
@@ -154,7 +141,6 @@ export const updateGame = async (gameId, updates, hostId) => {
   const allowedFields = [
     "title",
     "sport",
-    //"venue",
     "playersRequired",
     "startTime",
     "endTime",
@@ -195,7 +181,7 @@ export const updateGame = async (gameId, updates, hostId) => {
   return game;
 };
 
-export async function deleteGame(gameId,userID) {
+export async function deleteGame(gameId, userID) {
   if (!gameId) throw new Error("Game ID is required");
   await updateKarmaPoints(userID, -15);
   await Game.findByIdAndDelete(gameId);
