@@ -48,7 +48,7 @@
     <ol class="list-group list-group-numbered">
       {{#each topUsers}}
       <li class="list-group-item d-flex justify-content-between align-items-center">
-        {{this.firstName}} {{this.lastName}}
+        {{this.profile.firstName}} {{this.profile.lastName}}
         <span class="badge bg-primary rounded-pill">{{this.karma}} karma</span>
       </li>
       {{/each}}

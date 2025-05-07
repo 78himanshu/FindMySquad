@@ -183,52 +183,32 @@ export const unfollowUser = async (userId, targetUserId) => {
   return targetProfile.followers.length;
 };
 
-// export const getTopKarmaUsers = async (limit = 5) => {
-//   const topUsers = await UserProfile.find({})
-//     .sort({ karmaPoints: -1 })
-//     .limit(limit)
-//     .populate({
-//       path: 'userId',
-//       model: Userlist,
-//       select: 'username'
-//     })
-//     .lean();
 
-//   // Only return users that have a valid populated userId
-//   return topUsers
-//     .filter(user => user.userId && user.userId.username)
-//     .map(user => ({
-//       username: user.userId.username,
-//       karma: user.karmaPoints
-//     }));
-// };
 
 
 export const getTopKarmaUsers = async () => {
-  const topUsers = await UserProfile.aggregate([
-    {
-      $lookup: {
-        from: 'userlists',
-        localField: 'userId',
-        foreignField: '_id',
-        as: 'user'
+  try {
+    const topUsers = await UserProfile.find(
+      {},
+      {
+        'profile.firstName': 1,
+        'profile.lastName': 1,
+        userId: 1,
+        karmaPoints: 1,
+        _id: 0
       }
-    },
-    { $unwind: "$user" },
-    {
-      $project: {
-        _id: 0,
-        firstName: "$profile.firstName",
-        lastName: "$profile.lastName",
-        karma: "$karmaPoints"
-      }
-    },
-    { $sort: { karma: -1 } },
-    { $limit: 5 }
-  ]);
-  console.log("top users are here",topUsers);
-  return topUsers;
+    )
+      .sort({ karmaPoints: -1 })
+      .limit(5);
+
+    console.log("Top users are here:", topUsers);
+    return topUsers;
+  } catch (err) {
+    console.error("Error fetching top karma users:", err);
+    return [];
+  }
 };
+
 
 // export const getTopKarmaUsers = async () => {
 //  try{

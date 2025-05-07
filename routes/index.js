@@ -10,12 +10,15 @@ import User from "../models/User.js";
 import gymBuddyRoutes from './gymBuddyRoutes.js';
 import tournamentRoutes from './tournamentRoutes.js';
 import { hostGameData } from "../data/index.js";
+import {userProfileData} from "../data/index.js";
 
 const configRoutesFunction = (app) => {
 
   // Base route - simplified since we're using middleware
   app.get("/", async (req, res) => {
     console.log("req,", req.user);
+    const topUsers = await userProfileData.getTopKarmaUsers();
+    console.log("TOP USERS FOR HOMEPAGE:", topUsers);
     const upcomingGames = await hostGameData.upcomingGames();
     console.log("upcomingGames", upcomingGames);
 
@@ -23,7 +26,8 @@ const configRoutesFunction = (app) => {
       title: "FindMySquad",
       user: req.user || null,
       layout: "main",
-      upcomingGames: upcomingGames
+      upcomingGames: upcomingGames,
+      topUsers: topUsers
     });
   });
 

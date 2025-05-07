@@ -12,8 +12,8 @@ router.get("/", async (req, res) => {
     console.log("landing routes entered");
     // const recentGames = await hostGameData.getRecentGames();
     // console.log("Fetched Recent Games:", JSON.stringify(recentGames, null, 2));
-    const topUsers = await userProfileData.getTopKarmaUsers();
-    console.log("TOP USERS FOR HOMEPAGE:", topUsers);
+    // const topUsers = await userProfileData.getTopKarmaUsers();
+    // console.log("TOP USERS FOR HOMEPAGE:", topUsers);
 
     res.render("index", {
       user: req.session?.user,
@@ -21,7 +21,7 @@ router.get("/", async (req, res) => {
       username: req.session?.user?.username || null,
       //recentGames: recentGames.map((g) => g.toObject?.() ?? g),
       //recentGames: recentGames,
-      topUsers: topUsers,
+      //topUsers: topUsers,
       title: "Home",
     });
   } catch (e) {
