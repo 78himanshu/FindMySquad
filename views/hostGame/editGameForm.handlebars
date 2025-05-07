@@ -37,9 +37,30 @@
       <option value="Advanced" {{#if (eq game.skillLevel "Advanced")}}selected{{/if}}>Advanced</option>
     </select>
 
-    <input type="text" name="location" placeholder="City" value="{{game.location}}" />
+    <input type="text" id="autocomplete" name="location" class="form-control" placeholder="Update Game Location" value="{{game.location}}"/>
     <input type="hidden" name="host" value="{{hostId}}" />
 
     <button type="submit" class="submit-btn">Update Game</button>
   </form>
 </div>
+
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBP-FJZsXytqUxzesnIEkrkUu4JoB1zO-M&libraries=places"></script>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const input = document.getElementById('autocomplete'); // ✅ Use correct ID
+    if (input) {
+      const autocomplete = new google.maps.places.Autocomplete(input, {
+        types: ['geocode'],
+        componentRestrictions: { country: "us" }
+      });
+      autocomplete.addListener('place_changed', function () {
+        const place = autocomplete.getPlace();
+        console.log("Selected Place:", place);
+        if (place && place.formatted_address) {
+          input.value = place.formatted_address;
+        }
+      });
+    }
+  });
+</script>
