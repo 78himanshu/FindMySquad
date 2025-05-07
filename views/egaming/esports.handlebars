@@ -1,6 +1,7 @@
 
-<main class="container py-5">
-  <h1 class="text-center mb-4">Esports Games</h1>
+<main class="container-fluid py-5 esports-bg min-vh-100">
+  <div class="container">
+  <h1 class="text-center mb-5 text-light">Esports Games</h1>
 
   <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4">
     {{#each games}}
@@ -8,7 +9,7 @@
         <a href="/esports/game/{{encodeURI this.title}}" class="text-decoration-none text-light">
           <div class="game-card" style="background-image: url('{{this.image}}');">
             <div class="game-overlay">
-              <small class="text-muted d-block">{{this.platform}}</small>
+              <small class="d-block text-white-50">{{this.platform}}</small>
               {{this.title}}
             </div>
           </div>
@@ -16,9 +17,15 @@
       </div>
     {{/each}}
   </div>
+   </div>
 </main>
 
-<script src="/js/bootstrap.bundle.min.js"></script>
+<script
+  src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/js/bootstrap.bundle.min.js"
+  integrity="sha384-k6d4wzSIapyDyv1kpU366/PK5hCdSbCRGRCMv+eplOQJWyd1fbcAu9OCUj5zNLiq"
+  crossorigin="anonymous"
+></script>
+
 <script>
   document.addEventListener('DOMContentLoaded', function () {
     const toggles = document.querySelectorAll('.dropdown-toggle');
