@@ -43,6 +43,12 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
+    const allowedSports = ["Soccer", "Basketball", "Baseball", "Tennis", "Swimming", "Running", "Cycling", "Hiking", "Golf", "Volleyball"];
+    const allowedSkills = ["Beginner", "Intermediate", "Advanced"];
+    if (!allowedSports.includes(sport)) {
+      showToastError("Invalid sport selected");
+      return;
+    }
 
     const playersRequired = Number(form.playersRequired.value);
     if (
@@ -94,47 +100,15 @@ document.addEventListener("DOMContentLoaded", () => {
       showToastError("You cannot host a game in the past.");
       return;
     }
-    const allowedSports = ["Soccer", "Basketball", "Baseball", "Tennis", "Swimming", "Running", "Cycling", "Hiking", "Golf", "Volleyball"];
-    const allowedSkills = ["Beginner", "Intermediate", "Advanced"];
-    if (!allowedSports.includes(sport)) {
-      alert("Invalid sport selected.");
-      e.preventDefault();
-      return;
-    }
-    if (!allowedSkills.includes(skillLevel)) {
-      alert("Invalid skill level.");
-      e.preventDefault();
-      return;
-    }
-    if (description.split(/\s+/).length > 250) {
-      alert("Description must not exceed 250 words.");
-      e.preventDefault();
-      return;
-    }
-    const badWords = [
-      "fuck", "shit", "bitch", "asshole", "dick", "pussy", "cunt", "sex",
-      "nigger", "nigga", "fag", "faggot", "slut", "whore", "bastard", "damn",
-      "bullshit", "crap", "motherfucker", "cock", "tit", "dildo", "rape",
-      "suck", "kill yourself", "kys", "die", "retard", "moron",
-      "@$$", "f*ck", "s3x", "sh!t", "b!tch", "d!ck", "w#ore", "r@pe"
-    ];
-    const lowered = description.toLowerCase();
-    for (let word of badWords) {
-      if (lowered.includes(word)) {
-        alert("Description contains inappropriate language.");
-        e.preventDefault();
-        return;
-      }
-    }
-    // if (startTime >= endTime) {
-    //   alert("End time must be after start time.");
-    //   e.preventDefault();
-    //   return;
-    // }
 
     const skillLevel = form.skillLevel.value;
     if (!skillLevel) {
       showToastError("Please select a skill level.");
+      return;
+    }
+
+    if (!allowedSkills.includes(skillLevel)) {
+      showToastError("Invalid skill level.");
       return;
     }
     const location = form.location.value.trim();
@@ -153,6 +127,29 @@ document.addEventListener("DOMContentLoaded", () => {
       showToastError("Description cannot exceed 200 words.");
       return;
     }
+
+
+
+    if (description.split(/\s+/).length > 250) {
+      showToastError("Description must not exceed 250 words.");
+      return;
+    }
+    const badWords = [
+      "fuck", "shit", "bitch", "asshole", "dick", "pussy", "cunt", "sex",
+      "nigger", "nigga", "fag", "faggot", "slut", "whore", "bastard", "damn",
+      "bullshit", "crap", "motherfucker", "cock", "tit", "dildo", "rape",
+      "suck", "kill yourself", "kys", "die", "retard", "moron",
+      "@$$", "f*ck", "s3x", "sh!t", "b!tch", "d!ck", "w#ore", "r@pe"
+    ];
+    const lowered = description.toLowerCase();
+    for (let word of badWords) {
+      if (lowered.includes(word)) {
+        showToastError("Description contains inappropriate language");
+        return;
+      }
+    }
+
+
     const formData = {
       title,
       sport,

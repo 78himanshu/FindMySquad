@@ -32,8 +32,8 @@ router
       x.description = xss(x.description).trim();
       x.location = xss(x.location).trim();
 
-      x.playersRequired = Number(x.playersRequired.trim());
-      x.costPerHead = Number(x.costPerHead.trim());
+      x.playersRequired = Number(x.playersRequired);
+      x.costPerHead = Number(x.costPerHead);
 
       const requiredFields = [
         "title", "sport", "gameDate", "startTime", "endTime",

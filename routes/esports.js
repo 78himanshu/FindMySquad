@@ -9,7 +9,7 @@ const router = Router();
 const games = [
   { title: "Call of Duty: Black Ops 6", image: "/images/cod-bo6.jpeg", platform: "Cross-Platform" },
   { title: "Call of Duty Black Ops 6 Zombies", image: "/images/cod-bo6-zombies.jpg", platform: "Cross-Platform" },
-  { title: "Call of Duty: Warzone Verdansk", image: "/images/cod-warzone.jpeg", platform: "Cross-Platform" },
+  { title: "Call of Duty: Warzone Verdansk", image: "/images/cod-warzone.jpg", platform: "Cross-Platform" },
   { title: "Fortnite: Battle Royale", image: "/images/fortnite.jpg", platform: "PS5 / Xbox / PC" },
   { title: "Marvel Rivals", image: "/images/marvel-rivals.jpg", platform: "Cross-Platform" },
   { title: "Call of Duty: Modern Warfare 3", image: "/images/cod-mw3.jpg", platform: "Cross-Platform" },
@@ -17,19 +17,19 @@ const games = [
   { title: "Call of Duty: Vanguard", image: "/images/cod-vanguard.jpg", platform: "Cross-Platform" },
   { title: "Call of Duty: WWII", image: "/images/cod-wwii.jpg", platform: "PS4 / Xbox" },
   { title: "Call of Duty: Black Ops 4", image: "/images/cod-bo4.jpg", platform: "PS4 / Xbox" },
-  { title: "Call of Duty: Black Ops III", image: "/images/cod-bo3.jpeg", platform: "Cross-Platform" },
-  { title: "Call of Duty: Ghosts", image: "/images/cod-ghosts.jpg", platform: "Cross-Platform" },
+  { title: "Call of Duty: Black Ops III", image: "/images/cod-bo3.jpg", platform: "Cross-Platform" },
+  { title: "Call of Duty: Ghosts", image: "/images/cod-ghosts.png", platform: "Cross-Platform" },
   { title: "Fall Guys: Ultimate Knockout", image: "/images/fall-guys.jpg", platform: "Cross-Platform" },
   { title: "Call of Duty: Modern Warfare Remastered", image: "/images/cod-mw-remastered.jpg", platform: "Cross-Platform" },
   { title: "Call of Duty: Modern Warfare 2", image: "/images/cod-mw2.jpg", platform: "Cross-Platform" },
-  { title: "Call of Duty: Modern Warfare", image: "/images/cod-mw.jpeg", platform: "Cross-Platform" },
+  { title: "Call of Duty: Modern Warfare", image: "/images/cod-mw.jpg", platform: "Cross-Platform" },
   { title: "Call of Duty: Black Ops II", image: "/images/cod-bo2.jpg", platform: "PC" },
   { title: "Call of Duty: Warzone Mobile", image: "/images/warzone-mobile.jpeg", platform: "Mobile" },
   { title: "MLB The Show 25", image: "/images/mlb25.jpeg", platform: "Cross-Platform" },
   { title: "Madden 25", image: "/images/madden25.jpg", platform: "Cross-Platform" },
-  { title: "College Football 25", image: "/images/college-fb25.jpeg", platform: "Cross-Platform" },
-  { title: "NBA 2K25", image: "/images/nba2k25.jpg", platform: "Cross-Platform" },
-  { title: "NBA 2K24", image: "/images/nba2k24.jpg", platform: "Cross-Platform" },
+  { title: "College Football 25", image: "/images/college-fb25.png", platform: "Cross-Platform" },
+  { title: "NBA 2K25", image: "/images/nba2k25.jpeg", platform: "Cross-Platform" },
+  { title: "NBA 2K24", image: "/images/nba2k24.jpeg", platform: "Cross-Platform" },
   { title: "FC 25", image: "/images/fc25.jpeg", platform: "Cross-Platform" },
   { title: "Call of Duty: Advanced Warfare", image: "/images/cod-advanced.jpg", platform: "Cross-Platform" },
   { title: "Call of Duty: Black Ops", image: "/images/cod-bo.jpg", platform: "PC" },
@@ -45,7 +45,7 @@ const games = [
   { title: "Clash Royale", image: "/images/clash.jpeg", platform: "Mobile" },
   { title: "Valorant", image: "/images/valorant.jpg", platform: "PC" },
   { title: "Rocket League", image: "/images/rocket.jpeg", platform: "Cross-Platform" },
-  { title: "Apex Legends", image: "/images/apex.jpeg", platform: "Cross-Platform" }
+  { title: "Apex Legends", image: "/images/apex.jpg", platform: "Cross-Platform" }
 ];
 
   const getGameImage = (gameName) => {

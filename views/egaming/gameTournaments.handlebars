@@ -1,4 +1,4 @@
-<main class="container-fluid p-0">
+<main class="container-fluid esports-bg p-0 ">
   <!-- Game Banner -->
   <div
     class="game-banner"
@@ -25,7 +25,7 @@
   </div>
 
   <div class="container py-5">
-    <h2 class="text-center mb-5 fw-bold">Upcoming Tournaments</h2>
+    <h2 class="text-center mb-5 fw-bold text-light">Upcoming Tournaments</h2>
 
     {{#if tournaments.length}}
       <div class="d-flex flex-column gap-4">
@@ -91,7 +91,8 @@
       </div>
     {{else}}
       <div class="text-center py-5">
-        <h4 class="fw-bold text-muted">No tournaments available for this game yet.</h4>
+        <h4 class="fw-bold text-light">No tournaments available for this game yet.</h4>
+        <h4 class="fw-bold text-light">Stay tuned!</h4>
       </div>
     {{/if}}
   </div>
