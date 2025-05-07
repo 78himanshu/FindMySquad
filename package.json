@@ -28,6 +28,7 @@
     "fs": "^0.0.1-security",
     "hbs": "^4.2.0",
     "jsonwebtoken": "^9.0.2",
+    "luxon": "^3.6.1",
     "moment": "^2.30.1",
     "mongodb": "^6.15.0",
     "mongoose": "^8.14.0",

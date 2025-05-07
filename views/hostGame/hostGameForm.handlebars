@@ -1,61 +1,116 @@
-<div class="host-game-container">
-  <h1>Host Game</h1>
-  <form action="/host" method="POST" class="host-game-form">
-    <input type="text" name="title" placeholder="Title" />
-
-    <select name="sport" id="sportSelect">
-      <option value="">Select Sport</option>
-      <option value="Football">Soccer</option>
-      <option value="Basketball">Basketball</option>
-      <option value="Baseball">Baseball</option>
-      <option value="Tennis">Tennis</option>
-      <option value="Swimming">Swimming</option>
-      <option value="Running">Running</option>
-      <option value="Cycling">Cycling</option>
-      <option value="Hiking">Hiking</option>
-      <option value="Golf">Golf</option>
-      <option value="Volleyball">Volleyball</option>
-
-    </select>
-
-    <input type="text" name="venue" placeholder="Venue" />
-
-
-    <input type="date" name="gameDate" />
-    <div class="form-row">
-      <input type="time" name="startTime" placeholder="Start Time" />
-      <input type="time" name="endTime" placeholder="End Time" />
+<div class="container my-5">
+  <div class="card shadow border-success">
+    <div class="card-header bg-success text-white">
+      <h2 class="mb-0">Host a Game</h2>
     </div>
-    <input type="number" name="playersRequired" placeholder="Players" />
-    <input type="text" name="description" placeholder="Description" />
-    <input type="number" name="costPerHead" placeholder="Cost per Head" />
+    <div class="card-body">
+      <form class="host-game-form">
 
-    <select name="skillLevel">
-      <option value="">Select Skill Level</option>
-      <option value="Beginner">Beginner</option>
-      <option value="Intermediate">Intermediate</option>
-      <option value="Advanced">Advanced</option>
-    </select>
+        <div class="mb-3">
+          <input type="text" name="title" class="form-control" placeholder="Title" />
+        </div>
 
-    {{!-- <input type="text" name="location" placeholder="City" /> --}}
-    <input type="text" id="game-location" name="location" required placeholder="Enter a Location">
+        <div class="row g-3">
+          <div class="col-md-4">
+            <div class="mb-3">
+              <select name="sport" id="sportSelect" class="form-select">
+                <option value="">Select Sport</option>
+                <option value="Football">Soccer</option>
+                <option value="Basketball">Basketball</option>
+                <option value="Baseball">Baseball</option>
+                <option value="Tennis">Tennis</option>
+                <option value="Swimming">Swimming</option>
+                <option value="Running">Running</option>
+                <option value="Cycling">Cycling</option>
+                <option value="Hiking">Hiking</option>
+                <option value="Golf">Golf</option>
+                <option value="Volleyball">Volleyball</option>
+              </select>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <input type="number" name="playersRequired" class="form-control" placeholder="Players" />
+          </div>
+          <div class="col-md-4">
+            <input type="number" name="costPerHead" class="form-control" placeholder="Cost per Head" min="0" />
+          </div>
+        </div>
 
-    <div class="form-checks">
-      <label><input type="checkbox" name="bringEquipment" /> Bring your own equipment</label>
-      <label><input type="checkbox" name="costShared" /> Cost shared</label>
+        <div class="row g-3">
+          <div class="col-md-4">
+            <input type="date" name="gameDate" class="form-control" />
+          </div>
+          <div class="col-md-4">
+            <input type="time" name="startTime" class="form-control" placeholder="Start Time" />
+          </div>
+          <div class="col-md-4">
+            <input type="time" name="endTime" class="form-control" placeholder="End Time" />
+          </div>
+        </div>
+
+        <div class="row g-3">
+          <div class="col-md-6">
+            <div class="mb-3">
+              <select name="skillLevel" class="form-select">
+                <option value="">Select Skill Level</option>
+                <option value="Beginner">Beginner</option>
+                <option value="Intermediate">Intermediate</option>
+                <option value="Advanced">Advanced</option>
+              </select>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="mb-3">
+              <input type="text" id="game-location" name="location" class="form-control" placeholder="Enter a Location">
+            </div>
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <input type="text" name="description" class="form-control" placeholder="Description" />
+        </div>
+
+        <input type="hidden" name="userTimeZone" />
+        <input type="hidden" name="host" value="{{hostId}}" />
+
+        <div class="mb-3">
+          <textarea name="extraInfo" class="form-control" rows="3"
+            placeholder="Use this space to tell about the format and other details"></textarea>
+        </div>
+
+        <div class="row mb-3">
+          <div class="col-md-6 d-flex align-items-center">
+            <div class="form-check">
+              <input class="form-check-input me-2" type="checkbox" value="1" name="bringEquipment"
+                id="bringEquipment" />
+              <label class="form-check-label" for="bringEquipment">Bring your own equipment</label>
+            </div>
+          </div>
+          <div class="col-md-6 d-flex align-items-center">
+            <div class="form-check">
+              <input class="form-check-input me-2" type="checkbox" value="1" name="costShared" id="costShared" />
+              <label class="form-check-label" for="costShared">Cost shared</label>
+            </div>
+          </div>
+        </div>
+
+        <div class="d-grid">
+          <button type="submit" class="btn btn-success btn-lg">Host Game</button>
+        </div>
+
+      </form>
     </div>
-
-    <textarea name="extraInfo" placeholder="Use this space to tell about the format and other details"></textarea>
-
-    <input type="hidden" name="host" value="{{hostId}}" />
-
-    <button type="submit" class="submit-btn">Host Game</button>
-  </form>
+  </div>
 </div>
 
-<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBP-FJZsXytqUxzesnIEkrkUu4JoB1zO-M&libraries=places"></script>
+
+
+<script
+  src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBP-FJZsXytqUxzesnIEkrkUu4JoB1zO-M&libraries=places"></script>
 
 <script>
+
+
   document.addEventListener('DOMContentLoaded', () => {
     const input = document.getElementById('game-location');
     if (input) {
@@ -63,7 +118,7 @@
         types: ['geocode'],
         componentRestrictions: { country: "us" } // Optional: restrict to United States
       });
-      autocomplete.addListener('place_changed', function() {
+      autocomplete.addListener('place_changed', function () {
         const place = autocomplete.getPlace();
         console.log("Selected Place:", place);
         if (place && place.formatted_address) {
@@ -72,8 +127,12 @@
       });
     }
   });
+
+
+  document.querySelector("input[name='userTimeZone']").value = Intl.DateTimeFormat().resolvedOptions().timeZone;
+
+
 </script>
 
 
 <script src="/js/hostGame.js"></script>
-

@@ -134,7 +134,8 @@ router
     }
   })
   .post("/", auth, async (req, res) => {
-    const { gameId } = req.body;
+    //const { gameId } = req.body;
+    const gameId = req.body.gameId?.trim();
     const userId = req.user?.userID || req.userId;
 
     const game = await hostGameData.getGameById(gameId);
@@ -168,6 +169,7 @@ router.get("/filter", auth, async (req, res) => {
     filters.dateTime = { $gte: new Date() };
 
     const allGames = await hostGameData.getAllGames(filters);
+    allGames.sort((a, b) => new Date(a.startTime) - new Date(b.startTime));
     const plainAll = allGames.map((g) => g.toObject());
 
     res.render("joinGame/joinGameForm", {
@@ -248,16 +250,19 @@ router.get("/:id", async (req, res) => {
 router.post("/leave/:id", auth, async (req, res) => {
   const gameId = req.params.id;
   const userId = req.user.userID;
-
-  try {
+    // Prevent host from leaving their own game
+  try{
     const game = await hostGameData.getGameById(gameId);
     if (!game) return res.status(404).send("Game not found");
-
-    // Prevent host from leaving their own game
-    if (game.host.toString() === userId) {
-      const isLoggedIn = true;
-      const joinedGames = await joinGameData.getJoinedGamesByUser(userId);
-      const joinedGameIdStrings = joinedGames.map((g) => g._id.toString());
+  
+    await joinGameData.leaveGame(gameId, userId);
+    res.redirect("/join");
+  } catch (e) {
+    //Removing them since logivc added in data layer
+    // if (game.host.toString() === userId) {
+    //   const isLoggedIn = true;
+    //   const joinedGames = await joinGameData.getJoinedGamesByUser(userId);
+    //   const joinedGameIdStrings = joinedGames.map((g) => g._id.toString());
 
       return res.render("joinGame/gameDetails", {
         game: game.toObject(),
@@ -268,12 +273,6 @@ router.post("/leave/:id", auth, async (req, res) => {
         layout: "main",
         head: `<link rel="stylesheet" href="/css/joinGame.css">`,
       });
-    }
-
-    await joinGameData.leaveGame(gameId, userId);
-    res.redirect("/join");
-  } catch (e) {
-    res.status(400).send(e.message);
   }
 });
 

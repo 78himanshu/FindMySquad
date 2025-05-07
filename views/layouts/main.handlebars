@@ -62,13 +62,55 @@
   </nav>
 
   {{{body}}}
-  <div
-   id="toast-container"
+  <div id="toast-container"
     data-success="{{success}}{{#unless success}}{{#if justCreated}}Tournament created successfully!{{/if}}{{#if justDeleted}}Tournament deleted successfully!{{/if}}{{/unless}}"
-    data-error="{{error}}"
-    class="position-fixed bottom-0 end-0 p-3"
-></div>
-<script src="/js/auth.js"></script>
+    data-error="{{error}}" class="position-fixed bottom-0 end-0 p-3"></div>
+  <script src="/js/auth.js"></script>
+  <script src="/js/common.js"></script>
+
+
+  <footer class="footer bg-dark text-light py-4 mt-5">
+    <div class="container">
+      <div class="row align-items-center">
+
+        <div class="col-md-4 text-center text-md-start mb-3 mb-md-0">
+          <a href="/" class="navbar-brand text-light fs-4 fw-bold">FindMySquad</a>
+          <p class="mb-0 small">Find Players & Gym Buddies Nearby</p>
+        </div>
+
+
+        <div class="col-md-4 text-center mb-3 mb-md-0">
+          <ul class="list-inline mb-0">
+            <li class="list-inline-item mx-2"><a href="/join" class="text-light text-decoration-none">Join</a></li>
+            <li class="list-inline-item mx-2"><a href="/host" class="text-light text-decoration-none">Host</a></li>
+            <li class="list-inline-item mx-2"><a href="/gymBuddy" class="text-light text-decoration-none">GymBuddy</a>
+            </li>
+            <li class="list-inline-item mx-2"><a href="/profile/view"
+                class="text-light text-decoration-none">Profile</a></li>
+          </ul>
+        </div>
+
+
+        <div class="col-md-4 text-center text-md-end">
+          <a href="#" class="text-light me-3"><i class="fab fa-instagram"></i></a>
+          <a href="#" class="text-light me-3"><i class="fab fa-twitter"></i></a>
+          <a href="#" class="text-light"><i class="fab fa-linkedin-in"></i></a>
+        </div>
+      </div>
+
+      <hr class="bg-light my-3" />
+
+      <div class="text-center small">
+        Made with ❤️, way too much ☕, and some 3AM bug-fixes — by <strong>The Debug Ninjas</strong>:Aakash, Aditya,
+        Himanshu, Jitesh,
+        and Yash.
+      </div>
+
+      <div class="text-center small">
+        &copy; {{currentYear}} FindMySquad. All Rights Reserved.
+      </div>
+    </div>
+  </footer>
 
 
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
@@ -77,12 +119,12 @@
     integrity="sha384-k6d4wzSIapyDyv1kpU366/PK5hCdSbCRGRCMv+eplOQJWyd1fbcAu9OCUj5zNLiq"
     crossorigin="anonymous"></script>
 
-<script>
+  <script>
     document.addEventListener('DOMContentLoaded', () => {
       const container = document.getElementById('toast-container');
       // trim so that whitespace-only doesn't count
       const success = container.dataset.success?.trim();
-      const error   = container.dataset.error?.trim();
+      const error = container.dataset.error?.trim();
 
       function showToast(message, type) {
         const toastEl = document.createElement('div');
@@ -106,9 +148,9 @@
       }
 
       if (success) showToast(success, 'success');
-      if (error)   showToast(error,   'danger');
+      if (error) showToast(error, 'danger');
     });
-</script>
+  </script>
 
 
 </body>
