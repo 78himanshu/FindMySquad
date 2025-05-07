@@ -30,6 +30,31 @@
 
 
   </div>
+  <h3 style="text-align: center; margin-top: 10px;">📍 Game Location</h3>
+  <div id="single-game-map" style="height: 200px; width: 100%; max-width: 600px; margin: 15px auto; border: 1px solid #ccc; border-radius: 8px;"></div>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const mapDiv = document.getElementById('single-game-map');
+      if (!mapDiv) return;
+
+      const lat = {{{game.geoLocation.coordinates.[1]}}};
+      const lng = {{{game.geoLocation.coordinates.[0]}}};
+      const title = "{{game.title}}";
+      const sport = "{{game.sport}}";
+
+      const map = L.map('single-game-map').setView([lat, lng], 13);
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap contributors'
+      }).addTo(map);
+
+      L.marker([lat, lng]).addTo(map)
+        .bindPopup(`<strong>${title}</strong><br>${sport}`).openPopup();
+    });
+  </script>
+
 
   {{#if error}}
   <div class="error-message"

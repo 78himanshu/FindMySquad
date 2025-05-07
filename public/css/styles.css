@@ -805,3 +805,12 @@ main.esports-bg {
 footer {
   flex-shrink: 0;
 }
+
+#single-game-map {
+  height: 200px;
+  width: 100%;
+  max-width: 600px;
+  margin: 15px auto;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+}

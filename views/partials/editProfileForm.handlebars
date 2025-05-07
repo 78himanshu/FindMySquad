@@ -33,9 +33,8 @@
 
         <div class="row mb-4">
             <div class="col-md-6">
-                <label for="city" class="form-label">City</label>
-                <input type="text" id="city" name="city" class="form-control" placeholder="Enter your city"
-                    value="{{city}}">
+                <label for="autocomplete" class="form-label">Location</label>
+                <input type="text" id="autocomplete" name="city" class="form-control" placeholder="Enter your location" value="{{city}}">
                 <div id="cityError" class="form-text text-danger"></div>
             </div>
 
@@ -55,4 +54,24 @@
 
 </main>
 
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBP-FJZsXytqUxzesnIEkrkUu4JoB1zO-M&libraries=places"></script>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const input = document.getElementById('autocomplete'); // ✅ Use correct ID
+    if (input) {
+      const autocomplete = new google.maps.places.Autocomplete(input, {
+        types: ['geocode'],
+        componentRestrictions: { country: "us" }
+      });
+      autocomplete.addListener('place_changed', function () {
+        const place = autocomplete.getPlace();
+        console.log("Selected Place:", place);
+        if (place && place.formatted_address) {
+          input.value = place.formatted_address;
+        }
+      });
+    }
+  });
+</script>
 <script src="/js/userProfile.js"></script>

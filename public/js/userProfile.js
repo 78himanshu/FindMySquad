@@ -1,3 +1,8 @@
+function initAutocomplete() {
+  const input = document.getElementById("autocomplete");
+  if (!input) return;
+  const autocomplete = new google.maps.places.Autocomplete(input);
+}
 document.addEventListener("DOMContentLoaded", () => {
   const form = document.getElementById("editProfileForm");
 
@@ -33,9 +38,9 @@ document.addEventListener("DOMContentLoaded", () => {
     if (bio.length > 300) showError("bioError", "Bio max 300 characters");
 
     // 5) City/State letters + spaces
-    const locRe = /^[A-Za-z\s]{1,100}$/;
+    const locRe = /^[A-Za-z0-9\s,.-]{3,100}$/;
     if (city && !locRe.test(city))
-      showError("cityError", "City only letters/spaces");
+      showError("cityError", "Location can have only letters/spaces");
 
     // 6) Phone number: 10 digits
     const phoneRe = /^\d{10}$/;
@@ -136,3 +141,5 @@ function showToast(message, type = "info", duration = 5000) {
     toast.remove();
   };
 }
+
+window.initAutocomplete = initAutocomplete;

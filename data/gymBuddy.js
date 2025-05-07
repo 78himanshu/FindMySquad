@@ -4,6 +4,7 @@ import { checkString } from "../utils/helper.js";
 import UserProfile from "../models/userProfile.js";
 import { updateKarmaPoints } from "../utils/karmaHelper.js";
 import "../models/User.js"
+import fetch from "node-fetch";
 
 export const createGymSession = async (title, gym, description, date, startTime, endTime, gymlocation, experience, workoutType, hostedBy, maxMembers) => {
   if (
@@ -32,6 +33,21 @@ export const createGymSession = async (title, gym, description, date, startTime,
     ? checkString(description, "Description", 1)
     : "";
 
+  const encodedLocation = encodeURIComponent(trimmedLocation);
+  const apiURL = `https://nominatim.openstreetmap.org/search?q=${encodedLocation}&format=json&limit=1`;
+
+  const response = await fetch(apiURL, {
+    headers: {
+      "User-Agent": "FindMySquad-GymBuddy"
+    }
+  });
+  const geoData = await response.json();
+
+  if (!geoData.length) throw "Could not geocode gym location.";
+
+  const latitude = parseFloat(geoData[0].lat);
+  const longitude = parseFloat(geoData[0].lon);
+  
   // ⚡ Combine date and time for internal validation
   const startDateTime = new Date(`${date}T${startTime}`);
   const endDateTime = new Date(`${date}T${endTime}`);
@@ -58,6 +74,10 @@ export const createGymSession = async (title, gym, description, date, startTime,
     hostedBy,
     maxMembers: parseInt(maxMembers),
     currentMembers: 0,
+    geoLocation: {
+      type: "Point",
+      coordinates: [longitude, latitude]
+    },
   });
 
   const saved = await newSession.save();
