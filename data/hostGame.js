@@ -8,7 +8,7 @@ import { updateKarmaPoints } from "../utils/karmaHelper.js";
 export const createGame = async (
   title,
   sport,
-  venue,
+  //venue,
   playersRequired,
   startTime,
   endTime,
@@ -22,7 +22,7 @@ export const createGame = async (
   if (
     !title ||
     !sport ||
-    !venue ||
+    //!venue ||
     !playersRequired ||
     !startTime ||
     !endTime ||
@@ -36,7 +36,7 @@ export const createGame = async (
   if (!ObjectId.isValid(host)) throw "Host ID is invalid";
   const trimmedTitle = checkString(title, "Title", 1);
   const trimmedSport = checkString(sport, "Sport", 1);
-  const trimmedVenue = checkString(venue, "Venue", 1);
+  //const trimmedVenue = checkString(venue, "Venue", 1);
   const trimmedSkillLevel = checkString(skillLevel, "Skill Level", 1);
   const trimmedLocation = checkString(location, "Location", 1);
   let trimmedDescription = "";
@@ -66,7 +66,7 @@ export const createGame = async (
   const newGame = new Game({
     title: trimmedTitle,
     sport: trimmedSport,
-    venue: trimmedVenue,
+    //venue: trimmedVenue,
     playersRequired: playersRequired,
     startTime,
     endTime,
@@ -154,7 +154,7 @@ export const updateGame = async (gameId, updates, hostId) => {
   const allowedFields = [
     "title",
     "sport",
-    "venue",
+    //"venue",
     "playersRequired",
     "startTime",
     "endTime",
@@ -167,14 +167,22 @@ export const updateGame = async (gameId, updates, hostId) => {
   allowedFields.forEach((field) => {
     //Checking if allowedFields have valid values and then assigning
     if (updates[field] !== undefined) {
-      if (["title", "sport", "venue", "skillLevel", "location"].includes(field)) {
+      if (["title", "sport", "skillLevel", "location"].includes(field)) {
+        console.log(`💬 Setting ${field}:`, updates[field]);
         game[field] = checkString(updates[field], field);
       } else if (["playersRequired", "costPerHead"].includes(field)) {
-        game[field] = checkNumber(updates[field], field);
+        console.log(`💬 Setting ${field}:`, updates[field]);
+        const val = checkNumber(updates[field], field);
+        if (val === undefined || val === null || isNaN(val)) {
+          throw `${field} is required and must be a number`;
+        }
+        game[field] = val;
       } else if (["startTime", "endTime"].includes(field)) {
+        console.log(`💬 Setting ${field}:`, updates[field]);
         if (isNaN(Date.parse(updates[field]))) throw `${field} is not a valid date`;
         game[field] = updates[field];
       } else if (field === "description") {
+        console.log(`💬 Setting ${field}:`, updates[field]);
         game[field] = checkString(updates[field], field, 1);
       }
     }
@@ -182,7 +190,7 @@ export const updateGame = async (gameId, updates, hostId) => {
     //   game[field] = updates[field];
     // }
   });
-
+  console.log("🧨 Final game before save:", game);
   await game.save();
   return game;
 };

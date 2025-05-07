@@ -27,7 +27,7 @@ document.addEventListener("DOMContentLoaded", () => {
     //Adding Validations
     const title = form.title.value.trim();
     const sport = form.sport.value.trim();
-    const venue = form.venue.value.trim();
+    //const venue = form.venue.value.trim();
     const location = form.location.value.trim();
     const description = form.description.value.trim();
     const skillLevel = form.skillLevel.value;
@@ -63,7 +63,7 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
-    if (!title || !sport || !venue || !location || !skillLevel || !form.gameDate.value || !form.startTime.value || !form.endTime.value) {
+    if (!title || !sport || !location || !skillLevel || !form.gameDate.value || !form.startTime.value || !form.endTime.value) {
       alert("Please fill in all required fields.");
       e.preventDefault();
       return;

@@ -65,7 +65,7 @@ router
     const requiredFields = [
       "title",
       "sport",
-      "venue",
+      //"venue",
       "gameDate",
       "startTime",
       "endTime",
@@ -93,7 +93,7 @@ router
     try {
       checkString(x.title, "Title");
       checkString(x.sport, "Sport");
-      checkString(x.venue, "Venue");
+      //checkString(x.venue, "Venue");
       checkString(x.skillLevel, "Skill Level");
       checkString(x.location, "Location");
       checkString(x.description, "Description");
@@ -153,7 +153,7 @@ router
       const newGame = await hostGameData.createGame(
         x.title,
         x.sport,
-        x.venue,
+        //x.venue,
         x.playersRequired,
         x.startTime,
         x.endTime,
@@ -232,7 +232,33 @@ router.get("/edit/:id", requireAuth, async (req, res) => {
 // Handle Edit Submission
 router.post("/edit/:id", requireAuth, async (req, res) => {
   try {
-    const updates = req.body;
+    //console.log("🧾 Received body:", req.body);
+    const {
+      title,
+      sport,
+      gameDate,
+      startTime: startStr,
+      endTime: endStr,
+      playersRequired,
+      costPerHead,
+      description,
+      skillLevel,
+      location,
+    } = req.body;
+
+    // if (!req.body.playersRequired || isNaN(req.body.playersRequired)) {
+    //   return res.status(400).send("playersRequired must be a number");
+    // }
+    // if (!req.body.costPerHead || isNaN(req.body.costPerHead)) {
+    //   return res.status(400).send("costPerHead must be a number");
+    // }
+    
+    // const updates = {
+    //   ...req.body,
+    //   playersRequired: Number(req.body.playersRequired.trim()),
+    //   costPerHead: Number(req.body.costPerHead.trim()),
+    // };
+    // console.log("🛠 Updates before DB save:", updates);
 
     // const gameDate = new Date(updates.gameDate);
     // const [startHours, startMinutes] = updates.startTime.split(":");
@@ -242,30 +268,71 @@ router.post("/edit/:id", requireAuth, async (req, res) => {
     // updates.startTime.setHours(startHours, startMinutes);
     // updates.endTime = new Date(gameDate);
     // updates.endTime.setHours(endHours, endMinutes);
-    const gameDate = new Date(updates.gameDate);
-    const [startHours, startMinutes] = updates.startTime.split(":");
-    const [endHours, endMinutes] = updates.endTime.split(":");
+    // const gameDate = new Date(updates.gameDate);
+    // const [startHours, startMinutes] = updates.startTime.split(":");
+    // const [endHours, endMinutes] = updates.endTime.split(":");
     
-    updates.startTime = new Date(Date.UTC(
-      gameDate.getFullYear(),
-      gameDate.getMonth(),
-      gameDate.getDate(),
+    // updates.startTime = new Date(Date.UTC(
+    //   gameDate.getFullYear(),
+    //   gameDate.getMonth(),
+    //   gameDate.getDate(),
+    //   startHours,
+    //   startMinutes
+    // ));
+    
+    // updates.endTime = new Date(Date.UTC(
+    //   gameDate.getFullYear(),
+    //   gameDate.getMonth(),
+    //   gameDate.getDate(),
+    //   endHours,
+    //   endMinutes
+    // ));
+    // if (updates.startTime >= updates.endTime) {
+    //   return res.status(400).send("End time must be after start time");
+    // }
+    if (!playersRequired || isNaN(playersRequired)) {
+      return res.status(400).send("playersRequired must be a valid number");
+    }
+    if (!costPerHead || isNaN(costPerHead)) {
+      return res.status(400).send("costPerHead must be a valid number");
+    }
+
+    const gameDateObj = new Date(gameDate);
+    const [startHours, startMinutes] = startStr.split(":");
+    const [endHours, endMinutes] = endStr.split(":");
+
+    const startTime = new Date(Date.UTC(
+      gameDateObj.getFullYear(),
+      gameDateObj.getMonth(),
+      gameDateObj.getDate(),
       startHours,
       startMinutes
     ));
-    
-    updates.endTime = new Date(Date.UTC(
-      gameDate.getFullYear(),
-      gameDate.getMonth(),
-      gameDate.getDate(),
+
+    const endTime = new Date(Date.UTC(
+      gameDateObj.getFullYear(),
+      gameDateObj.getMonth(),
+      gameDateObj.getDate(),
       endHours,
       endMinutes
     ));
-        
-    if (updates.startTime >= updates.endTime) {
+
+    if (startTime >= endTime) {
       return res.status(400).send("End time must be after start time");
     }
 
+    const updates = {
+      title: title?.trim(),
+      sport: sport?.trim(),
+      startTime,
+      endTime,
+      playersRequired: Number(playersRequired),
+      costPerHead: Number(costPerHead),
+      description: description?.trim(),
+      skillLevel: skillLevel?.trim(),
+      location: location?.trim()
+    };
+    console.log("🛠 Final updates:", updates);
     await hostGameData.updateGame(req.params.id, updates, req.user.userID);
     res.redirect("/join");
   } catch (err) {

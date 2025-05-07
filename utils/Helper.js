@@ -10,4 +10,5 @@ export function checkNumber(y, input, z) {
   if (typeof y !== "number" || isNaN(y) || y < z) {
     throw new Error(`${input} must be a Number`);
   }
+  return y
 }
