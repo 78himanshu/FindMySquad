@@ -103,12 +103,27 @@ router.get('/game/:gameName', async (req, res, next) => {
       const hasStarted = now >= startDateTime;
       const hasEnded   = now  >  endDateTime;
       const isOngoing  = hasStarted && !hasEnded;
+      const teamCount = Array.isArray(t.teams) ? t.teams.length : 0;
+      t.teamCount = teamCount;
+      const maxSlots = t.maxTeams || 0;
 
       // attach flags for template
       t.hasStarted = hasStarted;
       t.hasEnded   = hasEnded;
       t.isOngoing  = isOngoing;
       t.isCreator  = userId && t.creator._id.toString() === userId;
+      t.teamCount = (t.teams || []).length;
+      // only mark full when you've hit maxTeams AND every team is itself at capacity
+      const maxTeams        = t.maxTeams || 0;
+      const playersPerTeam  = parseInt(t.format[0], 10);
+      // can still create brand-new teams?
+      const canCreate       = teamCount < maxTeams;
+      // is there at least one team that still has room?
+      const hasOpenSlot     = (t.teams || []).some(
+        team => Array.isArray(team.players) && team.players.length < playersPerTeam
+      );
+      // only truly “full” when neither creating nor joining is possible:
+      t.isFull             = !canCreate && !hasOpenSlot;
 
       if (hasEnded) {
         pastTournaments.push(t);
@@ -143,13 +158,21 @@ router.get('/:tournamentId/register-team', requireAuth, async (req, res, next) =
   try {
     const tournament = await Tournament.findById(req.params.tournamentId)
       .populate('teams.players', 'username')
-      .populate('creator', 'username');
+      .populate('creator', 'username').lean();
     if (!tournament) return res.status(404).send('Tournament not found.');
 
     const userId = req.user.userId.toString();
     const playersPerTeam = parseInt(tournament.format[0], 10);
-
+    const maxTeams        = tournament.maxTeams;
+    const teams          = Array.isArray(tournament.teams) ? tournament.teams : [];
     const isCreator = tournament.creator._id.toString() === userId;
+    const teamCount       = tournament.teams.length;
+    const canCreate       = teamCount < maxTeams;
+
+    // “is there at least one team with an open slot?”
+    const canJoin        = teams.some(team =>
+      Array.isArray(team.players) && team.players.length < playersPerTeam
+    );
     let isAlreadyInTeam = false;
     let isTeamLeader = false;
     let userTeam = null;
@@ -172,6 +195,8 @@ router.get('/:tournamentId/register-team', requireAuth, async (req, res, next) =
       isAlreadyInTeam,
       isTeamLeader,
       userTeam,
+      canCreate,
+      canJoin,
       backgroundImage: getGameImage(tournament.game)
     });
   } catch (err) {
@@ -188,6 +213,7 @@ router.post('/:tournamentId/register-team', requireAuth, async (req, res, next) 
 
     const userId = req.user.userId.toString();
     const playersPerTeam = parseInt(tournament.format[0], 10);
+    const maxTeams       = tournament.maxTeams;
 
     if (tournament.creator._id.toString() === userId) {
       return res.status(403).send('You created this tournament and cannot join.');
@@ -205,6 +231,9 @@ router.post('/:tournamentId/register-team', requireAuth, async (req, res, next) 
     }
 
     if (action === 'create') {
+      if (tournament.teams.length >= maxTeams) {
+        return res.status(400).send('All team slots are full.');
+      }
       if (!teamName || teamName.trim().length < 2) {
         return res.status(400).send('Team name must be at least 2 characters.');
       }

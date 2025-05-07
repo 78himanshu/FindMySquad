@@ -76,12 +76,13 @@
                       <button type="submit" class="btn btn-danger">Delete</button>
                     </form>
 
-                  {{!-- 3) Future tournaments: others → Enroll --}}
-                  {{else}}
-                    <a
-                      href="/esports/{{this._id}}/register-team"
-                      class="btn btn-success"
-                    >Enroll</a>
+                   {{!-- 3a) future but full --}}
+                    {{else}}
+                    {{#if this.isFull}}
+                      <button class="btn btn-secondary" disabled>Slots Full</button>
+                    {{else}}
+                      <a href="/esports/{{this._id}}/register-team" class="btn btn-success">Enroll</a>
+                    {{/if}}
                   {{/if}}
                 </div>
               </div>
