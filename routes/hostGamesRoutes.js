@@ -246,33 +246,11 @@ router.post("/edit/:id", requireAuth, async (req, res) => {
       location,
     } = req.body;
 
-    // if (!req.body.playersRequired || isNaN(req.body.playersRequired)) {
-    //   return res.status(400).send("playersRequired must be a number");
-    // }
-    // if (!req.body.costPerHead || isNaN(req.body.costPerHead)) {
-    //   return res.status(400).send("costPerHead must be a number");
-    // }
-    
-    // const updates = {
-    //   ...req.body,
-    //   playersRequired: Number(req.body.playersRequired.trim()),
-    //   costPerHead: Number(req.body.costPerHead.trim()),
-    // };
-    // console.log("🛠 Updates before DB save:", updates);
+    const gameDateObj = new Date(gameDate);
+    const [startHours, startMinutes] = startStr.split(":");
+    const [endHours, endMinutes] = endStr.split(":");
 
-    // const gameDate = new Date(updates.gameDate);
-    // const [startHours, startMinutes] = updates.startTime.split(":");
-    // const [endHours, endMinutes] = updates.endTime.split(":");
-
-    // updates.startTime = new Date(gameDate);
-    // updates.startTime.setHours(startHours, startMinutes);
-    // updates.endTime = new Date(gameDate);
-    // updates.endTime.setHours(endHours, endMinutes);
-    const gameDateObj = new Date(updates.gameDate);
-    const [startHours, startMinutes] = updates.startTime.split(":");
-    const [endHours, endMinutes] = updates.endTime.split(":");
-
-    updates.startTime = new Date(Date.UTC(
+    const startTime = new Date(Date.UTC(
       gameDateObj.getFullYear(),
       gameDateObj.getMonth(),
       gameDateObj.getDate(),
@@ -280,7 +258,7 @@ router.post("/edit/:id", requireAuth, async (req, res) => {
       startMinutes
     ));
 
-    updates.endTime = new Date(Date.UTC(
+    const endTime = new Date(Date.UTC(
       gameDateObj.getFullYear(),
       gameDateObj.getMonth(),
       gameDateObj.getDate(),
@@ -288,7 +266,7 @@ router.post("/edit/:id", requireAuth, async (req, res) => {
       endMinutes
     ));
 
-    if (updates.startTime >= updates.endTime) {
+    if (startTime >= endTime) {
       return res.status(400).send("End time must be after start time");
     }
 
