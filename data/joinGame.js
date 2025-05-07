@@ -17,6 +17,11 @@ export const joinGame = async (gameId, userId) => {
     throw new Error("Game doesnt exist, Please try another game");
   }
 
+  //checking in the data layer also abouyt the start time check
+  if (new Date(game.startTime) < new Date()) {
+    throw new Error("Cannot join a game that's already over");
+  }
+
   if (game.players.some((id) => id.toString() === userId.toString())) {
     throw new Error("User has already joined this game");
   }
@@ -46,20 +51,28 @@ export const leaveGame = async (gameId, userId) => {
   if (!game) {
     throw new Error("Game not found.");
   }
+  //Removing this since data layer should be reusable and decoupled from Express
   if (game.host.toString() === userId.toString()) {
-    const game = await hostGameData.getGameById(gameId);
-    return res.render("joinGame/gameDetails", {
-      game: game.toObject(),
-      isLoggedIn: true,
-      userId,
-      hostId: req.user.userID,
-      hasJoined: true,
-      error: "Host cannot leave their own game",
-      layout: "main",
-      head: `<link rel="stylesheet" href="/css/joinGame.css">`,
-    });
+    //const game = await hostGameData.getGameById(gameId);
+    // return res.render("joinGame/gameDetails", {
+    //   game: game.toObject(),
+    //   isLoggedIn: true,
+    //   userId,
+    //   hostId: req.user.userID,
+    //   hasJoined: true,
+    //   error: "Host cannot leave their own game",
+    //   layout: "main",
+    //   head: `<link rel="stylesheet" href="/css/joinGame.css">`,
+    // });
+    throw new Error("Host cannot leave their own game");
   }
 
+  const isInGame = game.players.some((id) => id.toString() === userId.toString());
+  if (!isInGame) {
+    throw new Error("You have not joined this game");
+  }
+
+  //checking if a player is part of the game or not
   game.players = game.players.filter(
     (id) => id.toString() !== userId.toString()
   );
@@ -67,4 +80,6 @@ export const leaveGame = async (gameId, userId) => {
 
   await updateKarmaPoints(userId, -10);
   await game.save();
+  //adding return statement
+  return game
 };

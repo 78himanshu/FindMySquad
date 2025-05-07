@@ -25,20 +25,26 @@ router
     x.costPerHead = Number(x.costPerHead);
 
     // for date + times into Date objects
-    // const gameDate = new Date(x.gameDate);
-    // const [startHours, startMinutes] = x.startTime.split(":");
-    // const [endHours, endMinutes] = x.endTime.split(":");
+    if (typeof x.startTime !== 'string' || typeof x.endTime !== 'string') {
+      return res.status(400).json({ error: "Invalid time format" });
+    }
 
-    // x.startTime = new Date(gameDate);
-    // x.startTime.setHours(startHours, startMinutes);
+    const [startHours, startMinutes] = x.startTime.split(":");
+    const [endHours, endMinutes] = x.endTime.split(":");
 
-    // x.endTime = new Date(gameDate);
-    // x.endTime.setHours(endHours, endMinutes);
 
-const dateStr = x.gameDate; // format: YYYY-MM-DD
-x.startTime = new Date(`${dateStr}T${x.startTime}:00Z`);
-x.endTime = new Date(`${dateStr}T${x.endTime}:00Z`);
+    if (!startHours || !startMinutes || !endHours || !endMinutes) {
+      return res.status(400).json({ error: "Incomplete time values provided" });
+    }
+    const gameDateStr = x.gameDate;
+    const startTime = new Date(`${gameDateStr}T${startHours.padStart(2, '0')}:${startMinutes.padStart(2, '0')}:00`);
+    const endTime = new Date(`${gameDateStr}T${endHours.padStart(2, '0')}:${endMinutes.padStart(2, '0')}:00`);
 
+    x.startTime = startTime;
+    x.endTime = endTime;
+    console.log("🕒 Final StartTime:", isNaN(startTime.getTime()) ? "Invalid" : startTime.toISOString());
+    console.log("🕒 Final EndTime:", isNaN(endTime.getTime()) ? "Invalid" : endTime.toISOString());
+    console.log("📅 Current Time:", new Date().toISOString());
 
     // Validation for start and end time.
     if (x.startTime >= x.endTime) {
@@ -47,7 +53,7 @@ x.endTime = new Date(`${dateStr}T${x.endTime}:00Z`);
         .json({ error: "End time must be after start time" });
     }
 
-    if (x.startTime < new Date()) {
+    if (x.startTime <= new Date()) {
       return res.status(400).json({ error: "Cannot host games in the past." });
     }
 
@@ -93,6 +99,32 @@ x.endTime = new Date(`${dateStr}T${x.endTime}:00Z`);
       checkString(x.description, "Description");
       checkNumber(x.playersRequired, "Players Required", 1);
       checkNumber(x.costPerHead, "Cost per Head", 0);
+      //Adding further validations
+      const allowedSports = [
+        "Soccer", "Basketball", "Baseball", "Tennis", "Swimming",
+        "Running", "Cycling", "Hiking", "Golf", "Volleyball"
+      ];
+      const allowedSkillLevels = ["Beginner", "Intermediate", "Advanced"];
+      
+      if (!allowedSports.includes(x.sport)) {
+        return res.status(400).json({ error: "Invalid sport selected" });
+      }
+      if (!allowedSkillLevels.includes(x.skillLevel)) {
+        return res.status(400).json({ error: "Invalid skill level selected" });
+      }
+      const badWords = [
+        "fuck", "shit", "bitch", "asshole", "dick", "pussy", "cunt", "sex",
+        "nigger", "nigga", "fag", "faggot", "slut", "whore", "bastard", "damn",
+        "bullshit", "crap", "motherfucker", "cock", "tit", "dildo", "rape",
+        "suck", "kill yourself", "kys", "die", "retard", "moron",
+        "@$$", "f*ck", "s3x", "sh!t", "b!tch", "d!ck", "w#ore", "r@pe"
+      ];
+      const lowered = x.description.toLowerCase();
+      for (let word of badWords) {
+        if (lowered.includes(word)) {
+          return res.status(400).json({ error: "Description contains inappropriate language." });
+        }
+      }
     } catch (e) {
       return res.status(400).json({ error: e.message });
     }
@@ -117,6 +149,7 @@ x.endTime = new Date(`${dateStr}T${x.endTime}:00Z`);
         coordinates: [lng, lat]
       };
       x.location = formattedAddress;
+      try{
       const newGame = await hostGameData.createGame(
         x.title,
         x.sport,
@@ -133,6 +166,11 @@ x.endTime = new Date(`${dateStr}T${x.endTime}:00Z`);
       );
       console.log(" Game created:", newGame);
       return res.redirect("/host/success");
+      }
+      catch(creationErr) {
+        console.error("❌ Game creation failed:", creationErr);
+        return res.status(500).json({ error: "Failed to create game" });
+      }
     } catch (e) {
       res.status(400).json({ error: e.message });
     }

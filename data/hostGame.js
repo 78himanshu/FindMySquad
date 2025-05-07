@@ -46,6 +46,23 @@ export const createGame = async (
   checkNumber(playersRequired, "Players Required", 1);
   checkNumber(costPerHead, "Cost per Head", 0);
 
+  //Adding geo location validatio
+  if (
+    !geoLocation ||
+    typeof geoLocation !== "object" ||
+    !Array.isArray(geoLocation.coordinates) ||
+    geoLocation.coordinates.length !== 2 ||
+    isNaN(geoLocation.coordinates[0]) ||
+    isNaN(geoLocation.coordinates[1])
+  ) {
+    throw "Invalid or missing geoLocation";
+  }
+
+  //Adding Date Check for start time and end time
+  if (!(startTime instanceof Date) || isNaN(startTime.getTime())) throw "Invalid start time";
+  if (!(endTime instanceof Date) || isNaN(endTime.getTime())) throw "Invalid end time";
+  if (new Date(startTime) >= new Date(endTime)) throw "End time must be after start time";
+
   const newGame = new Game({
     title: trimmedTitle,
     sport: trimmedSport,
@@ -122,6 +139,17 @@ export const updateGame = async (gameId, updates, hostId) => {
   if (!game) throw new Error("Game not found");
   if (game.host.toString() !== hostId)
     throw new Error("Unauthorized edit attempt");
+  if (updates.geoLocation) {
+    const g = updates.geoLocation;
+    if (
+      typeof g !== "object" ||
+      !Array.isArray(g.coordinates) ||
+      g.coordinates.length !== 2 ||
+      isNaN(g.coordinates[0]) ||
+      isNaN(g.coordinates[1])
+    ) throw "Invalid geoLocation";
+    game.geoLocation = g;
+  }
 
   const allowedFields = [
     "title",
@@ -137,9 +165,22 @@ export const updateGame = async (gameId, updates, hostId) => {
   ];
 
   allowedFields.forEach((field) => {
+    //Checking if allowedFields have valid values and then assigning
     if (updates[field] !== undefined) {
-      game[field] = updates[field];
+      if (["title", "sport", "venue", "skillLevel", "location"].includes(field)) {
+        game[field] = checkString(updates[field], field);
+      } else if (["playersRequired", "costPerHead"].includes(field)) {
+        game[field] = checkNumber(updates[field], field);
+      } else if (["startTime", "endTime"].includes(field)) {
+        if (isNaN(Date.parse(updates[field]))) throw `${field} is not a valid date`;
+        game[field] = updates[field];
+      } else if (field === "description") {
+        game[field] = checkString(updates[field], field, 1);
+      }
     }
+    // if (updates[field] !== undefined) {
+    //   game[field] = updates[field];
+    // }
   });
 
   await game.save();
