@@ -1,703 +1,268 @@
-/*.gym-hero {
-    background-image: url('/images/pexels-anastasia-shuraeva-4945525.jpg');
-    background-size: cover;
-    background-position: center;
-    min-height: 80vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    position: relative;
-    border-radius: 12px;
-    margin: 20px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-  }
-  
-  .gym-hero .overlay {
-    background: rgba(0, 0, 0, 0.5);
-    padding: 40px;
-    border-radius: 8px;
-    color: #fff;
-    text-align: center;
-    max-width: 600px;
-  }
-  
-  .gym-hero h1 {
-    font-size: 2.5rem;
-    margin-bottom: 15px;
-  }
-  
-  .gym-hero h1 span {
-    color: #00e5ff;
-  }
-  
-  .gym-hero p {
-    font-size: 1.2rem;
-    margin-bottom: 25px;
-  }
+/* Global background */
+body {
+  background-image: url("/images/pexels-ketut-subiyanto-4853675.jpg");
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+}
 
-  .button-group {
-    display: flex;
-    gap: 1rem;
-    margin-top: 1rem;
-  }
-  .gym-hero button {
-    background-color: #00e5ff;
-    border: none;
-    padding: 12px 24px;
-    font-size: 1rem;
-    color: #000;
-    font-weight: bold;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: background 0.3s ease;
-  }
-  
-  .gym-hero button:hover {
-    background-color: #00bcd4;
-  }
-  
-  .gym-session-form-container {
-    max-width: 800px;
-    margin: 40px auto;
-    background: #f9f9f9;
-    padding: 30px;
-    border-radius: 10px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-  }
-  
-  .gym-session-form-container h1 {
-    text-align: center;
-    margin-bottom: 20px;
-    color: #2c3e50;
-  }
-  
-  .gym-session-form-container form {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-  }
-  
-  .gym-session-form-container label {
-    font-weight: bold;
-    color: #333;
-  }
-  
-  .gym-session-form-container input,
-  .gym-session-form-container select,
-  .gym-session-form-container textarea {
-    padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    font-size: 16px;
-  }
-  
-  .gym-session-form-container button {
-    padding: 12px;
-    font-size: 16px;
-    background: #2ecc71;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background 0.3s;
-  }
-  
-  .gym-session-form-container button:hover {
-    background: #27ae60;
-  }
-  
-  body {
-    background-image: url("/images/pexels-ketut-subiyanto-4853675.jpg");
-    background-size: cover;
-    background-position: center;
-    background-attachment: fixed;
-  }
-  .find-buddies-container {
-    padding: 2rem;
-    background: #f4f4f4;
-    min-height: 100vh;
-  }
-  
-  .filter-form {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 1rem;
-    background: #fff;
-    padding: 1rem;
-    border-radius: 8px;
-    margin-bottom: 2rem;
-    align-items: center;
-  }
-  
-  .filter-group {
-    display: flex;
-    flex-direction: column;
-  }
-  
-  .filter-group label {
-    margin-bottom: 0.3rem;
-  }
-  
-  .filter-form button {
-    padding: 0.5rem 1rem;
-    background: #007bff;
-    color: white;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-  }
+/* Hero Section */
+.gym-hero {
+  background-image: url('/images/pexels-anastasia-shuraeva-4945525.jpg');
+  background-size: cover;
+  background-position: center;
+  min-height: 80vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  margin: 20px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
 
-  .session-grid {
-    background: white;
-    padding: 15px;
-    border-radius: 10px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    width: 300px;
-    transition: 0.3s;
-  }
-  .session-grid-wrapper {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 20px;
-    justify-content: flex-start;
-  }
-  .session-cards {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 20px;
-  }
-  
-  .session-card {
-    background: #fff;
-    padding: 1rem;
-    border-radius: 10px;
-    box-shadow: 0 0px 5px rgba(0, 0, 0, 0.1);
-    width: 300px;
-    transition: transform 0.2s ease;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-  }
-  
-  .session-card:hover {
-    transform: scale(1.02);
-  }
-  
-  .session-card h3 {
-    margin-top: 0;font-size: 1.1rem;
-    margin-bottom: 0.5rem;
-  }
+.gym-hero .overlay {
+  background: rgba(0, 0, 0, 0.5);
+  padding: 40px;
+  border-radius: 8px;
+  color: #fff;
+  text-align: center;
+  max-width: 600px;
+}
 
-  .session-card p {
-    margin: 0.5rem 0;
-    font-size: 0.95rem;
-  }
-  
-  .session-card button{
-    margin-top: 0.8rem;
-    padding: 0.5rem 1rem;
-    font-size: 0.9rem;
-    background-color: #007aff;
-    color: white;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-  }
-  
-  .session-card button:disabled {
-    background-color: #ccc;
-    cursor: not-allowed;
-  }
-  
-  .modal {
-    display: none;
-    position: fixed;
-    z-index: 100;
-    padding-top: 100px;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    overflow: auto;
-    background-color: rgba(0,0,0,0.4);
-  }
-  
-  .modal-content {
-    background-color: #fff;
-    margin: auto;
-    padding: 2rem;
-    width: 80%;
-    max-width: 500px;
-    border-radius: 10px;
-    position: relative;
-  }
-  
-  .close {
-    position: absolute;
-    float: right;
-    top: 10px; right: 15px;
-    font-size: 1.5rem;
-    cursor: pointer;
-    font-weight: bold;
-  }
+.gym-hero h1 {
+  font-size: 2.5rem;
+  margin-bottom: 15px;
+}
 
-  .close:hover,
-.close:focus {
-  color: black;
-  text-decoration: none;
+.gym-hero h1 span {
+  color: #00e5ff;
+}
+
+.gym-hero p {
+  font-size: 1.2rem;
+  margin-bottom: 25px;
+}
+
+.gym-hero button {
+  background-color: #00e5ff;
+  border: none;
+  padding: 12px 24px;
+  font-size: 1rem;
+  color: #000;
+  font-weight: bold;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.gym-hero button:hover {
+  background-color: #00bcd4;
+}
+
+/* Session Form */
+.gym-session-form-container {
+  max-width: 800px;
+  margin: 40px auto;
+  background: #f9f9f9;
+  padding: 30px;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.gym-session-form-container h1 {
+  text-align: center;
+  margin-bottom: 20px;
+  color: #2c3e50;
+}
+
+.gym-session-form-container form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.gym-session-form-container label {
+  font-weight: bold;
+  color: #333;
+}
+
+.gym-session-form-container input,
+.gym-session-form-container select,
+.gym-session-form-container textarea {
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 16px;
+}
+
+.gym-session-form-container button {
+  padding: 12px;
+  font-size: 16px;
+  background: #2ecc71;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.gym-session-form-container button:hover {
+  background: #27ae60;
+}
+
+/* Find Buddies */
+.find-buddies-container {
+  padding: 2rem;
+  background: #f4f4f4;
+  min-height: 100vh;
+}
+
+.filter-form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  background: #fff;
+  padding: 1rem;
+  border-radius: 8px;
+  margin-bottom: 2rem;
+  align-items: center;
+}
+
+.filter-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.filter-group label {
+  margin-bottom: 0.3rem;
+}
+
+.filter-form button {
+  padding: 0.5rem 1rem;
+  background: #007bff;
+  color: white;
+  border: none;
+  border-radius: 8px;
   cursor: pointer;
 }
 
-  .joined-msg,
-  .host-msg {
-    color: green;
-    font-weight: bold;
-  }
-  
-  .modal-content ul {
-    margin: 0;
-    padding-left: 20px;
-  }
-  
-  .modal-content li {
-    list-style-type: disc;
-    font-size: 14px;
-    color: #333;
-  }
-  
-  @media (max-width: 768px) {
-    .session-card {
-      width: 100%;
-    }
-  }
+/* Sessions Grid */
+.session-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1.5rem;
+  padding: 2rem;
+}
 
-  form button[type="submit"] {
-    padding: 8px 16px;
-    margin-top: 8px;
-    font-weight: bold;
-    cursor: pointer;
-  }
-  
-  form[action*="/leave/"] button {
-    background-color: #fff;
-    border: 2px solid #d9534f;
-    color: #d9534f;
-  }
-  
-  form[action*="/leave/"] button:hover {
-    background-color: #d9534f;
-    color: white;
-  }
-  
-  .error-msg {
-    color: #d9534f;
-    background-color: #f8d7da;
-    padding: 10px;
-    margin: 10px 0;
-    border: 1px solid #d9534f;
-    border-radius: 4px;
-  }
-  
-  .success-msg {
-    color: #155724;
-    background-color: #d4edda;
-    padding: 10px;
-    margin: 10px 0;
-    border: 1px solid #155724;
-    border-radius: 4px;
-  }
-  
-  .my-sessions-wrapper {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    padding: 2rem;
-    gap: 2rem;
-    flex-wrap: wrap;
-  }
-  
-  .session-column {
-    flex: 1;
-    min-width: 300px;
-  }
-  
-  .session-card {
-    background: white;
-    padding: 1rem;
-    margin-bottom: 1.5rem;
-    border-radius: 0.75rem;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-    color: #333;
-  }
-  
-  .welcome-header {
-    background: rgba(0, 0, 0, 0.6);
-    color: white;
-    display: inline-block;
-    padding: 1rem 2rem;
-    border-radius: 1rem;
-    margin: 2rem;
-    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.6);
-  }
-  
-  h2, h3 {
-    margin-bottom: 1rem;
-  }
-  
-  @media (max-width: 768px) {
-    .my-sessions-wrapper {
-      flex-direction: column;
-    }
-  
-    .session-column {
-      width: 100%;
-    }
-  }
-  
-  .welcome-header {
-    background: rgba(255, 255, 255, 0.2);
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
-    border-radius: 1rem;
-    padding: 1rem 2rem;
-    color: #fff;
-    font-weight: bold;
-  }
-  
-  
-  .welcome-header h2 {
-    color: #fff;
-    margin: 0;
-  }
-  
-  .session-grid {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 1.5rem;
-    justify-content: flex-start;
-    padding: 2rem;
-  }
-  
-  .session-card {
-    width: 300px;
-    padding: 1rem;
-    background: white;
-    border-radius: 1rem;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    cursor: pointer;
-    transition: transform 0.2s ease;
-    position: relative;
-  }
-  
-  .session-card:hover {
-    transform: translateY(-4px);
-  }
-  
-  .badge {
-    display: inline-block;
-    padding: 0.25rem 0.5rem;
-    border-radius: 0.5rem;
-    font-size: 0.75rem;
-    font-weight: bold;
-    color: white;
-    margin-bottom: 0.5rem;
-  }
-  
-  .hosted .badge {
-    background-color: #007bff;
-  }
-  
-  .joined .badge {
-    background-color: #28a745;
-  }
-  */
-  body {
-    background-image: url("/images/pexels-ketut-subiyanto-4853675.jpg");
-    background-size: cover;
-    background-position: center;
-    background-attachment: fixed;
-  }
-  
-  .gym-hero {
-    background-image: url('/images/pexels-anastasia-shuraeva-4945525.jpg');
-    background-size: cover;
-    background-position: center;
-    min-height: 80vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    position: relative;
-    border-radius: 12px;
-    margin: 20px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-  }
-  
-  .gym-hero .overlay {
-    background: rgba(0, 0, 0, 0.5);
-    padding: 40px;
-    border-radius: 8px;
-    color: #fff;
-    text-align: center;
-    max-width: 600px;
-  }
-  
-  .gym-hero h1 {
-    font-size: 2.5rem;
-    margin-bottom: 15px;
-  }
-  
-  .gym-hero h1 span {
-    color: #00e5ff;
-  }
-  
-  .gym-hero p {
-    font-size: 1.2rem;
-    margin-bottom: 25px;
-  }
-  
-  .gym-hero button {
-    background-color: #00e5ff;
-    border: none;
-    padding: 12px 24px;
-    font-size: 1rem;
-    color: #000;
-    font-weight: bold;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: background 0.3s ease;
-  }
-  
-  .gym-hero button:hover {
-    background-color: #00bcd4;
-  }
-  
-  .gym-session-form-container {
-    max-width: 800px;
-    margin: 40px auto;
-    background: #f9f9f9;
-    padding: 30px;
-    border-radius: 10px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-  }
-  
-  .gym-session-form-container h1 {
-    text-align: center;
-    margin-bottom: 20px;
-    color: #2c3e50;
-  }
-  
-  .gym-session-form-container form {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-  }
-  
-  .gym-session-form-container label {
-    font-weight: bold;
-    color: #333;
-  }
-  
-  .gym-session-form-container input,
-  .gym-session-form-container select,
-  .gym-session-form-container textarea {
-    padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    font-size: 16px;
-  }
-  
-  .gym-session-form-container button {
-    padding: 12px;
-    font-size: 16px;
-    background: #2ecc71;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background 0.3s;
-  }
-  
-  .gym-session-form-container button:hover {
-    background: #27ae60;
-  }
-  
-  .find-buddies-container {
-    padding: 2rem;
-    background: #f4f4f4;
-    min-height: 100vh;
-  }
-  
-  .filter-form {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 1rem;
-    background: #fff;
-    padding: 1rem;
-    border-radius: 8px;
-    margin-bottom: 2rem;
-    align-items: center;
-  }
-  
-  .filter-group {
-    display: flex;
-    flex-direction: column;
-  }
-  
-  .filter-group label {
-    margin-bottom: 0.3rem;
-  }
-  
-  .filter-form button {
-    padding: 0.5rem 1rem;
-    background: #007bff;
-    color: white;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-  }
-  
-  /* 🚀 MAIN GRID FOR SESSIONS */
+.session-card {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 1rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.session-card:hover {
+  transform: translateY(-4px);
+}
+
+.session-card h3 {
+  margin: 0 0 0.5rem 0;
+  font-size: 1.2rem;
+}
+
+.session-card p {
+  font-size: 0.95rem;
+  margin: 0.4rem 0;
+}
+
+.session-card button {
+  margin-top: 1rem;
+  padding: 0.5rem 1rem;
+  font-size: 0.9rem;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 0.5rem;
+  cursor: pointer;
+}
+
+.session-card button:hover {
+  background-color: #0056b3;
+}
+
+/* Session Detail View */
+.session-detail-container {
+  padding: 2rem;
+  background-color: #ffffff;
+  min-height: 100vh;
+}
+
+.session-detail {
+  background-color: #ffffff;
+  padding: 2rem;
+  max-width: 700px;
+  margin: 0 auto;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  color: #000;
+}
+
+.session-detail h1 {
+  font-size: 2rem;
+  margin-bottom: 1rem;
+}
+
+.session-detail p,
+.session-detail ul {
+  font-size: 1.1rem;
+  margin: 0.5rem 0;
+}
+
+.session-detail ul {
+  list-style: disc;
+  padding-left: 1.5rem;
+}
+
+.session-detail button {
+  margin-top: 1rem;
+  padding: 0.5rem 1rem;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.session-detail button:hover {
+  background-color: #0056b3;
+}
+
+/* Feedback messages */
+.error-msg {
+  color: #d9534f;
+  background-color: #f8d7da;
+  padding: 10px;
+  margin: 10px 0;
+  border: 1px solid #d9534f;
+  border-radius: 4px;
+}
+
+.success-msg {
+  color: #155724;
+  background-color: #d4edda;
+  padding: 10px;
+  margin: 10px 0;
+  border: 1px solid #155724;
+  border-radius: 4px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
   .session-container {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 1.5rem;
-    padding: 2rem;
+    grid-template-columns: 1fr;
   }
-  
-  .session-card {
-    background: white;
-    border-radius: 1rem;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    padding: 1.5rem;
-    transition: transform 0.2s;
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    cursor: pointer;
-  }
-  
-  .session-card:hover {
-    transform: translateY(-4px);
-  }
-  
-  .badge {
-    display: inline-block;
-    padding: 0.25rem 0.75rem;
-    font-size: 0.75rem;
-    border-radius: 0.5rem;
-    color: white;
-    font-weight: bold;
-    margin-bottom: 0.75rem;
-  }
-  
-  .badge.hosted {
-    background-color: #007bff;
-  }
-  
-  .badge.joined {
-    background-color: #28a745;
-  }
-  
-  .session-card button {
-    margin-top: 1rem;
-    padding: 0.5rem 1rem;
-    font-size: 0.9rem;
-    background-color: #007bff;
-    color: white;
-    border: none;
-    border-radius: 0.5rem;
-    cursor: pointer;
-  }
-  
-  .session-card button:hover {
-    background-color: #0056b3;
-  }
-  
-  /* 🌑 MODAL STYLES */
-  .modal {
-    display: none;
-    position: fixed;
-    z-index: 999;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    overflow-y: auto;
-    background-color: rgba(0, 0, 0, 0.5); /* Dark but not too much */
-    padding: 2rem;
-  }
-  
-  .modal-content {
-    background-color: #ffffff; /* Solid white */
-    padding: 2rem;
-    border-radius: 12px;
-    max-width: 500px;
-    width: 100%;
-    margin: auto;
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
-    position: relative;
-    animation: fadeIn 0.3s ease-in-out;
-    color: #000; /* Ensures all text is readable */
-  }
-  
-  
-  .close {
-    position: absolute;
-    top: 1rem;
-    right: 1.5rem;
-    font-size: 1.5rem;
-    font-weight: bold;
-    color: #333;
-    cursor: pointer;
-  }
-  
-  .close:hover {
-    color: black;
-  }
-  
-  /* Smooth fade animation */
-  @keyframes fadeIn {
-    from {
-      transform: scale(0.95);
-      opacity: 0;
-    }
-    to {
-      transform: scale(1);
-      opacity: 1;
-    }
-  }
-  
-  /* Avoid card list underneath from interfering */
-  body.modal-open {
-    overflow: hidden;
-  }  
-  
-  /* 🎉 Welcome header */
-  .welcome-header {
-    background: rgba(255, 255, 255, 0.2);
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
-    border-radius: 1rem;
-    padding: 1rem 2rem;
-    color: #fff;
-    font-weight: bold;
-    margin: 2rem;
-  }
-  
-  .welcome-header h2 {
-    color: #fff;
-    margin: 0;
-  }
-  
-  /* 📱 Responsive */
-  @media (max-width: 768px) {
-    .session-container {
-      grid-template-columns: 1fr;
-    }
-  
-    .session-card {
-      width: 100%;
-    }
-  }
-  
+}

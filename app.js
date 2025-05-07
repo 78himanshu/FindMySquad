@@ -10,8 +10,8 @@ import cookieParser from "cookie-parser";
 import jwt from "jsonwebtoken";
 import gymBuddyRoutes from "./routes/gymBuddyRoutes.js";
 import hostGameRoutes from "./routes/hostGamesRoutes.js";
-import leaderboardRoutes from './routes/leaderboardRoutes.js';
-
+import leaderboardRoutes from "./routes/leaderboardRoutes.js";
+import methodOverride from "method-override";
 
 // Handlebars prototype access (to fix _id issues in Handlebars)
 import { allowInsecurePrototypeAccess } from "@handlebars/allow-prototype-access";
@@ -139,7 +139,7 @@ const hbs = exphbs.create({
         return acc;
       }, {});
     },
-    subtract: (a, b) => a - b
+    subtract: (a, b) => a - b,
   },
 });
 
@@ -184,7 +184,7 @@ app.use((req, res, next) => {
       res.locals.username = decoded.username;
       res.locals.profilePic =
         decoded.profilePic || "/images/default-avatar.png";
-      res.locals.userId      = decoded.userId;
+      res.locals.userId = decoded.userId;
     } catch (err) {
       res.locals.isLoggedIn = false;
       res.locals.username = null;
@@ -334,6 +334,7 @@ io.on("connection", (socket) => {
     }
   });
 });
+app.use(methodOverride("_method"));
 
 // Start server
 const PORT = process.env.PORT || 8080;

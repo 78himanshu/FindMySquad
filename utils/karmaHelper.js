@@ -1,5 +1,4 @@
-// import { UserProfile } from "../models/userProfile.js"; // adjust path if needed
-import UserProfile from "../models/userProfile.js"; 
+import UserProfile from "../models/userProfile.js";
 
 export async function updateKarmaPoints(userId, pointsToAdd) {
   try {
@@ -10,7 +9,9 @@ export async function updateKarmaPoints(userId, pointsToAdd) {
     );
 
     if (updatedUser) {
-      console.log(`Karma Points Updated for user ${userId}: ${updatedUser.karmaPoints}`);
+      console.log(
+        `Karma Points Updated for user ${userId}: ${updatedUser.karmaPoints}`
+      );
     } else {
       console.error(`Failed to update karma points for user: ${userId}`);
     }

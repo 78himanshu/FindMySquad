@@ -29,12 +29,10 @@
       <div class="error-msg">{{error}}</div>
     {{/if}}
 
-    {{#if success}}
-      <div class="success-msg">{{success}}</div>
-    {{/if}}
+  {{#if error}}<div class="error-msg">{{error}}</div>{{/if}}
+  {{#if success}}<div class="success-msg">{{success}}</div>{{/if}}
 
-
-  <!-- Filters Section -->
+  <!-- Filters -->
   <form id="filterForm" method="GET" action="/gymBuddy/find" class="filter-form">
     <div class="filter-group">
       <label for="experienceFilter">Experience:</label>
@@ -64,16 +62,20 @@
     <button type="submit">Filter</button>
   </form>
 
-  <!-- Loop through all sessions -->
+  <!-- Session Cards -->
   <div class="session-container">
     {{#each sessions}}
-      <div class="session-card">
-        <h3>{{this.title}}</h3>
-        <p><strong>Gym:</strong> {{this.gym}}</p>
-        <p><strong>Date:</strong> {{this.formattedDateTime}}</p>
-        <p><strong>Hosted By:</strong> {{this.hostedBy.username}}</p>
-        <p><strong>Slots:</strong> {{this.currentMembers}} / {{this.maxMembers}}</p>
+    <div class="session-card">
+      <h3>{{this.title}}</h3>
+      <p><strong>Gym:</strong> {{this.gym}}</p>
+      <p><strong>Date:</strong> {{this.formattedDateTime}}</p>
+      <p><strong>Hosted By:</strong> {{this.hostedBy.username}}</p>
+      <p><strong>Slots:</strong> {{this.currentMembers}} / {{this.maxMembers}}</p>
 
+      <a href="/gymBuddy/find/{{this._id}}">
+        <button type="button">View Details</button>
+      </a>
+    </div>
         <button type="button" onclick="openModal('{{this._id}}')">View Details</button>
 
         <!-- Modal -->
