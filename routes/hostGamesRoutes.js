@@ -232,7 +232,7 @@ router.get("/edit/:id", requireAuth, async (req, res) => {
 
 router.post("/edit/:id", requireAuth, async (req, res) => {
   try {
-    //console.log("🧾 Received body:", req.body);
+    console.log("🧾 Received body:", req.body);
     const {
       title,
       sport,
