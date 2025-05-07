@@ -92,10 +92,7 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
-    if (!title || !sport || !location || !skillLevel || !form.gameDate.value || !form.startTime.value || !form.endTime.value) {
-      showToastError("Please fill in all required fields.");
-      return
-    }
+
     if (start < new Date()) {
       showToastError("You cannot host a game in the past.");
       return;
@@ -128,8 +125,6 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
-
-
     if (description.split(/\s+/).length > 250) {
       showToastError("Description must not exceed 250 words.");
       return;
@@ -147,6 +142,11 @@ document.addEventListener("DOMContentLoaded", () => {
         showToastError("Description contains inappropriate language");
         return;
       }
+    }
+
+    if (!title || !sport || !location || !skillLevel || !form.gameDate.value || !form.startTime.value || !form.endTime.value) {
+      showToastError("Please fill in all required fields.");
+      return
     }
 
 
