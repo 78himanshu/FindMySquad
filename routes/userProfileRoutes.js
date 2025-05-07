@@ -9,6 +9,8 @@ import UserProfile from "../models/userProfile.js";
 const ObjectId = mongoose.Types.ObjectId;
 //import { geocodeCity } from '../utils/geocode.js';
 import { format } from "date-fns";
+import axios from "axios";
+
 
 
 
@@ -22,6 +24,7 @@ const router = Router();
 router
   .route("/")
   .get(verifyToken, async (req, res) => {
+    console.log("Rendering edit view");
     try {
       const profile = await userProfileData.getProfile(req.user.userID);
       res.status(200).json(profile);
@@ -123,6 +126,29 @@ router
           // You can extend this to include state, zipCode, etc.
         },
       };
+
+      const encodedLoc = encodeURIComponent(updateData.location.city);
+      const apiKey = process.env.GOOGLE_MAPS_API_KEY;
+
+      const geoRes = await axios.get(
+        `https://maps.googleapis.com/maps/api/geocode/json?address=${encodedLoc}&key=${apiKey}`
+      );
+
+      if (
+        !geoRes.data ||
+        !geoRes.data.results ||
+        !geoRes.data.results[0]?.geometry?.location
+      ) {
+        return res
+          .status(400)
+          .json({ error: "Invalid city address, could not get location coordinates." });
+      }
+      const { lat, lng } = geoRes.data.results[0].geometry.location;
+      updateData.location.geoLocation = {
+        type: "Point",
+        coordinates: [lng, lat],
+      };
+
       const updated = await userProfileData.updateProfile(userId, updateData);
 
       if (!updated) {
@@ -197,10 +223,11 @@ router
         lastName: profile.profile.lastName,
         bio: profile.profile.bio,
         avatar: profile.profile.avatar,
-        city: profile.profile.city,
-        state: profile.profile.state,
-        zipCode: profile.profile.zipCode,
+        city: profile.location?.city || "",
+        state: profile.location?.state || "",
+        zipCode: profile.location?.zipCode || "",
         head: `<link rel="stylesheet" href="/css/editProfile.css">`,
+        googleMapsApiKey: process.env.GOOGLE_MAPS_API_KEY,
       });
     } catch (e) {
       res.status(404).render("error", { error: e.toString() });

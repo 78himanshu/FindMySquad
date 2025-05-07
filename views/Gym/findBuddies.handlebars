@@ -1,5 +1,30 @@
 <main class="find-buddies-container">
   <h1>Find Workout Buddies</h1>
+  <div id="gym-map" style="height: 300px; margin-bottom: 20px;"></div>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const map = L.map("gym-map").setView([40.7128, -74.0060], 11); // Default NYC
+
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: "© OpenStreetMap contributors"
+      }).addTo(map);
+
+      const sessions = {{{json sessions}}};
+
+      sessions.forEach(session => {
+        if (session.geoLocation && session.geoLocation.coordinates) {
+          const [lng, lat] = session.geoLocation.coordinates;
+          L.marker([lat, lng])
+            .addTo(map)
+            .bindPopup(`<strong>${session.title}</strong><br>${session.gym}`);
+        }
+      });
+    });
+  </script>
+
     {{#if error}}
       <div class="error-msg">{{error}}</div>
     {{/if}}
@@ -66,6 +91,7 @@
             <p><strong>Workout Type:</strong> {{this.workoutType}}</p>
             <p><strong>Date & Time:</strong> {{this.formattedDateTime}}</p>
             <p><strong>Slots:</strong> {{this.currentMembers}} / {{this.maxMembers}}</p>
+            <div id="session-map-{{this._id}}" style="height: 200px; margin-top: 10px;"></div>
             {{#if this.members}}
                 {{#if this.members.length}}
                     <p><strong>Attending:</strong></p>
@@ -126,4 +152,23 @@ window.onclick = function (event) {
   });
 };
   </script>
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const sessions = {{{json sessions}}};
+    sessions.forEach(session => {
+      if (session.geoLocation && session.geoLocation.coordinates) {
+        const [lng, lat] = session.geoLocation.coordinates;
+        const mapDivId = `session-map-${session._id}`;
+        const mapDiv = document.getElementById(mapDivId);
+        if (mapDiv) {
+          const map = L.map(mapDivId).setView([lat, lng], 13);
+          L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: "© OpenStreetMap contributors"
+          }).addTo(map);
+          L.marker([lat, lng]).addTo(map).bindPopup(session.gym);
+        }
+      }
+    });
+  });
+</script>
 </main>

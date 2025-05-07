@@ -10,6 +10,17 @@ const gymSchema = new structure({
   date: { type: String, required: true }, // e.g., "2025-05-01"
   startTime: { type: String, required: true }, // e.g., "19:00"
   endTime: { type: String, required: true }, // e.g., "21:00"
+  geoLocation: {
+    type: {
+      type: String,
+      enum: ["Point"],
+      default: "Point"
+    },
+    coordinates: {
+      type: [Number], // [longitude, latitude]
+      required: true
+    }
+  },
   gymlocation: { type: String, required: true },
   experience: {
     type: String,
@@ -51,5 +62,7 @@ const gymSchema = new structure({
   },
   players: [{ type: mongoose.Schema.Types.ObjectId, ref: "Userlist" }],
 });
+
+gymSchema.index({ geoLocation: "2dsphere" });
 
 export default mongoose.model("Gym", gymSchema);
