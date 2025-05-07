@@ -6,8 +6,8 @@ export const checkString = (input, name, minLength = 1) => {
   return trimmed;
 };
 
-export function checkNumber(y, input, z) {
-  if (typeof y !== "number" || isNaN(y) || y < z) {
-    throw new Error(`${input} must be a Number`);
+export function checkNumber(y, input, min = 0) {
+  if (typeof y !== "number" || isNaN(y) || y < min) {
+    throw new Error(`${input} must be a number ≥ ${min}`);
   }
 }

@@ -5,7 +5,7 @@ const structure = mongoose.Schema;
 const gameStructure = new structure({
   title: { type: String, required: true },
   sport: { type: String, required: true, trim: true },
-  venue: { type: String, required: true, trim: true },
+  // venue: { type: String, required: true, trim: true },
   playersRequired: { type: Number, required: true, min: 1 },
   playersGoing: { type: Number, default: 1 },
   startTime: { type: Date, required: true },
