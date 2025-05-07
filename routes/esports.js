@@ -2,6 +2,7 @@ import { Router } from 'express';
 import Tournament from '../models/tournament.js';
 import User from '../models/User.js';
 import { requireAuth } from '../middleware/authMiddleware.js';
+import { updateKarmaPoints } from '../utils/karmaHelper.js';
 
 const router = Router();
 
@@ -215,6 +216,7 @@ router.post('/:tournamentId/register-team', requireAuth, async (req, res, next) 
         return res.status(400).send('Team name already taken.');
       }
       tournament.teams.push({ teamName: teamName.trim(), description: teamDescription.trim(), players: [userId] });
+      await updateKarmaPoints(userId, 10);
     } else if (action === 'join') {
       const team = tournament.teams.id(joinTeamId);
       if (!team) return res.status(404).send('Team not found.');
@@ -222,6 +224,7 @@ router.post('/:tournamentId/register-team', requireAuth, async (req, res, next) 
         return res.status(400).send('That team is already full.');
       }
       team.players.push(userId);
+      await updateKarmaPoints(userId, 10);
     }
 
     await tournament.save();
@@ -255,6 +258,8 @@ router.post('/:tournamentId/leave-team', requireAuth, async (req, res, next) => 
           );
     }
 
+    await updateKarmaPoints(userId, -10);
+
     await tournament.save();
     res.redirect(`/esports/${req.params.tournamentId}/register-team`);
   } catch (err) {
@@ -279,6 +284,8 @@ router.post('/:tournamentId/team/:teamId/remove-member', requireAuth, async (req
     if (!isCreator && !isLeader) return res.status(403).send('Forbidden');
 
     team.players = team.players.filter(p => p.toString() !== memberId);
+    await updateKarmaPoints(memberId, -10);
+
     await tournament.save();
     res.redirect(`/esports/${tournamentId}/register-team`);
   } catch (err) {
@@ -301,6 +308,10 @@ router.post('/:tournamentId/team/:teamId/disband', requireAuth, async (req, res,
     const isLeader = team.players[0].toString() === userId;
     if (!isCreator && !isLeader) return res.status(403).send('Forbidden');
 
+    for (const member of team.players) {
+      if (member) await updateKarmaPoints(member.toString(), -10);
+    }
+
     tournament.teams = tournament.teams.filter(t => t._id.toString() !== teamId);
     await tournament.save();
     res.redirect(`/esports/${tournamentId}/register-team`);
@@ -320,6 +331,18 @@ router.post('/:tournamentId/delete', requireAuth, async (req, res, next) => {
     if (t.creator.toString() !== req.user.userId) {
       return res.status(403).send('Forbidden');
     }
+
+    await updateKarmaPoints(t.creator.toString(), -15); // Host loses 15
+
+    // All other players lose 10 (skip host)
+    for (const team of t.teams) {
+      for (const playerId of team.players) {
+        if (playerId && playerId.toString() !== t.creator.toString()) {
+          await updateKarmaPoints(playerId.toString(), -10);
+        }
+      }
+    }
+
     await Tournament.findByIdAndDelete(req.params.tournamentId);
 
     // redirect back to the game page to show the global toast

@@ -1,7 +1,7 @@
 import express from 'express';
 import Tournament from '../models/tournament.js';
 import { requireAuth } from '../middleware/authMiddleware.js'; // Optional middleware
-
+import { updateKarmaPoints } from '../utils/karmaHelper.js';
 const router = express.Router();
 
 // GET: Render Create Tournament Form
@@ -146,6 +146,7 @@ router.post('/create', requireAuth, async (req, res) => {
       prizeDescription,
       teams:           []
     });
+    await updateKarmaPoints(req.user.userId, 15);
     return res.redirect(
       `/esports/game/${encodeURIComponent(game)}?tournamentCreated=1`
     );
