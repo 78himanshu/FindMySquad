@@ -1,139 +1,134 @@
-<div class="host-game-container">
-  <h1>Register Team</h1>
+<main class="d-flex justify-content-center py-5">
+  <div
+    class="host-game-container card shadow-sm rounded p-4 mb-0"
+    style="max-width: 900px; width: 95%; margin: 0;"
+  >
 
-  {{!-- 1. Tournament Creator Management View --}}
-  {{#if isCreator}}
-    {{#if tournament.teams.length}}
-      {{#each tournament.teams}}
-        <div class="card mb-4 p-3">
-          <h4>Team: {{this.teamName}}</h4>
-          <p class="fst-italic text-muted">{{this.teamDescription}}</p>
-
-          <ul class="list-group mb-3">
-            {{#each this.players}}
-              <li class="list-group-item d-flex justify-content-between align-items-center">
-                {{this.username}}
-                <form
-                  action="/esports/{{../tournament._id}}/team/{{this._id}}/remove-member"
-                  method="POST"
-                  style="margin:0;"
-                >
-                  <input type="hidden" name="memberId" value="{{this._id}}">
-                  <button type="submit" class="btn btn-sm btn-danger">Remove</button>
-                </form>
-              </li>
-            {{/each}}
-          </ul>
-
-          <form
-            action="/esports/{{tournament._id}}/team/{{this._id}}/disband"
-            method="POST"
-          >
-            <button type="submit" class="btn btn-warning">Disband Team</button>
-          </form>
-        </div>
-      {{/each}}
+    {{!-- Page Title --}}
+    {{#if isCreator}}
+      <h1 class="text-center mb-4">Manage Teams</h1>
     {{else}}
-      <p class="text-muted">No teams yet registered.</p>
+      <h1 class="text-center mb-4">Register Team</h1>
     {{/if}}
 
-  {{!-- 2. Team Leader View --}}
-  {{else if isTeamLeader}}
-    <div class="card mb-4 p-3">
-      <h4>Your Team: {{userTeam.teamName}}</h4>
-      <p class="fst-italic text-muted">{{userTeam.teamDescription}}</p>
-
-      <ul class="list-group mb-3">
-        {{#each userTeam.players}}
-          <li class="list-group-item d-flex justify-content-between align-items-center">
-            {{this.username}}
-            {{#unless (eq this._id ../userId)}}
-              <form
-                action="/esports/{{../tournament._id}}/team/{{../userTeam._id}}/remove-member"
-                method="POST"
-                style="margin:0;"
-              >
-                <input type="hidden" name="memberId" value="{{this._id}}">
-                <button type="submit" class="btn btn-sm btn-danger">Remove</button>
-              </form>
-            {{/unless}}
-          </li>
+    {{!-- CREATOR VIEW --}}
+    {{#if isCreator}}
+      {{#if tournament.teams.length}}
+        {{#each tournament.teams}}
+          <div class="card mb-4 p-3">
+            <h4>Team: {{this.teamName}}</h4>
+            <p class="fst-italic text-muted">{{this.teamDescription}}</p>
+            <ul class="list-group mb-3">
+              {{#each this.players}}
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                  {{this.username}}
+                  <form
+                    action="/esports/{{@../tournament._id}}/team/{{this._id}}/remove-member"
+                    method="POST"
+                    class="m-0"
+                  >
+                    <input type="hidden" name="memberId" value="{{this._id}}">
+                    <button class="btn btn-sm btn-danger">Remove</button>
+                  </form>
+                </li>
+              {{/each}}
+            </ul>
+            <form
+              action="/esports/{{tournament._id}}/team/{{this._id}}/disband"
+              method="POST"
+            >
+              <button class="btn btn-warning">Disband Team</button>
+            </form>
+          </div>
         {{/each}}
-      </ul>
+      {{else}}
+        <p class="text-muted mb-0">No teams yet registered.</p>
+      {{/if}}
 
-      <form
-        action="/esports/{{tournament._id}}/team/{{userTeam._id}}/disband"
-        method="POST"
-      >
-        <button type="submit" class="btn btn-warning">Disband Team</button>
-      </form>
-    </div>
-
-  {{!-- 3. Regular Member View --}}
-  {{else if isAlreadyInTeam}}
-    <div class="text-center mb-4">
-      <h4>You’re in <strong>{{userTeam.teamName}}</strong></h4>
-      <p class="fst-italic text-muted">{{userTeam.teamDescription}}</p>
-      <form
-        action="/esports/{{tournament._id}}/leave-team"
-        method="POST"
-        class="mt-3"
-      >
-        <button type="submit" class="btn btn-warning">Leave Team</button>
-      </form>
-    </div>
-
-  {{!-- 4. New User: Create or Join --}}
-  {{else}}
-    <form
-      action="/esports/{{tournament._id}}/register-team"
-      method="POST"
-      class="host-game-form mb-4"
-    >
-      <input type="hidden" name="action" value="create">
-      <div class="mb-3">
-        <label for="teamName" class="form-label fw-bold">Team Name</label>
-        <input
-          type="text"
-          id="teamName"
-          name="teamName"
-          class="form-control"
-          placeholder="Enter Team Name"
-          required
-          minlength="2"
-          value="{{formData.teamName}}"
+    {{!-- TEAM-LEADER VIEW --}}
+    {{else if isTeamLeader}}
+      <div class="card mb-4 p-3">
+        <h4>Your Team: {{userTeam.teamName}}</h4>
+        <p class="fst-italic text-muted">{{userTeam.teamDescription}}</p>
+        <ul class="list-group mb-3">
+          {{#each userTeam.players}}
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+              {{this.username}}
+              {{#unless (eq this._id ../userId)}}
+                <form
+                  action="/esports/{{../tournament._id}}/team/{{../userTeam._id}}/remove-member"
+                  method="POST"
+                  class="m-0"
+                >
+                  <input type="hidden" name="memberId" value="{{this._id}}">
+                  <button class="btn btn-sm btn-danger">Remove</button>
+                </form>
+              {{/unless}}
+            </li>
+          {{/each}}
+        </ul>
+        <form
+          action="/esports/{{tournament._id}}/team/{{userTeam._id}}/disband"
+          method="POST"
         >
+          <button class="btn btn-warning">Disband Team</button>
+        </form>
       </div>
-      <div class="mb-3">
-        <label for="teamDescription" class="form-label fw-bold">Team Description</label>
-        <textarea
-          id="teamDescription"
-          name="teamDescription"
-          class="form-control"
-          placeholder="Describe your team..."
-          required
-          minlength="5"
-          maxlength="200"
-        >{{formData.teamDescription}}</textarea>
-      </div>
-      <button type="submit" class="submit-btn w-100">Create Team</button>
-    </form>
 
-    {{#if (gt playersPerTeam 1)}}
-      <div class="mt-4">
-        <h3 class="text-center mb-4">Or Join an Existing Team</h3>
-        <div class="row g-4">
+    {{!-- MEMBER VIEW --}}
+    {{else if isAlreadyInTeam}}
+      <div class="text-center mb-4">
+        <h4>You’re in <strong>{{userTeam.teamName}}</strong></h4>
+        <p class="fst-italic text-muted">{{userTeam.teamDescription}}</p>
+        <form
+          action="/esports/{{tournament._id}}/leave-team"
+          method="POST"
+          class="mt-3"
+        >
+          <button class="btn btn-warning">Leave Team</button>
+        </form>
+      </div>
+
+    {{!-- NEW USER VIEW --}}
+    {{else}}
+      <form
+        action="/esports/{{tournament._id}}/register-team"
+        method="POST"
+        class="mb-4"
+      >
+        <input type="hidden" name="action" value="create">
+        <div class="mb-3">
+          <label for="teamName" class="form-label fw-bold">Team Name</label>
+          <input
+            id="teamName" name="teamName"
+            class="form-control"
+            placeholder="Enter Team Name"
+            required minlength="2"
+            value="{{formData.teamName}}"
+          >
+        </div>
+        <div class="mb-3">
+          <label for="teamDescription" class="form-label fw-bold">Team Description</label>
+          <textarea
+            id="teamDescription" name="teamDescription"
+            class="form-control"
+            placeholder="Describe your team..."
+            required minlength="5" maxlength="200"
+          >{{formData.teamDescription}}</textarea>
+        </div>
+        <button class="btn btn-success w-100">Create Team</button>
+      </form>
+
+      {{#if (gt playersPerTeam 1)}}
+        <h5 class="text-center mb-3">Or Join an Existing Team</h5>
+        <div class="row g-3">
           {{#each tournament.teams}}
-            <div class="col-md-6">
+            <div class="col-12 col-md-6">
               <div class="card shadow-sm">
                 <div class="card-body">
-                  <h5 class="card-title">{{this.teamName}}</h5>
-                  <p class="fst-italic text-muted mb-2">{{this.description}}</p>
-                  <p>
-                    <strong>Players:</strong>
-                    {{this.players.length}} / {{../playersPerTeam}}
-                  </p>
-
+                  <h6 class="card-title">{{this.teamName}}</h6>
+                  <p class="fst-italic text-muted mb-2">{{this.teamDescription}}</p>
+                  <p><strong>Players:</strong> {{this.players.length}} / {{../playersPerTeam}}</p>
                   {{#if (lt this.players.length ../playersPerTeam)}}
                     <form
                       action="/esports/{{../tournament._id}}/register-team"
@@ -141,17 +136,18 @@
                     >
                       <input type="hidden" name="action" value="join">
                       <input type="hidden" name="joinTeamId" value="{{this._id}}">
-                      <button type="submit" class="btn btn-success w-100">Join Team</button>
+                      <button class="btn btn-outline-success w-100">Join Team</button>
                     </form>
                   {{else}}
-                    <p class="text-muted">Team Full</p>
+                    <p class="text-muted mb-0">Team Full</p>
                   {{/if}}
                 </div>
               </div>
             </div>
           {{/each}}
         </div>
-      </div>
+      {{/if}}
     {{/if}}
-  {{/if}}
-</div>
+
+  </div>
+</main>
