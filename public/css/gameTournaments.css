@@ -141,12 +141,12 @@ h4 {
 
 .esport-card {
   position: relative;
-  width: 100%;
-  aspect-ratio: 16 / 9;
+  /* width: 100%;
+  aspect-ratio: 16 / 9; */
   border-radius: 12px;
   overflow: hidden;
   position: relative;
-  height: 300px;
+  /* height: 300px; */
   background-size: cover;
   background-position: center;
   overflow: hidden;
@@ -163,17 +163,15 @@ h4 {
   position: absolute;
   bottom: 0;
   width: 100%;
-  left:   0;     
+  left: 0;
   width: 100%;
   font-weight: 600;
   padding: 0.75rem;
   line-height: 1.2;
-  background: linear-gradient(
-    to top,
-    rgba(0,0,0,0.8) 0%,
-    rgba(0,0,0,0.4) 50%,
-    transparent 100%
-  );
+  background: linear-gradient(to top,
+      rgba(0, 0, 0, 0.8) 0%,
+      rgba(0, 0, 0, 0.4) 50%,
+      transparent 100%);
   top: auto;
   right: auto;
   padding: 1rem;
@@ -184,7 +182,8 @@ h4 {
 }
 
 .esports-bg {
-  background-color: #000000;  /* adjust to taste: #e0e0e0 is a mid‐grey */
+  background-color: #000000;
+  /* adjust to taste: #e0e0e0 is a mid‐grey */
 }
 
 /* ---------------------------------------------------------------- */
@@ -195,7 +194,8 @@ h4 {
 .host-game-container {
   max-width: 900px;
   width: 100%;
-  margin: 1rem auto 0;        /* 1rem below nav, auto left/right, no bottom margin */
+  margin: 1rem auto 0;
+  /* 1rem below nav, auto left/right, no bottom margin */
   padding: 2rem;
   background: #fff;
   border-radius: 12px;
@@ -242,6 +242,8 @@ h4 {
   border-radius: 6px;
   transition: background-color 0.3s ease;
 }
+
 .submit-btn:hover {
   background-color: #218838;
+  /* adjust to taste: #e0e0e0 is a mid‐grey */
 }

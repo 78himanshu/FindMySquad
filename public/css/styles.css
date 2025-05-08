@@ -566,7 +566,7 @@ label.btn.active {
   border: 1px solid #ddd;
   border-radius: 1rem;
   transition: transform 0.3s ease, box-shadow 0.3s ease;
-  min-height: 100%;
+  /* min-height: 100%; */
 }
 
 .game-card:hover {
@@ -798,6 +798,7 @@ label.btn.active {
 main {
   display: block;
 }
+
 main.esports-bg {
   min-height: 100vh;
 }

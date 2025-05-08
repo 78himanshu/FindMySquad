@@ -8,6 +8,7 @@ import { DateTime } from 'luxon';
 import xss from 'xss';
 
 
+
 router
   .route("/")
   .get(requireAuth, (req, res) => {
@@ -31,7 +32,9 @@ router
       x.skillLevel = xss(x.skillLevel).trim();
       x.description = xss(x.description).trim();
       x.location = xss(x.location).trim();
-
+      x.extraInfo = xss(x.extraInfo?.trim() || "");
+      x.bringEquipment = x.bringEquipment === "true" || x.bringEquipment === true;
+      x.costShared = x.costShared === "true" || x.costShared === true;
       x.playersRequired = Number(x.playersRequired);
       x.costPerHead = Number(x.costPerHead);
 
@@ -155,7 +158,10 @@ router
           x.skillLevel,
           x.host,
           x.location,
-          geoLocation
+          geoLocation,
+          x.bringEquipment,
+          x.costShared,
+          x.extraInfo
         );
 
         return res.json({
@@ -217,7 +223,7 @@ router.get("/edit/:id", requireAuth, async (req, res) => {
       return res.status(403).render("error", { error: "Unauthorized access" });
     }
 
-    res.render("hostGame/editGameForm", {
+    res.render("hostGame/hostGameForm", {
       game: game.toObject(),
       hostId: req.user.userID,
       title: "Edit Game",
@@ -230,9 +236,11 @@ router.get("/edit/:id", requireAuth, async (req, res) => {
   }
 });
 
+
+
 router.post("/edit/:id", requireAuth, async (req, res) => {
   try {
-    console.log("🧾 Received body:", req.body);
+    console.log("Received body:", req.body);
     const {
       title,
       sport,
@@ -244,50 +252,74 @@ router.post("/edit/:id", requireAuth, async (req, res) => {
       description,
       skillLevel,
       location,
+      bringEquipment,
+      costShared,
+      extraInfo,
+      userTimeZone
     } = req.body;
 
-    const gameDateObj = new Date(gameDate);
-    const [startHours, startMinutes] = startStr.split(":");
-    const [endHours, endMinutes] = endStr.split(":");
+    // Validation
+    if (
+      !title || !sport || !gameDate || !startStr || !endStr ||
+      !description || !skillLevel || !location
+    ) {
+      return res.status(400).json({ error: "Missing required fields." });
+    }
 
-    const startTime = new Date(Date.UTC(
-      gameDateObj.getFullYear(),
-      gameDateObj.getMonth(),
-      gameDateObj.getDate(),
-      startHours,
-      startMinutes
-    ));
+    const allowedSports = ["Soccer", "Basketball", "Baseball", "Tennis", "Swimming", "Running", "Cycling", "Hiking", "Golf", "Volleyball"];
+    const allowedSkills = ["Beginner", "Intermediate", "Advanced"];
+    if (!allowedSports.includes(sport)) {
+      return res.status(400).json({ error: "Invalid sport selected." });
+    }
+    if (!allowedSkills.includes(skillLevel)) {
+      return res.status(400).json({ error: "Invalid skill level selected." });
+    }
 
-    const endTime = new Date(Date.UTC(
-      gameDateObj.getFullYear(),
-      gameDateObj.getMonth(),
-      gameDateObj.getDate(),
-      endHours,
-      endMinutes
-    ));
+    const sanitizedDescription = xss(description.trim());
+    const badWords = ["fuck", "shit", "bitch", "rape", "kys", "kill yourself", "nigger", "faggot"];
+    const lowered = sanitizedDescription.toLowerCase();
+    for (const word of badWords) {
+      if (lowered.includes(word)) {
+        return res.status(400).json({ error: "Description contains inappropriate language." });
+      }
+    }
 
-    if (startTime >= endTime) {
-      return res.status(400).send("End time must be after start time");
+    // Time parsing with Luxon
+    const rawStart = DateTime.fromISO(`${gameDate}T${startStr}`, { zone: userTimeZone });
+    let rawEnd = DateTime.fromISO(`${gameDate}T${endStr}`, { zone: userTimeZone });
+    if (rawEnd <= rawStart) rawEnd = rawEnd.plus({ days: 1 });
+
+    const now = DateTime.now().setZone(userTimeZone);
+    if (rawStart < now) {
+      return res.status(400).json({ error: "Cannot host games in the past." });
     }
 
     const updates = {
-      title: title?.trim(),
-      sport: sport?.trim(),
-      startTime,
-      endTime,
+      title: xss(title.trim()),
+      sport: xss(sport.trim()),
+      startTime: rawStart.toUTC().toJSDate(),
+      endTime: rawEnd.toUTC().toJSDate(),
       playersRequired: Number(playersRequired),
       costPerHead: Number(costPerHead),
-      description: description?.trim(),
-      skillLevel: skillLevel?.trim(),
-      location: location?.trim()
+      description: sanitizedDescription,
+      skillLevel: xss(skillLevel.trim()),
+      location: xss(location.trim()),
+      bringEquipment: bringEquipment === "true" || bringEquipment === true,
+      costShared: costShared === "true" || costShared === true,
+      extraInfo: xss(extraInfo || "")
     };
-    console.log("🛠 Final updates:", updates);
-    await hostGameData.updateGame(req.params.id, updates, req.user.userID);
-    res.redirect("/join");
+
+    console.log("✅ Final updates:", updates);
+
+    const updatedGame = await hostGameData.updateGame(req.params.id, updates, req.user.userID);
+
+    return res.json({ success: true, message: "Game updated!", gameId: updatedGame._id });
   } catch (err) {
-    res.status(400).send(err.message);
+    console.error("❌ Edit error:", err);
+    return res.status(400).json({ error: err.message });
   }
 });
+
 
 router.post("/delete/:id", requireAuth, async (req, res) => {
   try {

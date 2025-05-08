@@ -1,13 +1,12 @@
 <div class="container my-5">
   <div class="card shadow border-success">
     <div class="card-header bg-success text-white">
-      <h2 class="mb-0">Host a Game</h2>
+      <h2 class="mb-0">{{#if game}}Edit Game{{else}}Host a Game{{/if}}</h2>
     </div>
     <div class="card-body">
-      <form class="host-game-form">
-
+      <form class="host-game-form" data-edit="{{#if game}}true{{else}}false{{/if}}" data-game-id="{{game._id}}">
         <div class="mb-3">
-          <input type="text" name="title" class="form-control" placeholder="Title" />
+          <input type="text" name="title" class="form-control" placeholder="Title" value="{{game.title}}" />
         </div>
 
         <div class="row g-3">
@@ -15,36 +14,40 @@
             <div class="mb-3">
               <select name="sport" id="sportSelect" class="form-select">
                 <option value="">Select Sport</option>
-                <option value="Football">Soccer</option>
-                <option value="Basketball">Basketball</option>
-                <option value="Baseball">Baseball</option>
-                <option value="Tennis">Tennis</option>
-                <option value="Swimming">Swimming</option>
-                <option value="Running">Running</option>
-                <option value="Cycling">Cycling</option>
-                <option value="Hiking">Hiking</option>
-                <option value="Golf">Golf</option>
-                <option value="Volleyball">Volleyball</option>
+                <option value="Soccer" {{#if (eq game.sport "Soccer" )}}selected{{/if}}>Soccer</option>
+                <option value="Basketball" {{#if (eq game.sport "Basketball" )}}selected{{/if}}>Basketball</option>
+                <option value="Baseball" {{#if (eq game.sport "Baseball" )}}selected{{/if}}>Baseball</option>
+                <option value="Tennis" {{#if (eq game.sport "Tennis" )}}selected{{/if}}>Tennis</option>
+                <option value="Swimming" {{#if (eq game.sport "Swimming" )}}selected{{/if}}>Swimming</option>
+                <option value="Running" {{#if (eq game.sport "Running" )}}selected{{/if}}>Running</option>
+                <option value="Cycling" {{#if (eq game.sport "Cycling" )}}selected{{/if}}>Cycling</option>
+                <option value="Hiking" {{#if (eq game.sport "Hiking" )}}selected{{/if}}>Hiking</option>
+                <option value="Golf" {{#if (eq game.sport "Golf" )}}selected{{/if}}>Golf</option>
+                <option value="Volleyball" {{#if (eq game.sport "Volleyball" )}}selected{{/if}}>Volleyball</option>
               </select>
             </div>
           </div>
           <div class="col-md-4">
-            <input type="number" name="playersRequired" class="form-control" placeholder="Players" />
+            <input type="number" name="playersRequired" class="form-control" placeholder="Players"
+              value="{{game.playersRequired}}" />
           </div>
           <div class="col-md-4">
-            <input type="number" name="costPerHead" class="form-control" placeholder="Cost per Head" min="0" />
+            <input type="number" name="costPerHead" class="form-control" placeholder="Cost per Head" min="0"
+              value="{{game.costPerHead}}" />
           </div>
         </div>
 
         <div class="row g-3">
           <div class="col-md-4">
-            <input type="date" name="gameDate" class="form-control" />
+            <input type="date" name="gameDate" class="form-control" value="{{formatDateInput game.startTime}}" />
           </div>
           <div class="col-md-4">
-            <input type="time" name="startTime" class="form-control" placeholder="Start Time" />
+            <input type="time" name="startTime" class="form-control" placeholder="Start Time"
+              value="{{formatTimeInput game.startTime}}" />
           </div>
           <div class="col-md-4">
-            <input type="time" name="endTime" class="form-control" placeholder="End Time" />
+            <input type="time" name="endTime" class="form-control" placeholder="End Time"
+              value="{{formatTimeInput game.endTime}}" />
           </div>
         </div>
 
@@ -53,21 +56,24 @@
             <div class="mb-3">
               <select name="skillLevel" class="form-select">
                 <option value="">Select Skill Level</option>
-                <option value="Beginner">Beginner</option>
-                <option value="Intermediate">Intermediate</option>
-                <option value="Advanced">Advanced</option>
+                <option value="Beginner" {{#if (eq game.skillLevel "Beginner" )}}selected{{/if}}>Beginner</option>
+                <option value="Intermediate" {{#if (eq game.skillLevel "Intermediate" )}}selected{{/if}}>Intermediate
+                </option>
+                <option value="Advanced" {{#if (eq game.skillLevel "Advanced" )}}selected{{/if}}>Advanced</option>
               </select>
             </div>
           </div>
           <div class="col-md-6">
             <div class="mb-3">
-              <input type="text" id="game-location" name="location" class="form-control" placeholder="Enter a Location">
+              <input type="text" id="game-location" name="location" class="form-control" placeholder="Enter a Location"
+                value="{{game.location}}" />
             </div>
           </div>
         </div>
 
         <div class="mb-3">
-          <input type="text" name="description" class="form-control" placeholder="Description" />
+          <input type="text" name="description" class="form-control" placeholder="Description"
+            value="{{game.description}}" />
         </div>
 
         <input type="hidden" name="userTimeZone" />
@@ -75,27 +81,30 @@
 
         <div class="mb-3">
           <textarea name="extraInfo" class="form-control" rows="3"
-            placeholder="Use this space to tell about the format and other details"></textarea>
+            placeholder="Use this space to tell about the format and other details">{{game.extraInfo}}</textarea>
         </div>
 
         <div class="row mb-3">
           <div class="col-md-6 d-flex align-items-center">
             <div class="form-check">
-              <input class="form-check-input me-2" type="checkbox" value="1" name="bringEquipment"
-                id="bringEquipment" />
+              <input class="form-check-input me-2" type="checkbox" value="1" name="bringEquipment" id="bringEquipment"
+                {{#if game.bringEquipment}}checked{{/if}} />
               <label class="form-check-label" for="bringEquipment">Bring your own equipment</label>
             </div>
           </div>
           <div class="col-md-6 d-flex align-items-center">
             <div class="form-check">
-              <input class="form-check-input me-2" type="checkbox" value="1" name="costShared" id="costShared" />
+              <input class="form-check-input me-2" type="checkbox" value="1" name="costShared" id="costShared" {{#if
+                game.costShared}}checked{{/if}} />
               <label class="form-check-label" for="costShared">Cost shared</label>
             </div>
           </div>
         </div>
 
         <div class="d-grid">
-          <button type="submit" class="btn btn-success btn-lg">Host Game</button>
+          <button type="submit" class="btn btn-success btn-lg">
+            {{#if game}}Update Game{{else}}Host Game{{/if}}
+          </button>
         </div>
 
       </form>
@@ -103,36 +112,27 @@
   </div>
 </div>
 
-
-
 <script
   src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBP-FJZsXytqUxzesnIEkrkUu4JoB1zO-M&libraries=places"></script>
-
 <script>
-
-
   document.addEventListener('DOMContentLoaded', () => {
     const input = document.getElementById('game-location');
     if (input) {
       const autocomplete = new google.maps.places.Autocomplete(input, {
         types: ['geocode'],
-        componentRestrictions: { country: "us" } // Optional: restrict to United States
+        componentRestrictions: { country: "us" }
       });
       autocomplete.addListener('place_changed', function () {
         const place = autocomplete.getPlace();
-        console.log("Selected Place:", place);
         if (place && place.formatted_address) {
           input.value = place.formatted_address;
         }
       });
     }
+
+    document.querySelector("input[name='userTimeZone']").value =
+      Intl.DateTimeFormat().resolvedOptions().timeZone;
   });
-
-
-  document.querySelector("input[name='userTimeZone']").value = Intl.DateTimeFormat().resolvedOptions().timeZone;
-
-
 </script>
-
 
 <script src="/js/hostGame.js"></script>

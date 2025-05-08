@@ -15,9 +15,11 @@ export const createGame = async (
   skillLevel,
   host,
   location,
-  geoLocation
+  geoLocation,
+  bringEquipment = false,
+  costShared = false,
+  extraInfo = ""
 ) => {
-
   if (
     title === undefined ||
     sport === undefined ||
@@ -42,11 +44,11 @@ export const createGame = async (
   const trimmedSkillLevel = checkString(skillLevel, "Skill Level", 1);
   const trimmedLocation = checkString(location, "Location", 1);
   const trimmedDescription = checkString(description, "Description", 1);
+  const trimmedExtraInfo = typeof extraInfo === "string" ? extraInfo.trim() : "";
 
   checkNumber(playersRequired, "Players Required", 1);
   checkNumber(costPerHead, "Cost per Head", 0);
 
-  //Adding geo location validatio
   if (
     !geoLocation ||
     typeof geoLocation !== "object" ||
@@ -55,13 +57,12 @@ export const createGame = async (
     isNaN(geoLocation.coordinates[0]) ||
     isNaN(geoLocation.coordinates[1])
   ) {
-    throw "Invalid or missing geoLocation";
+    throw new Error("Invalid or missing geoLocation");
   }
 
-  //Adding Date Check for start time and end time
-  if (!(startTime instanceof Date) || isNaN(startTime.getTime())) throw "Invalid start time";
-  if (!(endTime instanceof Date) || isNaN(endTime.getTime())) throw "Invalid end time";
-  if (new Date(startTime) >= new Date(endTime)) throw "End time must be after start time";
+  if (!(startTime instanceof Date) || isNaN(startTime.getTime())) throw new Error("Invalid start time");
+  if (!(endTime instanceof Date) || isNaN(endTime.getTime())) throw new Error("Invalid end time");
+  if (startTime >= endTime) throw new Error("End time must be after start time");
 
   const newGame = new Game({
     title: trimmedTitle,
@@ -74,17 +75,20 @@ export const createGame = async (
     skillLevel: trimmedSkillLevel,
     host,
     location: trimmedLocation,
-    players: [host],
     geoLocation,
-    playersGoing: 1,
+    bringEquipment: Boolean(bringEquipment),
+    costShared: Boolean(costShared),
+    extraInfo: trimmedExtraInfo,
+    players: [host],
+    playersGoing: 1
   });
 
   const savedGame = await newGame.save();
-
   await updateKarmaPoints(host, 15);
 
   return savedGame;
 };
+
 
 
 export const getAllGames = async (filters = {}) => {
@@ -122,10 +126,11 @@ export const getRecentGames = async () => {
 
 export const updateGame = async (gameId, updates, hostId) => {
   if (!ObjectId.isValid(gameId)) throw new Error("Invalid game ID");
+
   const game = await Game.findById(gameId);
   if (!game) throw new Error("Game not found");
-  if (game.host.toString() !== hostId)
-    throw new Error("Unauthorized edit attempt");
+  if (game.host.toString() !== hostId) throw new Error("Unauthorized edit attempt");
+
   if (updates.geoLocation) {
     const g = updates.geoLocation;
     if (
@@ -148,38 +153,39 @@ export const updateGame = async (gameId, updates, hostId) => {
     "costPerHead",
     "skillLevel",
     "location",
+    "bringEquipment",
+    "costShared",
+    "extraInfo"
   ];
 
   allowedFields.forEach((field) => {
-    //Checking if allowedFields have valid values and then assigning
     if (updates[field] !== undefined) {
       if (["title", "sport", "skillLevel", "location"].includes(field)) {
-        console.log(`💬 Setting ${field}:`, updates[field]);
         game[field] = checkString(updates[field], field);
       } else if (["playersRequired", "costPerHead"].includes(field)) {
-        console.log(`💬 Setting ${field}:`, updates[field]);
         const val = checkNumber(updates[field], field);
         if (val === undefined || val === null || isNaN(val)) {
-          throw `${field} is required and must be a number`;
+          throw `${field} must be a valid number`;
         }
         game[field] = val;
       } else if (["startTime", "endTime"].includes(field)) {
-        console.log(`💬 Setting ${field}:`, updates[field]);
-        if (isNaN(Date.parse(updates[field]))) throw `${field} is not a valid date`;
-        game[field] = updates[field];
+        const date = new Date(updates[field]);
+        if (isNaN(date.getTime())) throw `${field} is not a valid date`;
+        game[field] = date;
       } else if (field === "description") {
-        console.log(`💬 Setting ${field}:`, updates[field]);
         game[field] = checkString(updates[field], field, 1);
+      } else if (["bringEquipment", "costShared"].includes(field)) {
+        game[field] = Boolean(updates[field]);
+      } else if (field === "extraInfo") {
+        game[field] = typeof updates[field] === "string" ? updates[field].trim() : "";
       }
     }
-    // if (updates[field] !== undefined) {
-    //   game[field] = updates[field];
-    // }
   });
-  console.log("🧨 Final game before save:", game);
+
   await game.save();
   return game;
 };
+
 
 export async function deleteGame(gameId, userID) {
   if (!gameId) throw new Error("Game ID is required");
