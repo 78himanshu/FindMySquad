@@ -5,7 +5,6 @@ import { hostGameData, joinGameData } from "../data/index.js";
 import auth from "../middleware/auth.js";
 import User from "../models/User.js";
 import { userProfileData } from "../data/index.js";
-//import userProfile from '../models/userProfile.js';
 
 router
   .get("/", async (req, res) => {
@@ -22,7 +21,7 @@ router
       if (req.user && req.user.userId) {
         userId = req.user.userId;
         const userProfile = await userProfileData.getProfile(userId);
-        const cookiecontaininglocation = req.cookies.user_location; //need to verify this
+        const cookiecontaininglocation = req.cookies.user_location;
 
         if (userProfile) {
           if (cookiecontaininglocation) {
@@ -57,31 +56,38 @@ router
 
         const upcomingGames = [];
 
-for (const game of allGames) {
-  const gameEndTime = new Date(game.endTime);
+        for (const game of allGames) {
+          const gameEndTime = new Date(game.endTime);
 
-  if (gameEndTime > now) {
-    // Still an upcoming game
-    upcomingGames.push(game);
-  } else {
-    // Game is over — check for karma penalty
-    const hasPlayers = game.players && game.players.length > 0;
-    const hostId = game.host.toString();
-    const onlyHost = !hasPlayers || game.players.every(p => p.toString() === hostId);
+          if (gameEndTime > now) {
+            // Still an upcoming game
+            upcomingGames.push(game);
+          } else {
+            // Game is over — check for karma penalty
+            const hasPlayers = game.players && game.players.length > 0;
+            const hostId = game.host.toString();
+            const onlyHost =
+              !hasPlayers || game.players.every((p) => p.toString() === hostId);
 
-    if (onlyHost) {
-      // No players joined apart from host — apply -15 karma
-      try {
-        const { updateKarmaPoints } = await import("../helpers/karmaHelper.js");
-        await updateKarmaPoints(hostId, -15);
-        console.log(`Applied -15 karma to host ${hostId} for unplayed game: ${game._id}`);
-      } catch (err) {
-        console.error("Failed to apply karma penalty for unplayed game:", err);
-      }
-    }
-  }
-}
-
+            if (onlyHost) {
+              // No players joined apart from host — apply -15 karma
+              try {
+                const { updateKarmaPoints } = await import(
+                  "../helpers/karmaHelper.js"
+                );
+                await updateKarmaPoints(hostId, -15);
+                console.log(
+                  `Applied -15 karma to host ${hostId} for unplayed game: ${game._id}`
+                );
+              } catch (err) {
+                console.error(
+                  "Failed to apply karma penalty for unplayed game:",
+                  err
+                );
+              }
+            }
+          }
+        }
 
         const plainAllGames = upcomingGames.map((g) => g.toObject());
 
@@ -137,9 +143,7 @@ for (const game of allGames) {
       const plainAllGames = upcomingGames.map((x) => x.toObject());
 
       const plainRecommendation =
-        recommendation.length > 0
-          ? upcomingGames.map((x) => x.toObject())
-          : [];
+        recommendation.length > 0 ? upcomingGames.map((x) => x.toObject()) : [];
 
       res.render("joinGame/joinGameForm", {
         recommendedGames: plainRecommendation, //.length > 0 ? plainRecommendation : plainAllGames,
@@ -147,6 +151,7 @@ for (const game of allGames) {
         calendarEvents,
         userId,
         hostId: req.user?.userID || null,
+        error: req.query.error || null,
         joinedGameIdStrings,
         isLoggedIn: !!userId,
         title: "Join Games",
@@ -167,17 +172,31 @@ for (const game of allGames) {
     const userId = req.user?.userID || req.userId;
 
     const game = await hostGameData.getGameById(gameId);
-    if (game.startTime < new Date()) {
-      return res.status(400).send("Cannot join a game that's already over.");
-    }
-
-    if (!userId || !gameId) {
-      return res.status(400).send("Invalid request");
-    }
-
     try {
+      const targetGame = await hostGameData.getGameById(gameId);
+
+      // Check if the game is in the past
+      if (new Date(targetGame.startTime) < new Date()) {
+        return res.status(400).send("Cannot join a past game.");
+      }
+
+      // Check for time clash with already joined games
+      const joinedGames = await joinGameData.getJoinedGamesByUser(userId);
+      const hasTimeClash = joinedGames.some((g) => {
+        const gStart = new Date(g.startTime);
+        const gEnd = new Date(g.endTime);
+        return (
+          new Date(targetGame.startTime) < gEnd &&
+          new Date(targetGame.endTime) > gStart
+        );
+      });
+
+      if (hasTimeClash) {
+        return res.redirect("/join?error=You already have a game at this time");
+      }
+
       await joinGameData.joinGame(gameId, userId);
-      res.redirect("/join/success");
+      return res.redirect("/join/success");
     } catch (e) {
       res.status(400).send(e.message);
     }
@@ -278,11 +297,11 @@ router.get("/:id", async (req, res) => {
 router.post("/leave/:id", auth, async (req, res) => {
   const gameId = req.params.id;
   const userId = req.user.userID;
-    // Prevent host from leaving their own game
-  try{
+  // Prevent host from leaving their own game
+  try {
     const game = await hostGameData.getGameById(gameId);
     if (!game) return res.status(404).send("Game not found");
-  
+
     await joinGameData.leaveGame(gameId, userId);
     res.redirect("/join");
   } catch (e) {
@@ -292,15 +311,15 @@ router.post("/leave/:id", auth, async (req, res) => {
     //   const joinedGames = await joinGameData.getJoinedGamesByUser(userId);
     //   const joinedGameIdStrings = joinedGames.map((g) => g._id.toString());
 
-      return res.render("joinGame/gameDetails", {
-        game: game.toObject(),
-        isLoggedIn,
-        userId,
-        joinedGameIdStrings,
-        error: "Host cannot leave their own game",
-        layout: "main",
-        head: `<link rel="stylesheet" href="/css/joinGame.css">`,
-      });
+    return res.render("joinGame/gameDetails", {
+      game: game.toObject(),
+      isLoggedIn,
+      userId,
+      joinedGameIdStrings,
+      error: "Host cannot leave their own game",
+      layout: "main",
+      head: `<link rel="stylesheet" href="/css/joinGame.css">`,
+    });
   }
 });
 

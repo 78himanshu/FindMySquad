@@ -1,4 +1,11 @@
 <main class="games-section container">
+{{#if error}}
+  <div id="top-error" class="alert alert-danger error-msg">{{error}}</div>
+{{/if}}
+
+  {{#if success}}
+  <div class="alert" class="alert-success success-msg">{{success}}</div>
+  {{/if}} 
   <!-- Tabs Section -->
   <div class="game-tabs">
     <button class="tab-button" onclick="showSection('calendar')">Calendar</button>
@@ -115,8 +122,8 @@
                 <button type="submit" class="btn btn-danger">Delete</button>
               </form>
             {{else}}
-              {{#if (includes ../joinedGameIdStrings this._id)}}
-                <!-- Already joined -->
+            {{#if (includes ../joinedGameIdStrings (toString this._id))}}      
+                 <!-- Already joined -->
                 <form action="/join/leave/{{this._id}}" method="POST">
                   <button type="submit" class="btn btn-secondary">Leave</button>
                 </form>
@@ -171,5 +178,14 @@ document.addEventListener("DOMContentLoaded", function () {
 
   window._myCalendarInstance = calendar;
 });
+
+ document.addEventListener('DOMContentLoaded', function () {
+    const topError = document.getElementById('top-error');
+    if (topError) {
+      setTimeout(() => {
+        topError.style.display = 'none';
+      }, 5000);
+    }
+  });
   </script>
 </main>
