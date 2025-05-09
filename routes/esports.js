@@ -165,25 +165,64 @@ router.get('/:tournamentId/register-team', requireAuth, async (req, res, next) =
     const playersPerTeam = parseInt(tournament.format[0], 10);
     const maxTeams        = tournament.maxTeams;
     const teams          = Array.isArray(tournament.teams) ? tournament.teams : [];
-    const isCreator = tournament.creator._id.toString() === userId;
-    const teamCount       = tournament.teams.length;
-    const canCreate       = teamCount < maxTeams;
-
-    // “is there at least one team with an open slot?”
-    const canJoin        = teams.some(team =>
-      Array.isArray(team.players) && team.players.length < playersPerTeam
+    const isCreator     = tournament.creator._id.toString() === userId;
+    const isAlreadyInTeam = teams.some(team =>
+      team.players.some(p => p._id.toString() === userId)
     );
-    let isAlreadyInTeam = false;
-    let isTeamLeader = false;
-    let userTeam = null;
-    for (const team of tournament.teams) {
-      if (team.players.some(p => p._id.toString() === userId)) {
-        isAlreadyInTeam = true;
-        userTeam = team;
-        isTeamLeader = team.players[0]._id.toString() === userId;
+    const isTeamLeader  = isAlreadyInTeam &&
+      teams.find(team => team.players.some(p => p._id.toString() === userId))
+           .players[0]._id.toString() === userId;
+
+    // original “canCreate” logic (only if slots remain)
+    const canCreate = teams.length < maxTeams;
+
+    // original “canJoin” logic (at least one team has room, and not already in one)
+    const baseCanJoin = teams.some(team =>
+      Array.isArray(team.players) && team.players.length < playersPerTeam
+    ) && !isAlreadyInTeam && !isCreator;
+
+    // ── NEW: time-conflict check ──────────────────────────────────────
+    // parse this tournament’s start/end into Date objects
+    const [h1, m1] = tournament.startTime.split(':').map(Number);
+    const [h2, m2] = tournament.endTime.split(':').map(Number);
+    const tDate     = new Date(tournament.date);
+    const thisStart = new Date(tDate); thisStart.setHours(h1, m1, 0, 0);
+    const thisEnd   = new Date(tDate); thisEnd.setHours(h2, m2, 0, 0);
+
+    // fetch all OTHER tournaments where the user is creator or participant
+    const occupied = await Tournament.find({
+      _id: { $ne: tournament._id },
+      $or: [
+        { creator: userId },
+        { 'teams.players': userId }
+      ]
+    }).lean();
+
+    // detect any overlap
+    let hasTimeConflict = false;
+    for (const ot of occupied) {
+      if (new Date(ot.date).toDateString() !== tDate.toDateString()) continue;
+      const [oh1, om1] = ot.startTime.split(':').map(Number);
+      const [oh2, om2] = ot.endTime.split(':').map(Number);
+      const otStart = new Date(ot.date); otStart.setHours(oh1, om1, 0, 0);
+      const otEnd   = new Date(ot.date); otEnd.setHours(oh2, om2, 0, 0);
+
+      if (thisStart < otEnd && otStart < thisEnd) {
+        hasTimeConflict = true;
         break;
       }
     }
+
+    // 4) Check if we were redirected here for overlap
+     const overlapError = req.query.overlapError === '1';
+
+     // final canJoin: only if slots remain, no time conflict, and no overlap redirect
+     const canJoin = baseCanJoin && !hasTimeConflict && !overlapError;
+ 
+     // turn overlapError into an actual message for the toast
+     const error = overlapError
+       ? "You’re already registered in a tournament that overlaps this time."
+       : "";
 
     res.render('egaming/registerTeam', {
       tournament,
@@ -194,9 +233,10 @@ router.get('/:tournamentId/register-team', requireAuth, async (req, res, next) =
       isCreator,
       isAlreadyInTeam,
       isTeamLeader,
-      userTeam,
+      userTeam: teams.find(t => t.players.some(p => p._id.toString() === userId)),
       canCreate,
       canJoin,
+      error,  
       backgroundImage: getGameImage(tournament.game)
     });
   } catch (err) {
@@ -214,6 +254,60 @@ router.post('/:tournamentId/register-team', requireAuth, async (req, res, next) 
     const userId = req.user.userId.toString();
     const playersPerTeam = parseInt(tournament.format[0], 10);
     const maxTeams       = tournament.maxTeams;
+
+     // ─── 1) PREP: build Date objects for this tournament’s start/end ───
+     const [h1, m1] = tournament.startTime.split(':').map(Number);
+     const [h2, m2] = tournament.endTime.split(':').map(Number);
+     const tDate = new Date(tournament.date);
+     const thisStart = new Date(tDate); thisStart.setHours(h1, m1, 0, 0);
+     const thisEnd   = new Date(tDate); thisEnd.setHours(h2, m2, 0, 0);
+ 
+     // ─── 2) FETCH all other tournaments the user is in (exclude this one) ───
+     const otherTourns = await Tournament.find({
+       'teams.players': userId,
+       _id: { $ne: tournament._id }
+     }).lean();
+ 
+     // ─── 3) CHECK for any time overlap on the SAME DATE ───
+     for (const ot of otherTourns) {
+       if (new Date(ot.date).toDateString() !== tDate.toDateString()) continue;
+       const [oh1, om1] = ot.startTime.split(':').map(Number);
+       const [oh2, om2] = ot.endTime.split(':').map(Number);
+       const oStart = new Date(ot.date); oStart.setHours(oh1, om1, 0, 0);
+       const oEnd   = new Date(ot.date); oEnd.setHours(oh2, om2, 0, 0);
+
+       // overlap if intervals intersect
+       if (thisStart < oEnd && oStart < thisEnd) {
+        return res.redirect(
+          `/esports/${tournament._id}/register-team?overlapError=1`
+        );
+       }
+     }
+ 
+     // ─── 4) FOR “create” (team) ACTION: check if creator already hosts a team at this slot ───
+     if (action === 'create') {
+       // disallow the tournament’s own creator from double-booking themself
+       if (tournament.creator._id.toString() === userId) {
+         // find other tournaments created by this user
+         const creatorTourns = await Tournament.find({
+           creator: userId,
+           _id: { $ne: tournament._id }
+         }).lean();
+ 
+         for (const ct of creatorTourns) {
+           if (new Date(ct.date).toDateString() !== tDate.toDateString()) continue;
+           const [ch1, cm1] = ct.startTime.split(':').map(Number);
+           const [ch2, cm2] = ct.endTime.split(':').map(Number);
+           const cStart = new Date(ct.date); cStart.setHours(ch1, cm1);
+           const cEnd   = new Date(ct.date); cEnd.setHours(ch2, cm2);
+           if (thisStart < cEnd && cStart < thisEnd) {
+             return res
+               .status(400)
+               .send('You’ve already created (hosted) a tournament at this same time.');
+           }
+         }
+       }
+     }
 
     if (tournament.creator._id.toString() === userId) {
       return res.status(403).send('You created this tournament and cannot join.');
