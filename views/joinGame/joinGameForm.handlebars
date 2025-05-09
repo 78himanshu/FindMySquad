@@ -53,8 +53,7 @@
       }).addTo(map);
 
       // Games are passed in via Handlebars
-      const games = {{{ json allGames }
-    }};
+const games = {{{json allGames}}};
 
     games.forEach(game => {
       if (game.geoLocation && game.geoLocation.coordinates) {
