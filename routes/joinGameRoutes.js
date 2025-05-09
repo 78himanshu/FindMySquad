@@ -5,6 +5,9 @@ import { hostGameData, joinGameData } from "../data/index.js";
 import auth from "../middleware/auth.js";
 import User from "../models/User.js";
 import { userProfileData } from "../data/index.js";
+import { sendGameEmail } from "../utils/emailHelper.js";
+import Reminder from "../models/Reminder.js";
+import { scheduleJobFromReminder } from "../emailScheduler.js";
 
 router
   .get("/", async (req, res) => {
@@ -128,13 +131,12 @@ router
         recommendation = await hostGameData.getAllGames(filters);
       }
 
+      const now = Date.now();
       allGames = await hostGameData.getAllGames({});
-
-      const now = new Date();
-      const upcomingGames = allGames.filter((game) => {
-        return new Date(game.startTime) > now; // Only future games
-      });
-
+      allGames = allGames.filter(game => new Date(game.endTime).getTime() > now); // ✅ Fix: show only ongoing/upcoming games
+                  
+      const upcomingGames = allGames;
+      
       upcomingGames.sort(
         (a, b) => new Date(a.startTime) - new Date(b.startTime)
       );
@@ -142,9 +144,10 @@ router
       // only for upcoming dates.
       const plainAllGames = upcomingGames.map((x) => x.toObject());
 
-      const plainRecommendation =
-        recommendation.length > 0 ? upcomingGames.map((x) => x.toObject()) : [];
-
+      const plainRecommendation = recommendation
+      .filter((g) => new Date(g.endTime).getTime() > now)
+      .map((x) => x.toObject());
+        
       res.render("joinGame/joinGameForm", {
         recommendedGames: plainRecommendation, //.length > 0 ? plainRecommendation : plainAllGames,
         allGames: plainAllGames,
@@ -176,8 +179,29 @@ router
       const targetGame = await hostGameData.getGameById(gameId);
 
       // Check if the game is in the past
-      if (new Date(targetGame.startTime) < new Date()) {
-        return res.status(400).send("Cannot join a past game.");
+      // if (new Date(targetGame.startTime) < new Date()) {
+      //   return res.redirect(`/join/${gameId}?error=This game has already started and cannot be joined.`);
+      // }
+      const now = new Date();
+      const gameStart = new Date(targetGame.startTime);
+
+      const nowRounded = new Date(
+        now.getFullYear(),
+        now.getMonth(),
+        now.getDate(),
+        now.getHours(),
+        now.getMinutes()
+      );
+      const gameStartRounded = new Date(
+        gameStart.getFullYear(),
+        gameStart.getMonth(),
+        gameStart.getDate(),
+        gameStart.getHours(),
+        gameStart.getMinutes()
+      );
+
+      if (new Date(targetGame.startTime).getTime() <= Date.now()) {
+        return res.redirect(`/join/${gameId}?error=This game has already started and cannot be joined.`);
       }
 
       // Check for time clash with already joined games
@@ -196,6 +220,33 @@ router
       }
 
       await joinGameData.joinGame(gameId, userId);
+
+      const user = await User.findById(userId); // ✅ Must come first
+
+      await sendGameEmail(
+        user.email,
+        `🎮 Game Confirmation: ${targetGame.title}`,
+        `<p>Hi ${user.username},</p><p>You have successfully joined <strong>${
+          targetGame.title
+        }</strong> on ${new Date(targetGame.startTime).toLocaleString()}.</p>`
+      );
+
+      // Schedule reminder
+      const reminderTime = new Date(
+        new Date(targetGame.startTime) - 60 * 60 * 1000
+      ); // 1 hr before
+
+      const reminder = await Reminder.create({
+        userEmail: user.email,
+        gameId: targetGame._id,
+        gameTitle: targetGame.title,
+        gameStartTime: targetGame.startTime,
+        gameLocation: targetGame.location,
+        reminderTime,
+      });
+
+      scheduleJobFromReminder(reminder);
+
       return res.redirect("/join/success");
     } catch (e) {
       res.status(400).send(e.message);
@@ -273,6 +324,24 @@ router.get("/:id", async (req, res) => {
         username: player.username,
       }));
     }
+    const now = new Date();
+    const gameStart = new Date(game.startTime);
+    const nowRounded = new Date(
+      now.getFullYear(),
+      now.getMonth(),
+      now.getDate(),
+      now.getHours(),
+      now.getMinutes()
+    );
+    const gameStartRounded = new Date(
+      gameStart.getFullYear(),
+      gameStart.getMonth(),
+      gameStart.getDate(),
+      gameStart.getHours(),
+      gameStart.getMinutes()
+    );
+
+    const gameAlreadyStarted = new Date(game.startTime).getTime() <= Date.now();
 
     res.render("joinGame/gameDetails", {
       game: game.toObject(),
@@ -283,8 +352,9 @@ router.get("/:id", async (req, res) => {
       hasJoined,
       joinedPlayers,
       joinedGameIdStrings,
+      gameAlreadyStarted,
       error: req.query.error || null,
-      username: req.user?.username || null, // ✅ ADD THIS LINE
+      username: req.user?.username || null,
       layout: "main",
       head: `<link rel="stylesheet" href="/css/joinGame.css">`,
     });

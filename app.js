@@ -1,10 +1,22 @@
 let serverBootTime = Date.now();
+
 import dotenv from "dotenv";
+dotenv.config(); // ✅ Load .env immediately
 
 import express from "express";
 import path from "path";
 import { fileURLToPath } from "url";
 import connectDB from "./config/mongoConnections.js";
+import { scheduleAllPendingReminders } from "./emailScheduler.js";
+
+// ✅ Wait for DB connection and schedule reminders BEFORE app setup
+await connectDB();
+await scheduleAllPendingReminders();
+
+// Fix __dirname issue in ES Modules
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
 import exphbs from "express-handlebars";
 import cookieParser from "cookie-parser";
 import jwt from "jsonwebtoken";
@@ -12,8 +24,6 @@ import gymBuddyRoutes from "./routes/gymBuddyRoutes.js";
 import hostGameRoutes from "./routes/hostGamesRoutes.js";
 import leaderboardRoutes from "./routes/leaderboardRoutes.js";
 import methodOverride from "method-override";
-
-// Handlebars prototype access (to fix _id issues in Handlebars)
 import { allowInsecurePrototypeAccess } from "@handlebars/allow-prototype-access";
 import Handlebars from "handlebars";
 import configRoutesFunction from "./routes/index.js";
@@ -24,16 +34,7 @@ import { Server } from "socket.io";
 import Game from "./models/hostGame.js";
 import ChatMessage from "./models/ChatMessage.js";
 
-// Fix __dirname issue in ES Modules
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-//  Force load .env from correct path
-dotenv.config({ path: path.resolve(__dirname, ".env") });
-
 const app = express();
-
-connectDB();
 
 // Handlebars setup with eq helper
 const hbs = exphbs.create({
