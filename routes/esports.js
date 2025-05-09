@@ -277,14 +277,25 @@ router.post('/:tournamentId/leave-team', requireAuth, async (req, res, next) => 
     );
 
     if (!team) return res.status(400).send('You are not part of any team');
+    // Is the user the team leader?
+    const isLeader = team.players[0].toString() === userId;
 
-    team.players = team.players.filter(p => p != null && p.toString() !== userId);
-
-    // Remove the team if it's empty
-    if (team.players.length === 0) {
-      tournament.teams = tournament.teams.filter(t =>
-            t._id.toString() !== team._id.toString()
-          );
+    if (isLeader) {
+      // Leader leaves → delete entire team
+      tournament.teams = tournament.teams.filter(t => t._id.toString() !== team._id.toString());
+      // Optionally, deduct karma from remaining members
+      for (const member of team.players) {
+        if (member.toString() !== userId) {
+          await updateKarmaPoints(member.toString(), -10);
+        }
+      }
+    } else {
+      // Regular member leaves → remove only that player
+      team.players = team.players.filter(p => p.toString() !== userId);
+      // If the team is now empty (just in case), clean it up
+      if (team.players.length === 0) {
+        tournament.teams = tournament.teams.filter(t => t._id.toString() !== team._id.toString());
+      }
     }
 
     await updateKarmaPoints(userId, -10);
@@ -312,8 +323,30 @@ router.post('/:tournamentId/team/:teamId/remove-member', requireAuth, async (req
     const isLeader = team.players[0].toString() === userId;
     if (!isCreator && !isLeader) return res.status(403).send('Forbidden');
 
-    team.players = team.players.filter(p => p.toString() !== memberId);
-    await updateKarmaPoints(memberId, -10);
+    // If we're removing the leader, disband the whole team:
+    const leaderId = team.players[0].toString();
+    if (memberId === leaderId) {
+      // collect all member IDs (including leader)
+      const allMemberIds = team.players.map(p => p.toString());
+
+      // remove the entire team subdocument
+      tournament.teams = tournament.teams.filter(t => t._id.toString() !== teamId);
+
+      // deduct karma from everyone who was on that team
+      for (const mId of allMemberIds) {
+        await updateKarmaPoints(mId, -10);
+      }
+
+    } else {
+      // Otherwise just remove that one member
+      team.players = team.players.filter(p => p.toString() !== memberId);
+      await updateKarmaPoints(memberId, -10);
+
+      // If that was the last member, clean up the empty team
+      if (team.players.length === 0) {
+        tournament.teams = tournament.teams.filter(t => t._id.toString() !== teamId);
+      }
+    }
 
     await tournament.save();
     res.redirect(`/esports/${tournamentId}/register-team`);

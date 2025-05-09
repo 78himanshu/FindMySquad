@@ -23,7 +23,7 @@
                 <li class="list-group-item d-flex justify-content-between align-items-center">
                   {{this.username}}
                   <form
-                    action="/esports/{{@../tournament._id}}/team/{{this._id}}/remove-member"
+                    action="/esports/{{@root.tournament._id}}/team/{{../_id}}/remove-member"
                     method="POST"
                     class="m-0"
                   >
@@ -34,7 +34,7 @@
               {{/each}}
             </ul>
             <form
-              action="/esports/{{tournament._id}}/team/{{this._id}}/disband"
+              action="/esports/{{@root.tournament._id}}/team/{{this._id}}/disband"
               method="POST"
             >
               <button type="submit" class="btn btn-warning">Disband Team</button>
@@ -56,7 +56,7 @@
               {{this.username}}
               {{#unless (eq this._id ../userId)}}
                 <form
-                  action="/esports/{{tournament._id}}/team/{{this._id}}/remove-member"
+                  action="/esports/{{@root.tournament._id}}/team/{{../userTeam._id}}/remove-member"
                   method="POST"
                   class="m-0"
                 >
@@ -68,7 +68,7 @@
           {{/each}}
         </ul>
         <form
-          action="/esports/{{tournament._id}}/team/{{this._id}}/disband"
+          action="/esports/{{@root.tournament._id}}/team/{{userTeam._id}}/disband"
           method="POST"
         >
           <button type="submit" class="btn btn-warning">Disband Team</button>
