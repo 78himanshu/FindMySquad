@@ -15,6 +15,7 @@ router
       hostId,
       title: "Host a Game",
       layout: "main",
+      profileCompleted: req.user?.profileCompleted || false,
       head: `
           <link rel="stylesheet" href="/css/hostGame.css">
         `,
@@ -24,9 +25,10 @@ router
     try {
       const x = req.body;
       x.host = req.user.userID;
-
+      console.log("🚨 Raw sport submitted:", x.sport, "| Length:", x.sport.length);
       x.title = xss(x.title).trim();
       x.sport = xss(x.sport).trim();
+      console.log("🚨 Submitted sport:", JSON.stringify(x.sport));
       x.skillLevel = xss(x.skillLevel).trim();
       x.description = xss(x.description).trim();
       x.location = xss(x.location).trim();
@@ -268,6 +270,7 @@ router.route("/success").get((req, res) => {
   res.render("hostGame/hostGameSuccess", {
     title: "Game Hosted!",
     layout: "main",
+      profileCompleted: req.user?.profileCompleted || false,
     head: `<link rel="stylesheet" href="/css/hostGame.css">`,
   });
 });
@@ -278,6 +281,7 @@ router.route("/form").get(requireAuth, (req, res) => {
     hostId,
     title: "Host a Game",
     layout: "main",
+      profileCompleted: req.user?.profileCompleted || false,
     head: `
           <link rel="stylesheet" href="/css/hostGame.css">
         `,
@@ -303,6 +307,7 @@ router.get("/edit/:id", requireAuth, async (req, res) => {
       hostId: req.user.userID,
       title: "Edit Game",
       layout: "main",
+      profileCompleted: req.user?.profileCompleted || false,
       head: `<link rel="stylesheet" href="/css/hostGame.css">`,
     });
   } catch (err) {

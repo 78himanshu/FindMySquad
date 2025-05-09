@@ -14,6 +14,7 @@ router.get("/", (req, res) => {
     title: "GymBuddy Home",
     layout: "main",
     head: `<link rel="stylesheet" href="/css/gym.css">`,
+    profileCompleted: req.user?.profileCompleted || false,
     success: req.query.success,
   });
 });
@@ -29,6 +30,7 @@ router
         username: req.user.username,
         userId: req.user.userId,
       },
+      profileCompleted: req.user?.profileCompleted || false,
       error: req.query.error,
     });
   })
@@ -238,7 +240,8 @@ router.get("/find", async (req, res) => {
     currentWorkoutType: workoutType || "",
     isLoggedIn: res.locals.isLoggedIn,
     error,
-    success,
+    profileCompleted: req.user?.profileCompleted || false,
+    success
   });
 });
 
@@ -403,6 +406,7 @@ router.get("/mySessions", requireAuth, async (req, res) => {
       username: req.user.username,
       hostedSessions,
       joinedSessions,
+      profileCompleted: req.user?.profileCompleted || false,
       isLoggedIn: true,
     });
   } catch (e) {

@@ -25,7 +25,7 @@
     <nav class="navbar navbar-expand-lg navbar-light bg-light px-4">
       <div class="container-fluid">
         <!-- Logo -->
-        <a class="navbar-brand" href="/">
+        <a class="navbar-brand require-profile" href="/">
           <img src="/images/navlogo.png" alt="FindMySquad Logo" height="40" />
         </a>
 
@@ -37,21 +37,17 @@
           <span class="navbar-toggler-icon"></span>
         </button>
 
-        <!-- Collapsible nav content -->
-        <div class="collapse navbar-collapse" id="navbarContent">
-          <!-- Left nav buttons -->
-          <ul
-            class="align-items-center justify-content-center gap-4 m-auto mb-2 mb-lg-0 me-auto navbar-nav">
-            <a href="/join"><button
-                class="btn btn-outline-success">Join</button></a>
-            <a href="/host"><button
-                class="btn btn-outline-success">Host</button></a>
-            <a href="/esports"><button
-                class="btn btn-outline-success">Esports</button></a>
-            <a href="/gymBuddy"><button
-                class="btn btn-outline-success">gymBuddy</button></a>
-
-          </ul>
+      <!-- Collapsible nav content -->
+      <div class="collapse navbar-collapse" id="navbarContent">
+        <!-- Left nav buttons -->
+      <ul class="align-items-center justify-content-center gap-4 m-auto mb-2 mb-lg-0 me-auto navbar-nav">
+        <a href="/join" class="require-profile">
+          <button class="btn btn-outline-success">Join</button>
+        </a>
+        <a href="/host" class="btn btn-outline-success require-profile">Host</a>
+        <a href="/esports" class="btn btn-outline-success require-profile">Esports</a>
+        <a href="/gymBuddy" class="btn btn-outline-success require-profile">gymBuddy</a>
+      </ul>
 
           <!-- Right auth buttons -->
           <div class="d-flex gap-2">
@@ -122,12 +118,11 @@
 
         <hr class="bg-light my-3" />
 
-        <div class="text-center small">
-          Made with ❤️, way too much ☕, and some 3AM bug-fixes — by <strong>The
-            Debug Ninjas</strong>:Aakash, Aditya,
-          Himanshu, Jitesh,
-          and Yash.
-        </div>
+      <div class="text-center small">
+        Made with ❤️, way too much ☕, and some 3AM bug-fixes — by <strong>The Debug Ninjas</strong>:Akshu, Addy,
+        Himanshi, Jittu,
+        and Chitte.
+      </div>
 
         <div class="text-center small">
           &copy; {{currentYear}} FindMySquad. All Rights Reserved.
@@ -176,6 +171,31 @@
     });
   </script>
 
-  </body>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const disableNav = {{#if disableNav}}true{{else}}false{{/if}};
+
+      if (disableNav) {
+        document.querySelectorAll('.require-profile').forEach(btn => {
+          btn.classList.add('disabled');
+          btn.style.pointerEvents = 'none';
+          btn.setAttribute('title', 'Complete your profile first');
+          btn.addEventListener('click', function (e) {
+            e.preventDefault();
+            alert("Please complete your profile before accessing this feature.");
+            window.location.href = "/profile/addprofile";
+          });
+        });
+      } else {
+        document.querySelectorAll('.require-profile').forEach(btn => {
+          btn.classList.remove('disabled');
+          btn.style.pointerEvents = 'auto';
+          btn.removeAttribute('title');
+        });
+      }
+    });
+  </script>
+
+</body>
 
 </html>

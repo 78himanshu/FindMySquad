@@ -161,6 +161,7 @@ router
         isLoggedIn: !!userId,
         title: "Join Games",
         layout: "main",
+        profileCompleted: req.user?.profileCompleted || false,
         head: `
               <link rel="stylesheet" href="/css/joinGame.css">
               <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
@@ -280,6 +281,7 @@ router.get("/filter", auth, async (req, res) => {
       userId: req.user.userId,
       title: "Join Games",
       layout: "main",
+      profileCompleted: req.user?.profileCompleted || false,
       head: `
                   <link rel="stylesheet" href="/css/joinGame.css">
                 `,
@@ -294,6 +296,7 @@ router.get("/success", (req, res) => {
     title: "Successfully Joined",
     message: "You have successfully joined the game!",
     layout: "main",
+    profileCompleted: req.user?.profileCompleted || false,
     head: `
               <link rel="stylesheet" href="/css/joinGame.css">
             `,
@@ -362,6 +365,7 @@ router.get("/:id", async (req, res) => {
       error: req.query.error || null,
       username: req.user?.username || null,
       layout: "main",
+      profileCompleted: req.user?.profileCompleted || false,
       head: `<link rel="stylesheet" href="/css/joinGame.css">`,
     });
   } catch (e) {

@@ -33,6 +33,7 @@ import http from "http";
 import { Server } from "socket.io";
 import Game from "./models/hostGame.js";
 import ChatMessage from "./models/ChatMessage.js";
+import { attachProfileStatus } from './middleware/profileStatus.js';
 
 const app = express();
 
@@ -163,8 +164,9 @@ app.use((req, res, next) => {
   if (token) {
     try {
       const decoded = jwt.verify(token, process.env.JWT_SECRET);
-
+      console.log("🧪 Decoded JWT Payload:", decoded);
       if (!decoded.userId) {
+        console.log("❌ JWT token missing userId:", decoded);
         res.clearCookie("token");
         res.locals.isLoggedIn = false;
         return res.status(401).send("Unauthorized: User info missing");
@@ -179,12 +181,19 @@ app.use((req, res, next) => {
         return next();
       }
 
-      req.user = decoded;
+      req.user = {
+        userId: decoded.userId,
+        username: decoded.username,
+        profilePic: decoded.profilePic || "/images/default-avatar.png",
+        profileCompleted: decoded.profileCompleted || false
+      };
+      
       res.locals.isLoggedIn = true;
       res.locals.username = decoded.username;
       res.locals.profilePic =
         decoded.profilePic || "/images/default-avatar.png";
-      res.locals.userId = decoded.userId;
+      res.locals.userId      = decoded.userId;
+      res.locals.profileCompleted = decoded.profileCompleted || false;
     } catch (err) {
       res.locals.isLoggedIn = false;
       res.locals.username = null;
@@ -199,6 +208,9 @@ app.use((req, res, next) => {
 
   next();
 });
+
+app.use(attachProfileStatus);
+
 // Routes
 configRoutesFunction(app);
 app.use("/host", hostGameRoutes);

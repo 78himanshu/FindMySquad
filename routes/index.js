@@ -15,18 +15,30 @@ import { userProfileData } from "../data/index.js";
 const configRoutesFunction = (app) => {
   // Base route - simplified since we're using middleware
   app.get("/", async (req, res) => {
+    let profileCompleted = false;
+
+    if (req.user && req.user.userId) {
+      try {
+        const userProfile = await userProfileData.getProfile(req.user.userId);
+        profileCompleted = userProfile?.profileCompleted || false;
+      } catch (e) {
+        console.error("Error fetching profile in homepage route:", e);
+      }
+    }
+
     console.log("req,", req.user);
     const topUsers = await userProfileData.getTopKarmaUsers();
     console.log("TOP USERS FOR HOMEPAGE:", topUsers);
     const upcomingGames = await hostGameData.upcomingGames();
     console.log("upcomingGames", upcomingGames);
-
+      
     res.render("index", {
       title: "FindMySquad",
       user: req.user || null,
       layout: "main",
       upcomingGames: upcomingGames,
       topUsers: topUsers,
+      profileCompleted
     });
   });
 

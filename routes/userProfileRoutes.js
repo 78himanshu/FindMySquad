@@ -10,6 +10,7 @@ const ObjectId = mongoose.Types.ObjectId;
 //import { geocodeCity } from '../utils/geocode.js';
 import { format } from "date-fns";
 import axios from "axios";
+import xss from 'xss';
 
 const router = Router();
 
@@ -29,19 +30,17 @@ router
   })
   .post(verifyToken, async (req, res) => {
     try {
-      const {
-        firstName,
-        lastName,
-        bio,
-        gender,
-        profilePic,
-        sportsInterests,
-        gymPreferences,
-        gamingInterests,
-        city,
-        phoneNumber,
-        //geoLocation
-      } = req.body;
+      const firstName = xss(req.body.firstName).trim();
+      const lastName = xss(req.body.lastName).trim();
+      const bio = xss(req.body.bio || "").trim();
+      const gender = xss(req.body.gender).trim();
+      const profilePic = xss(req.body.profilePic).trim();
+      const city = xss(req.body.city || "").trim();
+      const phoneNumber = xss(req.body.phoneNumber || "").trim();
+      
+      const sportsInterests = req.body.sportsInterests.map(i => xss(i.trim()));
+      const gymPreferences = req.body.gymPreferences.map(i => xss(i.trim()));
+      const gamingInterests = req.body.gamingInterests.map(i => xss(i.trim()));
 
       console.log(">>>", req.body);
 
@@ -251,6 +250,7 @@ router.route("/addprofile").get(verifyToken, async (req, res) => {
   res.render("userProfile/complete-profile", {
     title: "Complete Profile",
     layout: "main",
+    disableNav: true,
     error: req.query.error,
     username: req.username || null || "",
     email: req.query.email || "",

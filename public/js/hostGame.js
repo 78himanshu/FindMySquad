@@ -23,28 +23,49 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Form field extraction and validation
     const title = form.title.value.trim();
-    const sport = form.sport.value;
+    if (!title) {
+      showToastError("Title is required.");
+      return;
+    }
+    const sport = form.sport.value.trim();
+    if (!sport || sport === "Select") {
+      showToastError("Please select a sport.");
+      return;
+    }
+
+    const allowedSports = ["Soccer", "Basketball", "Baseball", "Tennis", "Swimming", "Running", "Cycling", "Hiking", "Golf", "Volleyball"];
+    const allowedSkills = ["Beginner", "Intermediate", "Advanced"];
+    if (!allowedSports.includes(sport)) {
+      showToastError("Invalid sport selected");
+      return;
+    }
+
+    const playersRequired = Number(form.playersRequired.value);
+    if (
+      form.playersRequired.value.trim() === "" ||
+      isNaN(playersRequired) ||
+      playersRequired <= 0
+    ) {
+      showToastError("Players Required must be a number greater than 0.");
+      return;
+    }
+
+    const costPerHead = Number(form.costPerHead.value);
+    if (
+      form.costPerHead.value.trim() === "" ||
+      isNaN(costPerHead) ||
+      costPerHead < 0
+    ) {
+      showToastError("Cost per Head must be a valid number (0 or more).");
+      return;
+    }
+
     const gameDate = form.gameDate.value;
     const startTime = form.startTime.value;
     const endTime = form.endTime.value;
-    const playersRequired = Number(form.playersRequired.value);
-    const costPerHead = Number(form.costPerHead.value);
     const skillLevel = form.skillLevel.value;
     const location = form.location.value.trim();
     const description = form.description.value.trim();
-    const allowedSports = [
-      "Soccer",
-      "Basketball",
-      "Baseball",
-      "Tennis",
-      "Swimming",
-      "Running",
-      "Cycling",
-      "Hiking",
-      "Golf",
-      "Volleyball",
-    ];
-    const allowedSkills = ["Beginner", "Intermediate", "Advanced"];
     const badWords = [
       "fuck",
       "shit",
