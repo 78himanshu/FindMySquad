@@ -1,34 +1,240 @@
-<div class="profile-page">
+<div class="container my-4">
+  <div class="row">
+    <!-- Sidebar -->
+    <div class="col-md-3">
+      <div class="card border rounded shadow-sm">
+        <div class="card-body text-center">
+          <img src="{{avatar}}" alt="avatar" class="rounded-circle mb-3" width="90" height="90">
+          <h5 class="fw-semibold mb-1">{{firstName}} {{ lastName}}</h5>
+          <small class="text-muted d-block">{{ email}}</small>
+          <small class="text-muted">{{ gender}}</small>
+        </div>
 
-  <div class="sidebar">
-    <img src="{{avatar}}" alt="User Avatar" class="avatar">
-    <h3>{{firstName}} {{lastName}}</h3>
-    <p>{{email}}</p>
-    <p>ID: {{userId}}</p>
+        {{!-- NEW: Follow/Unfollow Button (only when viewing someone else)
+        {{#unless isOwn}}
+        <form method="POST" action="/profile/{{#if isFollowing}}unfollow{{else}}follow{{/if}}/{{userId}}">
+          <button type="submit" class="btn {{#if isFollowing}}btn-secondary{{else}}btn-primary{{/if}}">
+            {{#if isFollowing}}Unfollow{{else}}Follow{{/if}}
+          </button>
+        </form>
+        {{/unless}}
+        --}}
 
-    <a href="/profile/games" class="button">All Games</a>
-    <a href="/profile/edit" class="button edit">Edit Profile</a>
-  </div>
+        {{#if isOwn}}
+        <!-- Do not show Follow button if it’s your own profile -->
+        {{else}}
+        <button id="followButton" data-user-id="{{ userId}}">
+          {{#if isFollowing}}Following{{else}}Follow{{/if}}
+        </button>
+        {{/if}}
 
-  <div class="profile-content">
-    <h2>User Information</h2>
 
-    <div class="info">
-      <label>Name:</label>
-      <span>{{firstName}} {{lastName}}</span>
+        <ul class="list-group list-group-flush">
+          <li class="list-group-item bg-success text-white fw-semibold nav-btn" data-target="overview">
+            <i class="bi bi-bookmark-fill me-2"></i> Overview
+          </li>
+
+          {{#if isOwn}}
+          <ul class="list-group list-group-flush">
+            <li class="list-group-item nav-btn" data-target="edit">
+              <i class="bi bi-pencil me-2"></i> Edit Profile
+            </li>
+            <li class="list-group-item nav-btn" data-target="bookings">
+              <i class="bi bi-reply me-2"></i> Show All Bookings
+            </li>
+          </ul>
+          {{/if}}
+
+        </ul>
+      </div>
     </div>
 
-    <div class="info">
-      <label>Email:</label>
-      <span>{{email}}</span>
-    </div>
+    <!-- Main Content -->
+    <div class="col-md-9">
+      <div class="card border rounded shadow-sm">
+        <div class="card-body">
 
-    <div class="info">
-      <label>User ID:</label>
-      <span>{{userId}}</span>
-    </div>
+          <!-- Section: Profile Overview -->
+          <div id="section-overview">
+            <h4 class="fw-semibold mb-3">Your Profile Overview</h4>
+            <p><strong>Bio:</strong> {{ bio}}</p>
 
+            <div class="mb-3">
+              <strong>Sports Interests:</strong>
+              {{#each sportsInterests}}<span class="badge bg-primary me-1">{{this}}</span>{{/each}}
+            </div>
+
+            <div class="mb-3">
+              <strong>Gym Preferences:</strong>
+              {{#each gymPreferences}}<span class="badge bg-success me-1">{{this}}</span>{{/each}}
+            </div>
+
+            <div class="mb-3">
+              <strong>Gaming Interests:</strong>
+              {{#each gamingInterests}}<span class="badge bg-warning text-dark me-1">{{this}}</span>{{/each}}
+            </div>
+
+            <div class="mb-3">
+              <strong>Location:</strong>
+              {{#if location.city}}{{ location.city}}, {{/if}}{{ location.state}}
+              {{ location.zipCode}}
+            </div>
+
+            <div class="align-items-center d-flex justify-content-center mt-4 row text-center">
+              <div class="col-md-3">
+                <h5>{{ karmaPoints}}</h5>
+                <p class="text-muted">Karma Points</p>
+              </div>
+              <div class="col-md-3">
+                <h5>{{ followers.length}}</h5>
+                <p class="text-muted">Followers</p>
+              </div>
+              <div class="col-md-3">
+                <h5>{{ following.length}}</h5>
+                <p class="text-muted">Following</p>
+              </div>
+              <div class="col-md-3">
+                <div class="text-center mt-3">
+
+                  {{#if ratingCount}}
+                  <p class="mb-0 fs-5">{{averageRating}} / 5</p>
+                  <small class="text-muted">Based on {{ratingCount}} rating{{#unless (eq ratingCount
+                    1)}}s{{/unless}}</small>
+                  {{else}}
+                  <p class="text-muted">No ratings yet</p>
+                  {{/if}}
+
+                  <h5>⭐ Average Rating</h5>
+                </div>
+              </div>
+            </div>
+
+
+
+          </div>
+
+          {{#if achievements.length}}
+          <div class="mt-4">
+            <strong>Achievements:</strong>
+            <ul>{{#each achievements}}<li>{{this}}</li>{{/each}}</ul>
+          </div>
+          {{/if}}
+        </div>
+
+        <!-- Section: Edit Profile -->
+        <div id="section-edit" class="d-none">
+          <h4 class="fw-semibold px-2">Edit Your Profile</h4>
+          {{> editProfileForm }}
+        </div>
+
+        <!-- Section: Bookings -->
+        <div id="section-bookings" class="d-none">
+          <h4 class="fw-semibold m-3">Your Bookings</h4>
+
+          <p>🎾 <strong>Game Bookings</strong></p>
+          <p><strong>Future Games:</strong> No upcoming games.</p>
+          <p><strong>Past Games:</strong> No past games.</p>
+
+          <p>🐕‍🦺 <strong>Gym Bookings</strong></p>
+          <p><strong>Future Sessions:</strong> No upcoming sessions.</p>
+          <p><strong>Past Sessions:</strong> No past sessions.</p>
+
+          <p>🎮 <strong>Esports Bookings:</strong> Coming soon!</p>
+        </div>
+
+
+      </div>
+    </div>
   </div>
 </div>
+</div>
+
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const navButtons = document.querySelectorAll('.nav-btn');
+    const sections = ['overview', 'edit'];
+
+    navButtons.forEach(btn => {
+      btn.addEventListener('click', function () {
+        const target = this.getAttribute('data-target');
+
+        // ✅ Fix: Redirect immediately to /profile/bookings when clicked
+        if (target === 'bookings') {
+          window.location.href = '/profile/bookings';
+          return; // ⬅️ very important to exit early
+        }
+
+        // Otherwise toggle internal sections
+        sections.forEach(id => {
+          const el = document.getElementById(`section-${id}`);
+          if (el) el.classList.add('d-none');
+        });
+        const sectionEl = document.getElementById(`section-${target}`);
+        if (sectionEl) sectionEl.classList.remove('d-none');
+
+        // Sidebar highlight
+        navButtons.forEach(b => b.classList.remove('bg-success', 'text-white'));
+        this.classList.add('bg-success', 'text-white');
+      });
+    });
+
+
+    const followButton = document.getElementById('followButton');
+    if (followButton) {
+      followButton.addEventListener('click', async () => {
+        const targetUserId = followButton.dataset.userId;
+        const isFollowing = followButton.innerText.trim() === 'Following';
+        const action = isFollowing ? 'unfollow' : 'follow';
+
+        try {
+          const res = await fetch(`/profile/${action}/${targetUserId}`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            credentials: 'include'
+          });
+
+          const result = await res.json();
+
+          if (res.ok) {
+            // ✅ Toggle Follow/Following
+            followButton.innerText = isFollowing ? 'Follow' : 'Following';
+            showToast(`${isFollowing ? 'Unfollowed' : 'Followed'} successfully! 🎉`, true);
+          } else {
+            // ❌ Handle server error like "Already following"
+            showToast(result.error || 'Something went wrong.', false);
+          }
+        } catch (err) {
+          showToast('Server error. Please try again.', false);
+        }
+      });
+    }
+  });
+
+  // Popup message (basic version)
+  function showToast(message, isSuccess) {
+    const color = isSuccess ? 'green' : 'red';
+    const toast = document.createElement('div');
+    toast.textContent = message;
+    toast.style.position = 'fixed';
+    toast.style.top = '20px';
+    toast.style.right = '20px';
+    toast.style.background = color;
+    toast.style.color = 'white';
+    toast.style.padding = '10px 15px';
+    toast.style.borderRadius = '8px';
+    toast.style.zIndex = 9999;
+    toast.style.fontSize = '14px';
+    document.body.appendChild(toast);
+
+    setTimeout(() => {
+      toast.remove();
+    }, 2000);
+  }
+</script>
+
+
 
 <script src="/js/userProfile.js"></script>

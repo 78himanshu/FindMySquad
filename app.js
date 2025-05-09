@@ -1,35 +1,145 @@
 let serverBootTime = Date.now();
+
 import dotenv from "dotenv";
+dotenv.config();
 
 import express from "express";
 import path from "path";
 import { fileURLToPath } from "url";
 import connectDB from "./config/mongoConnections.js";
-import exphbs from "express-handlebars";
-import fs from "fs";
-import cookieParser from "cookie-parser";
-import jwt from "jsonwebtoken";
+import { scheduleAllPendingReminders } from "./emailScheduler.js";
 
-import configRoutesFunction from "./routes/index.js";
+// Wait for DB connection and schedule reminders BEFORE app setup
+await connectDB();
+await scheduleAllPendingReminders();
 
 // Fix __dirname issue in ES Modules
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-//  Force load .env from correct path
-dotenv.config({ path: path.resolve(__dirname, ".env") });
+import exphbs from "express-handlebars";
+import cookieParser from "cookie-parser";
+import jwt from "jsonwebtoken";
+import gymBuddyRoutes from "./routes/gymBuddyRoutes.js";
+import hostGameRoutes from "./routes/hostGamesRoutes.js";
+import leaderboardRoutes from "./routes/leaderboardRoutes.js";
+import methodOverride from "method-override";
+import { allowInsecurePrototypeAccess } from "@handlebars/allow-prototype-access";
+import Handlebars from "handlebars";
+import configRoutesFunction from "./routes/index.js";
+import "./utils/handlebarsHelper.js";
+import esportsRoutes from "./routes/esports.js";
+import http from "http";
+import { Server } from "socket.io";
+import Game from "./models/hostGame.js";
+import ChatMessage from "./models/ChatMessage.js";
 
 const app = express();
 
-// Connect to MongoDB
-connectDB();
-
-// Handlebars configuration
+// Handlebars setup with eq helper
 const hbs = exphbs.create({
   defaultLayout: false,
   extname: ".handlebars",
+  runtimeOptions: {
+    allowProtoPropertiesByDefault: true,
+    allowProtoMethodsByDefault: true,
+  },
+  handlebars: allowInsecurePrototypeAccess(Handlebars),
   helpers: {
-    // Add any custom helpers here if needed
+    eq: (a, b) => a === b,
+    lt: (a, b) => a < b,
+    add: (a, b) => a + b,
+    gt: (a, b) => a > b,
+    gte: (a, b) => a >= b,
+    lte: (a, b) => a <= b,
+    length: (array) => (Array.isArray(array) ? array.length : 0),
+    includes: (arr, val) => Array.isArray(arr) && arr.includes(val.toString()),
+    json: (context) => JSON.stringify(context, null, 2),
+    encodeURI: (str) => encodeURIComponent(str),
+
+    array: (...args) => {
+      return args.slice(0, -1);
+    },
+
+    formatDate: (datetime) => {
+      if (!datetime) return "";
+      return new Date(datetime).toLocaleDateString("en-US", {
+        weekday: "short",
+        year: "numeric",
+        month: "short",
+        day: "numeric",
+      });
+    },
+
+    formatTime: (timeVal) => {
+      if (!timeVal) return "";
+
+      let hour, minute;
+
+      if (typeof timeVal === "string" && timeVal.includes(":")) {
+        [hour, minute] = timeVal.split(":");
+        hour = parseInt(hour, 10);
+        minute = parseInt(minute, 10);
+      } else if (timeVal instanceof Date || !isNaN(Date.parse(timeVal))) {
+        const dateObj = new Date(timeVal);
+        hour = dateObj.getHours();
+        minute = dateObj.getMinutes();
+      } else {
+        return "";
+      }
+
+      const ampm = hour >= 12 ? "PM" : "AM";
+      const formattedHour = hour % 12 || 12;
+      return `${formattedHour}:${minute.toString().padStart(2, "0")} ${ampm}`;
+    },
+
+    formatDateInput: (datetime) => {
+      if (!datetime) return "";
+      const date = new Date(datetime);
+      return date.toISOString().split("T")[0];
+    },
+
+    formatTimeInput: (datetime) => {
+      if (!datetime) return "";
+      const date = new Date(datetime);
+      return date.toTimeString().slice(0, 5); // "HH:mm"
+    },
+
+    ifCond: function (v1, operator, v2, options) {
+      switch (operator) {
+        case "!=":
+          return v1 != v2 ? options.fn(this) : options.inverse(this);
+        case "==":
+          return v1 == v2 ? options.fn(this) : options.inverse(this);
+        case ">":
+          return v1 > v2 ? options.fn(this) : options.inverse(this);
+        case "<":
+          return v1 < v2 ? options.fn(this) : options.inverse(this);
+        case ">=":
+          return v1 >= v2 ? options.fn(this) : options.inverse(this);
+        case "<=":
+          return v1 <= v2 ? options.fn(this) : options.inverse(this);
+        default:
+          return options.inverse(this);
+      }
+    },
+
+    range: (from, to) => {
+      let result = [];
+      for (let i = from; i <= to; i++) {
+        result.push(i);
+      }
+      return result;
+    },
+
+    object: (...args) => {
+      const options = args.pop();
+      return args.reduce((acc, val, i) => {
+        if (i % 2 === 0) acc[val] = args[i + 1];
+        return acc;
+      }, {});
+    },
+    subtract: (a, b) => a - b,
   },
 });
 
@@ -54,32 +164,48 @@ app.use((req, res, next) => {
     try {
       const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
+      if (!decoded.userId) {
+        res.clearCookie("token");
+        res.locals.isLoggedIn = false;
+        return res.status(401).send("Unauthorized: User info missing");
+      }
+
       // Invalidate token if it's older than server boot time
       if (decoded.iat * 1000 < serverBootTime) {
         res.clearCookie("token");
         res.locals.isLoggedIn = false;
         res.locals.username = null;
+        res.locals.profilePic = "/images/default-avatar.png"; // fallback
         return next();
       }
 
-      req.user = decoded; // ✅ this line is the key
+      req.user = decoded;
       res.locals.isLoggedIn = true;
       res.locals.username = decoded.username;
+      res.locals.profilePic =
+        decoded.profilePic || "/images/default-avatar.png";
+      res.locals.userId = decoded.userId;
     } catch (err) {
       res.locals.isLoggedIn = false;
       res.locals.username = null;
+      res.locals.profilePic = "/images/default-avatar.png"; // fallback
       res.clearCookie("token");
     }
   } else {
     res.locals.isLoggedIn = false;
     res.locals.username = null;
+    res.locals.profilePic = "/images/default-avatar.png"; // fallback
   }
 
   next();
 });
 // Routes
 configRoutesFunction(app);
-
+app.use("/host", hostGameRoutes);
+app.use("/gymBuddy", gymBuddyRoutes);
+app.use("/leaderboard", leaderboardRoutes);
+app.use("/esports", esportsRoutes);
+app.use("/join", esportsRoutes);
 // 404 Handler (must come after routes but before error handler)
 app.use((req, res, next) => {
   console.log("404 Handler triggered for:", req.originalUrl);
@@ -101,8 +227,117 @@ app.use((err, req, res, next) => {
   });
 });
 
+// for chat-message for joined game
+// Create HTTP server and bind it to Express app
+const server = http.createServer(app);
+
+// Initialize Socket.IO server with open CORS policy
+const io = new Server(server, {
+  cors: {
+    origin: "*", // Adjust as needed for production
+  },
+});
+
+// Attach Socket.IO instance to app for external use
+app.set("io", io);
+
+// Store active chat sessions by game ID
+const activeChats = {}; // { gameId: { sockets: Set, endTime: Number } }
+
+// Handle socket connections
+io.on("connection", (socket) => {
+  console.log("User connected to Socket.IO:", socket.id);
+
+  // User attempts to join a chat room for a specific game
+  socket.on("joinGameChat", async ({ gameId, userId }) => {
+    try {
+      const game = await Game.findById(gameId);
+      if (!game) {
+        socket.emit("chatClosed", "Game not found.");
+        return;
+      }
+
+      const now = Date.now();
+      const end = new Date(game.endTime).getTime();
+
+      // If the current time is past the game's end, disallow chat
+      if (now > end) {
+        socket.emit("chatClosed", "This chat has ended.");
+        return;
+      }
+
+      // Join the room for this game
+      socket.join(gameId);
+      console.log(`User ${userId} joined chat room for game ${gameId}`);
+
+      // Load chat history and send to the newly joined client
+      const pastMessages = await ChatMessage.find({ gameId })
+        .sort({ timestamp: 1 })
+        .lean();
+
+      socket.emit("previousMessages", pastMessages);
+
+      // Track and timeout the room if it's not already active
+      if (!activeChats[gameId]) {
+        activeChats[gameId] = {
+          sockets: new Set(),
+          endTime: end,
+        };
+
+        const msRemaining = end - now;
+        setTimeout(() => {
+          io.to(gameId).emit("chatClosed", "This chat has ended.");
+          io.socketsLeave(gameId);
+          delete activeChats[gameId];
+          console.log(`Chat room ${gameId} closed due to timeout`);
+        }, msRemaining);
+      }
+
+      activeChats[gameId].sockets.add(socket.id);
+    } catch (err) {
+      console.error("Error handling joinGameChat:", err);
+      socket.emit("chatClosed", "An error occurred while joining the chat.");
+    }
+  });
+
+  // Handle new messages sent by users
+  socket.on("sendMessage", async ({ gameId, username, message }) => {
+    const now = Date.now();
+    const chatEnd = activeChats[gameId]?.endTime;
+
+    const messageData = {
+      username,
+      message,
+      time: new Date(now).toLocaleTimeString([], {
+        hour: "2-digit",
+        minute: "2-digit",
+      }),
+    };
+
+    if (chatEnd && now < chatEnd) {
+      io.to(gameId).emit("receiveMessage", messageData);
+      console.log(`Message from ${username} in ${gameId}: ${message}`);
+
+      // Store in DB
+      try {
+        await ChatMessage.create({
+          gameId,
+          username,
+          message,
+          timestamp: new Date(now),
+        });
+      } catch (err) {
+        console.error("Failed to save message:", err);
+      }
+    } else {
+      socket.emit("chatClosed", "This chat has ended.");
+    }
+  });
+});
+app.use(methodOverride("_method"));
+
 // Start server
 const PORT = process.env.PORT || 8080;
-app.listen(PORT, () => {
+server.listen(PORT, () => {
   console.log(`🚀 Server is running on http://localhost:${PORT}`);
 });

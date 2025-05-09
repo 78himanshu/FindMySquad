@@ -31,10 +31,29 @@ export default async function requireAuth(req, res, next) {
       username: decoded.username, // Optional
     };
 
+    // ✅ Pass user info to Handlebars
+    const userCookie = req.cookies.user;
+
+    if (userCookie) {
+      const userData = JSON.parse(userCookie);
+      res.locals.isLoggedIn = true;
+      res.locals.username = userData.username || "";
+      res.locals.profilePic =
+        userData.profilePic || "/images/default-avatar.png";
+    } else {
+      res.locals.isLoggedIn = true;
+      res.locals.username = decoded.username || "";
+      res.locals.profilePic = "/images/default-avatar.png"; // fallback
+    }
+
     next();
   } catch (err) {
     console.error("Auth Middleware Error:", err.message);
     res.clearCookie("token");
-    return res.redirect("/login?error=Session expired. Please log in again.");
+    // res.clearCookie("user");
+
+    return res.redirect(
+      `/login?redirect=${encodeURIComponent(req.originalUrl)}`
+    );
   }
 }

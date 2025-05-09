@@ -4,7 +4,8 @@ const userSchema = new mongoose.Schema({
   username: { type: String, required: true, unique: true, trim: true },
   email: { type: String, required: true, unique: true, trim: true },
   password: { type: String, required: true },
+  profileCompleted: { type: Boolean, default: false },
   createdAt: { type: Date, default: Date.now },
 });
 
-export default mongoose.model('Userlist', userSchema);
+export default mongoose.model("Userlist", userSchema);

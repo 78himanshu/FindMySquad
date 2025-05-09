@@ -1,33 +1,32 @@
 import express from "express";
 const router = express.Router();
 import hostGamesRoutes from "./hostGamesRoutes.js";
-import joinGameRoutes from "./joinGameRoutes.js"
+import joinGameRoutes from "./joinGameRoutes.js";
 import authRoutes from "./authRoutes.js";
-import userProfileRoutes from "./userProfileRoutes.js";  // <-- ADD THIS
-
+import userProfileRoutes from "./userProfileRoutes.js";
+import esportsRoutes from "./esports.js";
 import jwt from "jsonwebtoken";
 import User from "../models/User.js";
+import gymBuddyRoutes from "./gymBuddyRoutes.js";
+import tournamentRoutes from "./tournamentRoutes.js";
+import { hostGameData } from "../data/index.js";
+import { userProfileData } from "../data/index.js";
 
 const configRoutesFunction = (app) => {
-  // Authentication middleware (runs before all routes)
-  //   app.use(async (req, res, next) => {
-  //     try {
-  //       const token = req.cookies?.token;
-  //       if (token) {
-  //         const decoded = jwt.verify(token, process.env.JWT_SECRET);
-  //         req.user = await User.findById(decoded.userId);
-  //       }
-  //     } catch (err) {
-  //       console.error('Authentication error:', err);
-  //     }
-  //     next();
-  //   });
-
   // Base route - simplified since we're using middleware
-  app.get("/", (req, res) => {
+  app.get("/", async (req, res) => {
+    console.log("req,", req.user);
+    const topUsers = await userProfileData.getTopKarmaUsers();
+    console.log("TOP USERS FOR HOMEPAGE:", topUsers);
+    const upcomingGames = await hostGameData.upcomingGames();
+    console.log("upcomingGames", upcomingGames);
+
     res.render("index", {
       title: "FindMySquad",
-      user: req.user || null
+      user: req.user || null,
+      layout: "main",
+      upcomingGames: upcomingGames,
+      topUsers: topUsers,
     });
   });
 
@@ -36,13 +35,12 @@ const configRoutesFunction = (app) => {
 
   // Host games routes
   app.use("/host", hostGamesRoutes);
-
+  app.use("/tournaments", tournamentRoutes);
+  app.use("/gymBuddy", gymBuddyRoutes);
   //Join game routes
-  app.use('/join', joinGameRoutes);
+  app.use("/join", joinGameRoutes);
 
   app.use("/profile", userProfileRoutes);
-
-
 };
 
-export default configRoutesFunction; 
+export default configRoutesFunction;

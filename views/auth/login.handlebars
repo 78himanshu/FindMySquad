@@ -4,9 +4,11 @@
       <div class="card shadow-sm p-4">
         <h2 class="text-center mb-4">Welcome Back!</h2>
 
-        <form id="loginForm" novalidate>
-             <!-- HIDDEN REDIRECT INPUT HERE -->
-          <input type="hidden" name="redirect" id="redirectInput" value="{{redirect}}" />
+        <form id="loginForm" method="POST" action="/login" novalidate>
+
+          <!-- HIDDEN REDIRECT INPUT HERE -->
+          <input type="hidden" name="redirect" id="redirectInput"
+            value="{{redirect}}" />
           <!-- Email -->
           <div class="mb-3">
             <label for="email" class="form-label">E-mail</label>
@@ -15,8 +17,7 @@
               class="form-control"
               id="email"
               name="email"
-              placeholder="you@example.com"
-            />
+              placeholder="you@example.com" />
             <div id="emailError" class="form-text text-danger"></div>
           </div>
 
@@ -28,14 +29,14 @@
               class="form-control"
               id="password"
               name="password"
-              placeholder="••••••••"
-            />
+              placeholder="••••••••" />
             <div id="passwordError" class="form-text text-danger"></div>
           </div>
 
           <!-- Submit -->
           <div class="d-grid mb-3">
-            <button type="submit" class="btn btn-primary submit-button">Log In</button>
+            <button type="submit" class="btn btn-primary submit-button">Log
+              In</button>
           </div>
 
           <p class="text-center">
@@ -46,8 +47,4 @@
     </div>
   </div>
 
-  <!-- Toast container -->
- <div id="toast-container" class="position-fixed bottom-0 end-0 p-3"></div>
 </main>
-
-<script src="/js/auth.js"></script>

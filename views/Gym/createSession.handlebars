@@ -1,0 +1,114 @@
+<main class="gym-session-form-container">
+  {{#if error}}
+  <div class="error-msg">{{error}}</div>
+  {{/if}}
+  <h2 class="mb-0">{{#if isEditMode}}Edit Gym Session{{else}}Create Gym Session{{/if}}</h2>
+
+  <form action="{{#if isEditMode}}/gymBuddy/update/{{_id}}{{else}}/gymBuddy/create{{/if}}" method="POST">
+    {{#if isEditMode}}
+    <input type="hidden" name="_method" value="PUT" />
+    {{/if}}
+
+    <label for="title">Workout Title:</label>
+    <input type="text" name="title" placeholder="Title" value="{{title}}" required />
+
+    <label for="description">Description:</label>
+    <textarea id="description" name="description">{{description}}</textarea>
+
+    <label for="sessionDate">Date:</label>
+    <input type="date" id="sessionDate" name="date" value="{{date}}" required />
+
+    <div class="form-row">
+      <div style="display:inline-block; margin-right:10px;">
+        <label for="startTime">Start Time:</label>
+        <input type="time" id="startTime" name="startTime" value="{{startTime}}" required />
+      </div>
+      <div style="display:inline-block;">
+        <label for="endTime">End Time:</label>
+        <input type="time" id="endTime" name="endTime" value="{{endTime}}" required />
+      </div>
+    </div>
+    <div class="card-body">
+      <form id="gym-session-form" data-edit="{{#if isEditMode}}true{{else}}false{{/if}}" data-session-id="{{_id}}">
+        <div class="mb-3">
+          <input type="text" name="title" class="form-control" placeholder="Workout Title" value="{{title}}" />
+        </div>
+
+        <div class="mb-3">
+          <textarea name="description" class="form-control" rows="3"
+            placeholder="Describe your workout session">{{description}}</textarea>
+        </div>
+
+        <label for="location">Gym Location:</label>
+        <input type="text" id="gym-location" name="gymlocation" value="{{gymlocation}}" required
+          placeholder="Enter a Gym Location" />
+
+        <label for="experience">Experience:</label>
+        <select name="experience" id="experience" required>
+          <option value>--Select experience--</option>
+          <option value="newcomer" {{#if (eq experience "newcomer" )}}selected{{/if}}>Newcomer</option>
+          <option value="1+ year" {{#if (eq experience "1+ year" )}}selected{{/if}}>1+ Year</option>
+          <option value="3+ year" {{#if (eq experience "3+ year" )}}selected{{/if}}>3+ Years</option>
+          <option value="5+ year" {{#if (eq experience "5+ year" )}}selected{{/if}}>5+ Years</option>
+          <option value="10+ year" {{#if (eq experience "10+ year" )}}selected{{/if}}>10+ Years</option>
+        </select>
+
+        <label for="workoutType">Workout Type:</label>
+        <select id="workoutType" name="workoutType" required>
+          <option value>--Select--</option>
+          <option value="Cardio" {{#if (eq workoutType "Cardio" )}}selected{{/if}}>Cardio</option>
+          <option value="Body Building" {{#if (eq workoutType "Body Building" )}}selected{{/if}}>Body Building</option>
+          <option value="Power Lifting" {{#if (eq workoutType "Power Lifting" )}}selected{{/if}}>Power Lifting</option>
+          <option value="Calisthenics" {{#if (eq workoutType "Calisthenics" )}}selected{{/if}}>Calisthenics</option>
+          <option value="Yoga" {{#if (eq workoutType "Yoga" )}}selected{{/if}}>Yoga</option>
+          <option value="Other" {{#if (eq workoutType "Other" )}}selected{{/if}}>Other</option>
+        </select>
+
+        <label for="maxMembers">How many members do you want?</label>
+        <select id="maxMembers" name="maxMembers" required {{#if isEditMode}}disabled{{/if}}>
+          <option value>--Select--</option>
+          <option value="1" {{#if (eq maxMembers "1" )}}selected{{/if}}>Buddy
+            (1)</option>
+          <option value="2" {{#if (eq maxMembers "2" )}}selected{{/if}}>Trio
+            (2)</option>
+          <option value="3" {{#if (eq maxMembers "3" )}}selected{{/if}}>Gang
+            (3)</option>
+          <option value="4" {{#if (eq maxMembers "4" )}}selected{{/if}}>Group
+            (4)</option>
+        </select>
+
+        {{#if isEditMode}}
+        <input type="hidden" name="maxMembers" value="{{maxMembers}}" />
+        {{/if}}
+
+        <label for="hostedByDisplay">Hosted By:</label>
+        <input type="text" id="hostedByDisplay" value="{{user.username}}" readonly
+          style="color: gray; background-color: #f0f0f0;" />
+        <input type="hidden" id="hostedBy" name="hostedBy" value="{{user.userId}}" />
+
+        <button type="submit">
+          {{#if isEditMode}}Update Session{{else}}{{/if}}
+        </button>
+      </form>
+</main>
+
+<script
+  src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBP-FJZsXytqUxzesnIEkrkUu4JoB1zO-M&libraries=places"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const input = document.getElementById('gym-location');
+    if (input) {
+      const autocomplete = new google.maps.places.Autocomplete(input, {
+        types: ['geocode'],
+        componentRestrictions: { country: "us" }
+      });
+      autocomplete.addListener('place_changed', function () {
+        const place = autocomplete.getPlace();
+        if (place && place.formatted_address) {
+          input.value = place.formatted_address;
+        }
+      });
+    }
+  });
+</script>
+<script src="/js/createSession.js"></script>

@@ -1,35 +1,192 @@
-<main class="games-section">
-  {{#if userLoggedIn}}
-    <section>
-      <h2>Recommended Games</h2>
-      {{#if recommendedGames.length}}
-        {{#each recommendedGames}}
-          <div class="game-card">
-            <a href="/join/{{this._id}}">
-              <h3>{{this.title}}</h3>
-              <p>Sport: {{this.sport}}</p>
-              <p>Location: {{this.location}}</p>
-              <p>Date: {{this.dateTime}}</p>
-            </a>
-          </div>
-        {{/each}}
-      {{else}}
-        <p>Check out all games below!</p>
-      {{/if}}
-    </section>
+<main class="games-section container">
+  {{#if error}}
+  <div id="top-error" class="alert alert-danger error-msg">{{error}}</div>
   {{/if}}
 
-  <section>
-    <h2>All Games</h2>
-    {{#each allGames}}
-      <div class="game-card">
-        <a href="/join/{{this._id}}">
-          <h3>{{this.title}}</h3>
-          <p>Sport: {{this.sport}}</p>
-          <p>Location: {{this.location}}</p>
-          <p>Date: {{this.dateTime}}</p>
-        </a>
-      </div>
-    {{/each}}
+  {{#if success}}
+  <div class="alert" class="alert-success success-msg">{{success}}</div>
+  {{/if}}
+  <!-- Tabs Section -->
+  <div class="game-tabs">
+    <button class="tab-button" onclick="showSection('calendar')">Calendar</button>
+    <button class="tab-button active" onclick="showSection('mySports')">My Sports</button>
+  </div>
+
+  <!-- Calendar Section -->
+  <section id="calendar" class="tab-content" style="display: none;">
+    <div id="calendar-container">
+      <div id="calendar"></div>
+    </div>
   </section>
+
+  <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.css" rel="stylesheet" />
+
+  <div id="game-map" style="height: 400px; margin-bottom: 20px;"></div>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const mapContainer = document.getElementById('game-map');
+      if (!mapContainer) return;
+
+      // Default coordinates: NYC
+      let defaultLat = 40.7128;
+      let defaultLng = -74.0060;
+      const cookieMatch = document.cookie.match(/user_location=([^;]+)/);
+      if (cookieMatch) {
+        try {
+          const loc = JSON.parse(decodeURIComponent(cookieMatch[1]));
+          if (loc.lat && loc.lng) {
+            defaultLat = loc.lat;
+            defaultLng = loc.lng;
+          }
+        } catch (e) {
+          console.warn('Could not parse location cookie');
+        }
+      }
+
+      const map = L.map('game-map').setView([defaultLat, defaultLng], 12);
+
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap contributors'
+      }).addTo(map);
+
+      // Games are passed in via Handlebars
+const games = {{{json allGames}}};
+
+    games.forEach(game => {
+      if (game.geoLocation && game.geoLocation.coordinates) {
+        const [lng, lat] = game.geoLocation.coordinates;
+        L.marker([lat, lng]).addTo(map)
+          .bindPopup(`<strong>${game.title}</strong><br>${game.sport}<br><a href="/join/${game._id}">View Game</a>`);
+      }
+    });
+    });
+  </script>
+
+
+
+  <!-- My Sports Section (default visible) -->
+  <section id="mySports" class="tab-content" style="display: block;">
+    <section>
+      <h2 class="section-heading">Recommended Games</h2>
+      {{#if recommendedGames.length}}
+      <div class="game-grid">
+        {{#each recommendedGames}}
+        <div class="game-card">
+          <a href="/join/{{this._id}}">
+            <h3>{{this.title}}</h3>
+            <p>Sport: {{this.sport}}</p>
+            <p>Location: {{this.location}}</p>
+            <p>
+              Date: {{formatDate this.startTime}} |
+              Time: {{formatTime this.startTime}} - {{formatTime this.endTime}}
+            </p>
+          </a>
+        </div>
+        {{/each}}
+      </div>
+      {{else}}
+      <div class="no-match-box">
+        <p class="no-match">Oops...No Match Found for this Selection Criteria</p>
+        <p>You can host an activity & we will shout-out to the community to join in :)</p>
+        <a href="/host/form" class="btn btn-success">Create Game</a>
+      </div>
+      {{/if}}
+    </section>
+
+    <!-- All Games -->
+    <section>
+      <h2 class="section-heading">All Games</h2>
+      <div class="game-grid">
+        {{#each allGames}}
+        <div class="game-card">
+          <a href="/join/{{this._id}}">
+            <h3>{{this.title}}</h3>
+            <p>Sport: {{this.sport}}</p>
+            <p>Location: {{this.location}}</p>
+            <p>
+              Date: {{formatDate this.startTime}} |
+              Time: {{formatTime this.startTime}} - {{formatTime this.endTime}}
+            </p>
+            {{#if this.host.username}}
+            <p>Hosted By: {{this.host.username}}</p>
+            {{/if}}
+          </a>
+
+          {{#if (eq ../hostId this.host._id)}}
+          <!-- Host: Edit/Delete buttons -->
+          <a href="/host/edit/{{this._id}}" class="btn btn-warning">Edit</a>
+          <form action="/host/delete/{{this._id}}" method="POST" style="display:inline;"
+            onsubmit="return confirm('Are you sure you want to delete this game?')">
+            <button type="submit" class="btn btn-danger">Delete</button>
+          </form>
+          {{else}}
+          {{#if (includes ../joinedGameIdStrings (toString this._id))}}
+          <!-- Already joined -->
+          <form action="/join/leave/{{this._id}}" method="POST">
+            <button type="submit" class="btn btn-secondary">Leave</button>
+          </form>
+          {{else if (gte (length this.players) this.playersRequired)}}
+          <!-- Session full and not joined -->
+          <p class="full-session">🚫 Session is Full</p>
+          {{/if}}
+          {{/if}}
+        </div>
+        {{/each}}
+      </div>
+    </section>
+  </section>
+
+
+  <!-- JS Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js"></script>
+  <script>
+    function showSection(sectionId) {
+      const sections = document.querySelectorAll('.tab-content');
+      sections.forEach(sec => sec.style.display = 'none');
+
+      const buttons = document.querySelectorAll('.tab-button');
+      buttons.forEach(btn => btn.classList.remove('active'));
+
+      const activeTab = document.getElementById(sectionId);
+      activeTab.style.display = 'block';
+      event.target.classList.add('active');
+
+      if (sectionId === 'calendar' && window._myCalendarInstance) {
+        setTimeout(() => {
+          window._myCalendarInstance.render();
+        }, 10);
+      }
+    }
+
+    document.addEventListener("DOMContentLoaded", function () {
+      const calendarEl = document.getElementById("calendar");
+
+      const calendar = new FullCalendar.Calendar(calendarEl, {
+        initialView: "dayGridMonth",
+        height: "auto",
+        headerToolbar: {
+          left: "prev,today,next",
+          center: "title",
+          right: "dayGridMonth,timeGridWeek,timeGridDay"
+        },
+        events: {{{ json calendarEvents }}}
+  });
+
+    calendar.render();
+
+    window._myCalendarInstance = calendar;
+});
+
+    document.addEventListener('DOMContentLoaded', function () {
+      const topError = document.getElementById('top-error');
+      if (topError) {
+        setTimeout(() => {
+          topError.style.display = 'none';
+        }, 5000);
+      }
+    });
+  </script>
 </main>

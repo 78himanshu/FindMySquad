@@ -1,0 +1,176 @@
+<main class="find-buddies-container">
+  <h1>Find Workout Buddies</h1>
+  <div id="gym-map" style="height: 300px; margin-bottom: 20px;"></div>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const map = L.map("gym-map").setView([40.7128, -74.0060], 11); // Default NYC
+
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: "© OpenStreetMap contributors"
+      }).addTo(map);
+
+      const sessions = {{{json sessions}}};
+
+      sessions.forEach(session => {
+        if (session.geoLocation && session.geoLocation.coordinates) {
+          const [lng, lat] = session.geoLocation.coordinates;
+          L.marker([lat, lng])
+            .addTo(map)
+            .bindPopup(`<strong>${session.title}</strong><br>${session.gym}`);
+        }
+      });
+    });
+  </script>
+
+    {{#if error}}
+      <div class="error-msg">{{error}}</div>
+    {{/if}}
+
+  {{#if error}}<div class="error-msg">{{error}}</div>{{/if}}
+  {{#if success}}<div class="success-msg">{{success}}</div>{{/if}}
+
+  <!-- Filters -->
+  <form id="filterForm" method="GET" action="/gymBuddy/find" class="filter-form">
+    <div class="filter-group">
+      <label for="experienceFilter">Experience:</label>
+      <select name="experience" id="experienceFilter">
+        <option value="">All Experience Levels</option>
+        <option value="newcomer" {{#if (eq currentExperience "newcomer")}}selected{{/if}}>Newcomer</option>
+        <option value="1+ year" {{#if (eq currentExperience "1+ year")}}selected{{/if}}>1+ Year</option>
+        <option value="3+ year" {{#if (eq currentExperience "3+ year")}}selected{{/if}}>3+ Years</option>
+        <option value="5+ year" {{#if (eq currentExperience "5+ year")}}selected{{/if}}>5+ Years</option>
+        <option value="10+ year" {{#if (eq currentExperience "10+ year")}}selected{{/if}}>10+ Years</option>
+      </select>
+    </div>
+
+    <div class="filter-group">
+      <label for="workoutTypeFilter">Workout Type:</label>
+      <select name="workoutType" id="workoutTypeFilter">
+        <option value="">All Workout Types</option>
+        <option value="Cardio" {{#if (eq currentWorkoutType "Cardio")}}selected{{/if}}>Cardio</option>
+        <option value="Body Building" {{#if (eq currentWorkoutType "Body Building")}}selected{{/if}}>Body Building</option>
+        <option value="Power Lifting" {{#if (eq currentWorkoutType "Power Lifting")}}selected{{/if}}>Power Lifting</option>
+        <option value="Calisthenics" {{#if (eq currentWorkoutType "Calisthenics")}}selected{{/if}}>Calisthenics</option>
+        <option value="Yoga" {{#if (eq currentWorkoutType "Yoga")}}selected{{/if}}>Yoga</option>
+        <option value="Other" {{#if (eq currentWorkoutType "Other")}}selected{{/if}}>Other</option>
+      </select>
+    </div>
+
+    <button type="submit">Filter</button>
+  </form>
+
+  <!-- Session Cards -->
+  <div class="session-container">
+    {{#each sessions}}
+    <div class="session-card">
+      <h3>{{this.title}}</h3>
+      <p><strong>Gym:</strong> {{this.gym}}</p>
+      <p><strong>Date:</strong> {{this.formattedDateTime}}</p>
+      <p><strong>Hosted By:</strong> {{this.hostedBy.username}}</p>
+      <p><strong>Slots:</strong> {{this.currentMembers}} / {{this.maxMembers}}</p>
+
+      <a href="/gymBuddy/find/{{this._id}}">
+        <button type="button">View Details</button>
+      </a>
+    </div>
+        <button type="button" onclick="openModal('{{this._id}}')">View Details</button>
+
+        <!-- Modal -->
+        <div id="modal-{{this._id}}" class="modal">
+          <div class="modal-content">
+            <span class="close" onclick="closeModal('{{this._id}}')">&times;</span>
+            <h2>{{this.title}}</h2>
+            <p><strong>Hosted By:</strong> 
+              <a href="/profile/view/{{this.hostedBy._id}}" class="host-link">{{this.hostedBy.username}}</a>
+            </p>
+            <p><strong>Gym:</strong> {{this.gym}}</p>
+            <p><strong>Description:</strong> {{this.description}}</p>
+            <p><strong>Location:</strong> {{this.gymlocation}}</p>
+            <p><strong>Experience:</strong> {{this.experience}}</p>
+            <p><strong>Workout Type:</strong> {{this.workoutType}}</p>
+            <p><strong>Date & Time:</strong> {{this.formattedDateTime}}</p>
+            <p><strong>Slots:</strong> {{this.currentMembers}} / {{this.maxMembers}}</p>
+            <div id="session-map-{{this._id}}" style="height: 200px; margin-top: 10px;"></div>
+            {{#if this.members}}
+                {{#if this.members.length}}
+                    <p><strong>Attending:</strong></p>
+                <ul>
+                {{#each this.members}}
+        <a href="/profile/userview/{{this._id}}" class="player-link">{{this.username}}</a>
+                {{/each}}
+            </ul>
+            {{else}}
+            <p><em>No members joined yet.</em></p>
+            {{/if}}
+            {{/if}}
+            
+        
+            {{#if this.isHost}}
+              <p class="host-msg">You are hosting this session 🧑‍🏫</p>
+            {{else}}
+              {{#if this.hasJoined}}
+                  <p class="joined-msg">You’ve already joined this session ✅</p>
+                  <form action="/gymBuddy/leave/{{this._id}}" method="POST" onsubmit="return confirm('Are you sure you want to leave this session?');">
+                    <button type="submit">Leave Session</button>
+                  </form>
+                {{else}}
+                  {{#if ../isLoggedIn}}
+                    <form action="/gymBuddy/join/{{this._id}}" method="POST">
+                      <button type="submit" {{#if (eq this.currentMembers this.maxMembers)}}disabled{{/if}}>
+                        {{#if (eq this.currentMembers this.maxMembers)}}Full{{else}}Join{{/if}}
+                      </button>
+                    </form>
+                  {{else}}
+                    <a href="/login?error=Please log in to join a session">
+                      <button>Login to Join</button>
+                    </a>
+                  {{/if}}
+                {{/if}}
+            {{/if}}
+          </div>
+        </div>
+      </div>
+    {{/each}}
+  </div>
+
+  <!-- Modal JS -->
+  <script>
+    function openModal(id) {
+  document.getElementById(`modal-${id}`).style.display = "flex";
+}
+
+function closeModal(id) {
+  document.getElementById(`modal-${id}`).style.display = "none";
+}
+
+window.onclick = function (event) {
+  document.querySelectorAll('.modal').forEach(modal => {
+    if (event.target === modal) {
+      modal.style.display = "none";
+    }
+  });
+};
+  </script>
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const sessions = {{{json sessions}}};
+    sessions.forEach(session => {
+      if (session.geoLocation && session.geoLocation.coordinates) {
+        const [lng, lat] = session.geoLocation.coordinates;
+        const mapDivId = `session-map-${session._id}`;
+        const mapDiv = document.getElementById(mapDivId);
+        if (mapDiv) {
+          const map = L.map(mapDivId).setView([lat, lng], 13);
+          L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: "© OpenStreetMap contributors"
+          }).addTo(map);
+          L.marker([lat, lng]).addTo(map).bindPopup(session.gym);
+        }
+      }
+    });
+  });
+</script>
+</main>

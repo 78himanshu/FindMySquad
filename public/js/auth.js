@@ -27,12 +27,6 @@ document.addEventListener("DOMContentLoaded", () => {
     signupForm.addEventListener("submit", async (e) => {
       e.preventDefault();
 
-      // console.log("first")
-      // Clear previous errors
-      // document.querySelectorAll(".form__error").forEach((el) => (el.textContent = ""));
-      // const signupError = document.getElementById("error-messages");
-      // if (signupError) signupError.textContent = "";
-
       const submitButton = signupForm.querySelector(".submit-button");
       submitButton.disabled = true;
       submitButton.textContent = "Signing up...";
@@ -71,8 +65,13 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         showToast("Signup successful! Redirecting...", "success");
+
         setTimeout(() => {
-          window.location.href = "/login";
+          if (data.redirect) {
+            window.location.href = data.redirect; // redirect to /profile/addprofile
+          } else {
+            window.location.href = "/login"; // fallback
+          }
         }, 1500);
       } catch (error) {
         showToast(error.message || "Something went wrong", "error");
@@ -129,6 +128,7 @@ document.addEventListener("DOMContentLoaded", () => {
         });
 
         const data = await response.json();
+        console.log("data", data);
 
         if (!response.ok) {
           if (data.errors) {
@@ -145,9 +145,16 @@ document.addEventListener("DOMContentLoaded", () => {
         showToast("Login successful! Redirecting...", "success");
 
         setTimeout(() => {
-          // Go to the page user originally intended to visit
-          window.location.href = data.redirect || "/";
-        }, 1000);
+          if (data.redirect) {
+            //  Redirect to the original page user intended (e.g., /host)
+            window.location.href = data.redirect;
+          } else if (data.user.profileCompleted) {
+            // fallback logic if no redirect provided
+            window.location.href = "/";
+          } else {
+            window.location.href = "/profile/addprofile";
+          }
+        }, 1500);
       } catch (error) {
         showToast(error.message || "Something went wrong", "error");
       } finally {
@@ -171,9 +178,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Username
     if (!/^[a-zA-Z0-9]{3,20}$/.test(username)) {
-      // document.getElementById("usernameError").textContent =
-      //   "Username must be 3–20 characters (letters and numbers only)";
-      // isValid = false;
       showToast(
         "Username must be 3–20 characters (letters and numbers only)",
         "error"
@@ -183,8 +187,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Email
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      // document.getElementById("emailError").textContent =
-      //   "Please enter a valid email address";
       showToast("Please enter a valid email address", "error");
 
       isValid = false;
