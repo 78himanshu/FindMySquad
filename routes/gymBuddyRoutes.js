@@ -38,19 +38,7 @@ router
       return res.status(400).json({ error: "Request body cannot be empty" });
     }
 
-    const {
-      title,
-      gym,
-      description,
-      date,
-      startTime,
-      endTime,
-      gymlocation,
-      experience,
-      workoutType,
-      hostedBy,
-      maxMembers,
-    } = data;
+    const { title, gym, description, date, startTime, endTime, gymlocation, experience, workoutType, hostedBy, maxMembers } = data;
 
     if (!ObjectId.isValid(hostedBy)) {
       return res.status(400).json({ error: "Invalid hostedBy ID" });
