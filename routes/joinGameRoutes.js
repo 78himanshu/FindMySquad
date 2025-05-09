@@ -133,10 +133,12 @@ router
 
       const now = Date.now();
       allGames = await hostGameData.getAllGames({});
-      allGames = allGames.filter(game => new Date(game.endTime).getTime() > now); // ✅ Fix: show only ongoing/upcoming games
-                  
+      allGames = allGames.filter(
+        (game) => new Date(game.endTime).getTime() > now
+      );
+
       const upcomingGames = allGames;
-      
+
       upcomingGames.sort(
         (a, b) => new Date(a.startTime) - new Date(b.startTime)
       );
@@ -145,9 +147,9 @@ router
       const plainAllGames = upcomingGames.map((x) => x.toObject());
 
       const plainRecommendation = recommendation
-      .filter((g) => new Date(g.endTime).getTime() > now)
-      .map((x) => x.toObject());
-        
+        .filter((g) => new Date(g.endTime).getTime() > now)
+        .map((x) => x.toObject());
+
       res.render("joinGame/joinGameForm", {
         recommendedGames: plainRecommendation, //.length > 0 ? plainRecommendation : plainAllGames,
         allGames: plainAllGames,
@@ -201,7 +203,9 @@ router
       );
 
       if (new Date(targetGame.startTime).getTime() <= Date.now()) {
-        return res.redirect(`/join/${gameId}?error=This game has already started and cannot be joined.`);
+        return res.redirect(
+          `/join/${gameId}?error=This game has already started and cannot be joined.`
+        );
       }
 
       // Check for time clash with already joined games
@@ -221,7 +225,7 @@ router
 
       await joinGameData.joinGame(gameId, userId);
 
-      const user = await User.findById(userId); // ✅ Must come first
+      const user = await User.findById(userId);
 
       await sendGameEmail(
         user.email,
@@ -284,6 +288,7 @@ router.get("/filter", auth, async (req, res) => {
     res.status(500).send(e.message);
   }
 });
+
 router.get("/success", (req, res) => {
   res.render("joinGame/joinGameSuccess", {
     title: "Successfully Joined",
@@ -294,6 +299,7 @@ router.get("/success", (req, res) => {
             `,
   });
 });
+
 router.get("/:id", async (req, res) => {
   //http://localhost:8080/join/67f970e5d5c97b58736c31be
   try {

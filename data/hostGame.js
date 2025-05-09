@@ -44,7 +44,8 @@ export const createGame = async (
   const trimmedSkillLevel = checkString(skillLevel, "Skill Level", 1);
   const trimmedLocation = checkString(location, "Location", 1);
   const trimmedDescription = checkString(description, "Description", 1);
-  const trimmedExtraInfo = typeof extraInfo === "string" ? extraInfo.trim() : "";
+  const trimmedExtraInfo =
+    typeof extraInfo === "string" ? extraInfo.trim() : "";
 
   checkNumber(playersRequired, "Players Required", 1);
   checkNumber(costPerHead, "Cost per Head", 0);
@@ -60,9 +61,12 @@ export const createGame = async (
     throw new Error("Invalid or missing geoLocation");
   }
 
-  if (!(startTime instanceof Date) || isNaN(startTime.getTime())) throw new Error("Invalid start time");
-  if (!(endTime instanceof Date) || isNaN(endTime.getTime())) throw new Error("Invalid end time");
-  if (startTime >= endTime) throw new Error("End time must be after start time");
+  if (!(startTime instanceof Date) || isNaN(startTime.getTime()))
+    throw new Error("Invalid start time");
+  if (!(endTime instanceof Date) || isNaN(endTime.getTime()))
+    throw new Error("Invalid end time");
+  if (startTime >= endTime)
+    throw new Error("End time must be after start time");
 
   const newGame = new Game({
     title: trimmedTitle,
@@ -80,7 +84,7 @@ export const createGame = async (
     costShared: Boolean(costShared),
     extraInfo: trimmedExtraInfo,
     players: [host],
-    playersGoing: 1
+    playersGoing: 1,
   });
 
   const savedGame = await newGame.save();
@@ -88,8 +92,6 @@ export const createGame = async (
 
   return savedGame;
 };
-
-
 
 export const getAllGames = async (filters = {}) => {
   return await Game.find(filters);
@@ -129,7 +131,8 @@ export const updateGame = async (gameId, updates, hostId) => {
 
   const game = await Game.findById(gameId);
   if (!game) throw new Error("Game not found");
-  if (game.host.toString() !== hostId) throw new Error("Unauthorized edit attempt");
+  if (game.host.toString() !== hostId)
+    throw new Error("Unauthorized edit attempt");
 
   if (updates.geoLocation) {
     const g = updates.geoLocation;
@@ -139,7 +142,8 @@ export const updateGame = async (gameId, updates, hostId) => {
       g.coordinates.length !== 2 ||
       isNaN(g.coordinates[0]) ||
       isNaN(g.coordinates[1])
-    ) throw "Invalid geoLocation";
+    )
+      throw "Invalid geoLocation";
     game.geoLocation = g;
   }
 
@@ -155,7 +159,7 @@ export const updateGame = async (gameId, updates, hostId) => {
     "location",
     "bringEquipment",
     "costShared",
-    "extraInfo"
+    "extraInfo",
   ];
 
   allowedFields.forEach((field) => {
@@ -177,7 +181,8 @@ export const updateGame = async (gameId, updates, hostId) => {
       } else if (["bringEquipment", "costShared"].includes(field)) {
         game[field] = Boolean(updates[field]);
       } else if (field === "extraInfo") {
-        game[field] = typeof updates[field] === "string" ? updates[field].trim() : "";
+        game[field] =
+          typeof updates[field] === "string" ? updates[field].trim() : "";
       }
     }
   });
@@ -186,7 +191,6 @@ export const updateGame = async (gameId, updates, hostId) => {
   return game;
 };
 
-
 export async function deleteGame(gameId, userID) {
   if (!gameId) throw new Error("Game ID is required");
   await updateKarmaPoints(userID, -15);
@@ -194,10 +198,9 @@ export async function deleteGame(gameId, userID) {
 }
 
 export const upcomingGames = async () => {
-
   const upcomingGames = await Game.find({
-    startTime: { $gte: new Date() } // games starting now or in future
+    startTime: { $gte: new Date() }, // games starting now or in future
   }).sort({ startTime: 1 });
 
   return upcomingGames;
-}
+};

@@ -3,10 +3,22 @@ import { ObjectId } from "mongodb";
 import { checkString } from "../utils/helper.js";
 import UserProfile from "../models/userProfile.js";
 import { updateKarmaPoints } from "../utils/karmaHelper.js";
-import "../models/User.js"
+import "../models/User.js";
 import fetch from "node-fetch";
 
-export const createGymSession = async (title, gym, description, date, startTime, endTime, gymlocation, experience, workoutType, hostedBy, maxMembers) => {
+export const createGymSession = async (
+  title,
+  gym,
+  description,
+  date,
+  startTime,
+  endTime,
+  gymlocation,
+  experience,
+  workoutType,
+  hostedBy,
+  maxMembers
+) => {
   if (
     !title ||
     !gym ||
@@ -38,8 +50,8 @@ export const createGymSession = async (title, gym, description, date, startTime,
 
   const response = await fetch(apiURL, {
     headers: {
-      "User-Agent": "FindMySquad-GymBuddy"
-    }
+      "User-Agent": "FindMySquad-GymBuddy",
+    },
   });
   const geoData = await response.json();
 
@@ -47,7 +59,7 @@ export const createGymSession = async (title, gym, description, date, startTime,
 
   const latitude = parseFloat(geoData[0].lat);
   const longitude = parseFloat(geoData[0].lon);
-  
+
   // ⚡ Combine date and time for internal validation
   const startDateTime = new Date(`${date}T${startTime}`);
   const endDateTime = new Date(`${date}T${endTime}`);
@@ -65,9 +77,9 @@ export const createGymSession = async (title, gym, description, date, startTime,
     title: trimmedTitle,
     gym: trimmedGym,
     description: trimmedDescription,
-    date: date,                // e.g., "2025-05-01"
-    startTime: startTime,       // e.g., "19:00"
-    endTime: endTime,           // e.g., "21:00"
+    date: date, // e.g., "2025-05-01"
+    startTime: startTime, // e.g., "19:00"
+    endTime: endTime, // e.g., "21:00"
     gymlocation: trimmedLocation,
     experience: trimmedExperience,
     workoutType: trimmedWorkout,
@@ -76,7 +88,7 @@ export const createGymSession = async (title, gym, description, date, startTime,
     currentMembers: 0,
     geoLocation: {
       type: "Point",
-      coordinates: [longitude, latitude]
+      coordinates: [longitude, latitude],
     },
   });
 
@@ -87,15 +99,6 @@ export const createGymSession = async (title, gym, description, date, startTime,
   }
 
   await updateKarmaPoints(hostedBy, 15);
-
-  // ⚡ Add the session to the user's hosted sessions
-  // const user = await UserProfile.findById(hostedBy);
-  // if (!user) throw "User not found";
-  // user.hostedSessions.push(saved._id);
-  // await user.save();
-  // console.log("saved", saved);
-  // console.log("user", user);
-
 
   return saved;
 };
@@ -155,7 +158,7 @@ export const getAllGymSessions = async () => {
   return await Gym.find({}).populate("hostedBy", "username");
 };
 
-// NEW: get all gym sessions where this user is a member
+// get all gym sessions where this user is a member
 export const getJoinedSessionsByUser = async (userId) => {
   if (!ObjectId.isValid(userId)) throw "Invalid user ID";
   // Assumes your Gym schema has a `members: [ObjectId]` field

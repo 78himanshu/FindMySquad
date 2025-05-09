@@ -40,7 +40,7 @@ const gameStructure = new structure({
   },
   bringEquipment: { type: Boolean, default: false },
   costShared: { type: Boolean, default: false },
-  extraInfo: { type: String, default: "" }
+  extraInfo: { type: String, default: "" },
 });
 
 gameStructure.index({ geoLocation: "2dsphere" });

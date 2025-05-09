@@ -1,7 +1,6 @@
 import Game from "../models/hostGame.js";
 import { ObjectId } from "mongodb";
-import { updateKarmaPoints } from "../utils/karmaHelper.js"; 
-
+import { updateKarmaPoints } from "../utils/karmaHelper.js";
 
 export const joinGame = async (gameId, userId) => {
   if (!ObjectId.isValid(gameId) || !ObjectId.isValid(userId)) {
@@ -51,23 +50,13 @@ export const leaveGame = async (gameId, userId) => {
   if (!game) {
     throw new Error("Game not found.");
   }
-  //Removing this since data layer should be reusable and decoupled from Express
   if (game.host.toString() === userId.toString()) {
-    //const game = await hostGameData.getGameById(gameId);
-    // return res.render("joinGame/gameDetails", {
-    //   game: game.toObject(),
-    //   isLoggedIn: true,
-    //   userId,
-    //   hostId: req.user.userID,
-    //   hasJoined: true,
-    //   error: "Host cannot leave their own game",
-    //   layout: "main",
-    //   head: `<link rel="stylesheet" href="/css/joinGame.css">`,
-    // });
     throw new Error("Host cannot leave their own game");
   }
 
-  const isInGame = game.players.some((id) => id.toString() === userId.toString());
+  const isInGame = game.players.some(
+    (id) => id.toString() === userId.toString()
+  );
   if (!isInGame) {
     throw new Error("You have not joined this game");
   }
@@ -81,5 +70,5 @@ export const leaveGame = async (gameId, userId) => {
   await updateKarmaPoints(userId, -10);
   await game.save();
   //adding return statement
-  return game
+  return game;
 };

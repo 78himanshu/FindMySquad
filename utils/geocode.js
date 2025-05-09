@@ -1,5 +1,5 @@
-import axios from 'axios';
-import dotenv from 'dotenv';
+import axios from "axios";
+import dotenv from "dotenv";
 dotenv.config();
 
 export async function geocodeCity(city) {
@@ -15,8 +15,8 @@ export async function geocodeCity(city) {
 
     const { lat, lng } = result.geometry.location;
     return {
-      type: 'Point',
-      coordinates: [lng, lat]
+      type: "Point",
+      coordinates: [lng, lat],
     };
   } catch (err) {
     throw new Error("Geocoding failed");

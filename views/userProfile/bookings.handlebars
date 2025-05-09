@@ -14,7 +14,8 @@
           <p class="card-text"><strong>Venue:</strong> {{venue}}</p>
 
           {{#ifCond players.length '>' 1}}
-          <button class="btn btn-primary btn-sm mb-2 rate-players-btn" data-booking-id="{{_id}}">
+          <button class="btn btn-primary btn-sm mb-2 rate-players-btn"
+            data-booking-id="{{_id}}">
             Rate Players
           </button>
           {{/ifCond}}
@@ -26,22 +27,26 @@
               <div class="rating-section mb-2">
                 <a href="/profile/userview/{{_id}}"
                   class="d-block mb-1 fw-semibold text-decoration-none text-dark">{{username}}</a>
-                <div class="stars {{#if hasBeenRated}}disabled{{/if}}" data-user-id="{{_id}}"
+                <div class="stars {{#if hasBeenRated}}disabled{{/if}}"
+                  data-user-id="{{_id}}"
                   data-rated="{{hasBeenRated}}">
                   {{#each (range 1 5)}}
-                  <i class="bi bi-star-fill star {{#if (lte this ../ratedScore)}}selected{{/if}}"
+                  <i
+                    class="bi bi-star-fill star {{#if (lte this ../ratedScore)}}selected{{/if}}"
                     data-score="{{this}}"></i>
                   {{/each}}
                 </div>
 
                 {{#if hasBeenRated}}
-                <input type="hidden" name="ratings[]" value='{{json (object "userId" _id "score" ratedScore)}}' />
+                <input type="hidden" name="ratings[]"
+                  value='{{json (object "userId" _id "score" ratedScore)}}' />
                 {{/if}}
               </div>
               {{/ifCond}}
               {{/each}}
 
-              <button type="submit" class="btn btn-success btn-sm">Submit Ratings</button>
+              <button type="submit" class="btn btn-success btn-sm">Submit
+                Ratings</button>
             </form>
           </div>
         </div>
@@ -64,7 +69,8 @@
           <p class="card-text"><strong>Gym:</strong> {{gym}}</p>
 
           {{#ifCond players.length '>' 1}}
-          <button class="btn btn-primary btn-sm mb-2 rate-players-btn" data-booking-id="{{_id}}">
+          <button class="btn btn-primary btn-sm mb-2 rate-players-btn"
+            data-booking-id="{{_id}}">
             Rate Players
           </button>
           {{/ifCond}}
@@ -76,22 +82,26 @@
               <div class="rating-section mb-2">
                 <a href="/profile/userview/{{_id}}"
                   class="d-block mb-1 fw-semibold text-decoration-none text-dark">{{username}}</a>
-                <div class="stars {{#if hasBeenRated}}disabled{{/if}}" data-user-id="{{_id}}"
+                <div class="stars {{#if hasBeenRated}}disabled{{/if}}"
+                  data-user-id="{{_id}}"
                   data-rated="{{hasBeenRated}}">
                   {{#each (range 1 5)}}
-                  <i class="bi bi-star-fill star {{#if (lte this ../ratedScore)}}selected{{/if}}"
+                  <i
+                    class="bi bi-star-fill star {{#if (lte this ../ratedScore)}}selected{{/if}}"
                     data-score="{{this}}"></i>
                   {{/each}}
                 </div>
 
                 {{#if hasBeenRated}}
-                <input type="hidden" name="ratings[]" value='{{json (object "userId" _id "score" ratedScore)}}' />
+                <input type="hidden" name="ratings[]"
+                  value='{{json (object "userId" _id "score" ratedScore)}}' />
                 {{/if}}
               </div>
               {{/ifCond}}
               {{/each}}
 
-              <button type="submit" class="btn btn-success btn-sm">Submit Ratings</button>
+              <button type="submit" class="btn btn-success btn-sm">Submit
+                Ratings</button>
             </form>
           </div>
         </div>

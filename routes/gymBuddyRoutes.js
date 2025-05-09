@@ -150,7 +150,7 @@ router
         );
       }
 
-      // 🪵 Log inputs for debugging
+      // Log inputs for debugging
       console.log("Creating session with:", {
         title,
         gym,

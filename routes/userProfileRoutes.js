@@ -11,11 +11,6 @@ const ObjectId = mongoose.Types.ObjectId;
 import { format } from "date-fns";
 import axios from "axios";
 
-
-
-
-
-
 const router = Router();
 
 // -----------------------------------------
@@ -141,7 +136,9 @@ router
       ) {
         return res
           .status(400)
-          .json({ error: "Invalid city address, could not get location coordinates." });
+          .json({
+            error: "Invalid city address, could not get location coordinates.",
+          });
       }
       const { lat, lng } = geoRes.data.results[0].geometry.location;
       updateData.location.geoLocation = {
@@ -155,7 +152,11 @@ router
         return res.status(404).json({ error: "Profile not updated" });
       }
 
-      return res.json({ success: true, message: "Profile updated", data: updated });
+      return res.json({
+        success: true,
+        message: "Profile updated",
+        data: updated,
+      });
     } catch (err) {
       console.error("Edit profile error:", err);
       res.status(500).json({ error: "Server error" });
@@ -293,17 +294,10 @@ router.route("/addprofile").get(verifyToken, async (req, res) => {
       "Strategy",
       "Puzzle",
     ],
-    // firstName: user.firstName || '',
-    // lastName: user.lastName || '',
-    // gender: user.gender || '',
-    // bio: user.bio || '',
-    // selectedPic: user.profilePic || '',
-    // selectedSports: user.sportsInterests || [],
   });
 });
 
 // ————— Show All Bookings Page ——————
-
 
 router.get("/bookings", verifyToken, async (req, res) => {
   const userId = req.user.userID;
@@ -416,7 +410,6 @@ router.get("/bookings", verifyToken, async (req, res) => {
   }
 });
 
-
 // ————— Rate Players API ——————
 
 router.post("/bookings/rate", verifyToken, async (req, res) => {
@@ -464,10 +457,11 @@ router.post("/bookings/rate", verifyToken, async (req, res) => {
     return res.json({ success: true });
   } catch (e) {
     console.error("Error saving ratings:", e);
-    return res.status(500).json({ error: "An error occurred while saving ratings." });
+    return res
+      .status(500)
+      .json({ error: "An error occurred while saving ratings." });
   }
 });
-
 
 // ————— Show Rate Players Form ——————
 router.get("/bookings/rate/:bookingId", verifyToken, async (req, res) => {
@@ -509,7 +503,6 @@ router.get("/view/:targetUserId", verifyToken, async (req, res) => {
   try {
     const profile = await userProfileData.getProfile(req.params.targetUserId);
 
-
     const isOwn = req.params.targetUserId === req.user.userID;
     const isFollowing = profile.followers
       .map((f) => f.toString())
@@ -545,7 +538,6 @@ router.get("/view/:targetUserId", verifyToken, async (req, res) => {
 router.get("/userview/:targetUserId", verifyToken, async (req, res) => {
   try {
     const profile = await userProfileData.getProfile(req.params.targetUserId);
-
 
     const isOwn = req.params.targetUserId === req.user.userID;
     const isFollowing = profile.followers

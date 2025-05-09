@@ -24,7 +24,6 @@ export const login = async (email, password) => {
   const trimmedemail = checkString(email, "email", 1).toLowerCase();
   const trimmedpassword = checkString(password, "password", 1);
 
-  // console.log("trimmedemail", trimmedemail);
   const user = await Userlist.findOne({ email: trimmedemail });
   console.log("user", user);
 
@@ -61,16 +60,6 @@ export const login = async (email, password) => {
     profilePic,
   };
 };
-
-// res.status(200).json({
-//     message: 'Login successful',
-//     token,
-//     user: {
-//         id: user._id,
-//         username: user.username,
-//         email: user.email,
-//     },
-// });
 
 export const signup = async (username, email, password) => {
   if (!username || !email || !password) {

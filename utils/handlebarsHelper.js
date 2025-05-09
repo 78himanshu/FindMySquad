@@ -19,14 +19,14 @@ export default hbsInstance;
 
 import Handlebars from "handlebars";
 
-Handlebars.registerHelper('isStartingSoon', function(date) {
+Handlebars.registerHelper("isStartingSoon", function (date) {
   const eventTime = new Date(date).getTime();
   const now = Date.now();
   const diff = eventTime - now;
-  return diff > 0 && diff < (24 * 60 * 60 * 1000); // within 24 hours
+  return diff > 0 && diff < 24 * 60 * 60 * 1000; // within 24 hours
 });
 
-Handlebars.registerHelper('timeUntil', function(date) {
+Handlebars.registerHelper("timeUntil", function (date) {
   const eventTime = new Date(date).getTime();
   const now = Date.now();
   let diff = eventTime - now;
@@ -44,7 +44,6 @@ Handlebars.registerHelper('timeUntil', function(date) {
   }
 });
 
-
-Handlebars.registerHelper('lt', function (a, b) {
+Handlebars.registerHelper("lt", function (a, b) {
   return a < b;
 });

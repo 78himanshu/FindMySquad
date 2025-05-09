@@ -4,7 +4,7 @@ import { geocodeCity } from "../utils/geocode.js";
 import UserProfile from "../models/userProfile.js";
 import { checkString } from "../utils/helper.js";
 import Userlist from "../models/User.js";
-import mongoose from 'mongoose';
+import mongoose from "mongoose";
 
 export const createProfile = async (userId, data) => {
   console.log(">>>", userId);
@@ -45,9 +45,12 @@ export const updateProfile = async (userId, data) => {
   const update = {};
 
   if (data.profile) {
-    if (data.profile.firstName) update["profile.firstName"] = data.profile.firstName.trim();
-    if (data.profile.lastName) update["profile.lastName"] = data.profile.lastName.trim();
-    if (data.profile.gender) update["profile.gender"] = data.profile.gender.trim();
+    if (data.profile.firstName)
+      update["profile.firstName"] = data.profile.firstName.trim();
+    if (data.profile.lastName)
+      update["profile.lastName"] = data.profile.lastName.trim();
+    if (data.profile.gender)
+      update["profile.gender"] = data.profile.gender.trim();
     if (data.profile.bio) update["profile.bio"] = data.profile.bio.trim();
   }
 
@@ -73,7 +76,6 @@ export const updateProfile = async (userId, data) => {
 
   return updatedProfile;
 };
-
 
 export const deleteProfile = async (userId) => {
   const deleted = await UserProfile.findOneAndDelete({ userId });
@@ -130,8 +132,8 @@ export const followUser = async (userId, targetUserId) => {
     throw "Already following";
   }
 
-  targetProfile.followers.push(new ObjectId(userId)); // <-- FIXED
-  followerProfile.following.push({ userId: new ObjectId(targetUserId) }); // <-- FIXED
+  targetProfile.followers.push(new ObjectId(userId));
+  followerProfile.following.push({ userId: new ObjectId(targetUserId) });
 
   await targetProfile.save();
   await followerProfile.save();
@@ -183,19 +185,16 @@ export const unfollowUser = async (userId, targetUserId) => {
   return targetProfile.followers.length;
 };
 
-
-
-
 export const getTopKarmaUsers = async () => {
   try {
     const topUsers = await UserProfile.find(
       {},
       {
-        'profile.firstName': 1,
-        'profile.lastName': 1,
+        "profile.firstName": 1,
+        "profile.lastName": 1,
         userId: 1,
         karmaPoints: 1,
-        _id: 0
+        _id: 0,
       }
     )
       .sort({ karmaPoints: -1 })
@@ -208,28 +207,3 @@ export const getTopKarmaUsers = async () => {
     return [];
   }
 };
-
-
-// export const getTopKarmaUsers = async () => {
-//  try{
-
-//   const topUsers = await UserProfile.aggregate([
-//     {
-//       $project: {
-//         firstName: "$profile.firstName",
-//         lastName: "$profile.lastName",
-//         karma: "$karmaPoints"
-//       }
-//     },
-//     { $sort: { karma: -1 } },
-//     { $limit: 5 }
-//   ]);
-
-//   console.log("✅ Fetched topUsers in getTopKarmaUsers():", topUsers);
-//     return topUsers;
-//   } catch (err) {
-//     console.error("❌ Error in getTopKarmaUsers():", err);
-//     return [];
-//   }
-//   //return topUsers;
-// };

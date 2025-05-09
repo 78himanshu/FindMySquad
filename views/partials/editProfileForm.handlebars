@@ -5,21 +5,26 @@
         <div class="row">
             <div class="col-md-4">
                 <label for="firstName" class="form-label">First Name</label>
-                <input type="text" id="firstName" name="firstName" class="form-control" value="{{firstName}}">
+                <input type="text" id="firstName" name="firstName"
+                    class="form-control" value="{{firstName}}">
                 <div id="firstNameError" class="form-text text-danger"></div>
             </div>
             <div class="col-md-4">
                 <label for="lastName" class="form-label">Last Name</label>
-                <input type="text" id="lastName" name="lastName" class="form-control" value="{{lastName}}">
+                <input type="text" id="lastName" name="lastName"
+                    class="form-control" value="{{lastName}}">
                 <div id="lastNameError" class="form-text text-danger"></div>
             </div>
             <div class="col-md-4">
                 <label for="gender" class="form-label">Gender</label>
                 <select id="gender" name="gender" class="form-select">
-                    <option value="">Select Gender</option>
-                    <option value="Male" {{#if (eq gender "Male" )}}selected{{/if}}>Male</option>
-                    <option value="Female" {{#if (eq gender "Female" )}}selected{{/if}}>Female</option>
-                    <option value="Other" {{#if (eq gender "Other" )}}selected{{/if}}>Other</option>
+                    <option value>Select Gender</option>
+                    <option value="Male" {{#if (eq gender "Male"
+                        )}}selected{{/if}}>Male</option>
+                    <option value="Female" {{#if (eq gender "Female"
+                        )}}selected{{/if}}>Female</option>
+                    <option value="Other" {{#if (eq gender "Other"
+                        )}}selected{{/if}}>Other</option>
                 </select>
                 <div id="genderError" class="form-text text-danger"></div>
             </div>
@@ -27,26 +32,31 @@
 
         <div class="mb-3">
             <label for="bio" class="form-label">Bio</label>
-            <textarea id="bio" name="bio" class="form-control" rows="3">{{bio}}</textarea>
+            <textarea id="bio" name="bio" class="form-control"
+                rows="3">{{bio}}</textarea>
             <div id="bioError" class="form-text text-danger"></div>
         </div>
 
         <div class="row mb-4">
             <div class="col-md-6">
                 <label for="autocomplete" class="form-label">Location</label>
-                <input type="text" id="autocomplete" name="city" class="form-control" placeholder="Enter your location" value="{{city}}">
+                <input type="text" id="autocomplete" name="city"
+                    class="form-control" placeholder="Enter your location"
+                    value="{{city}}">
                 <div id="cityError" class="form-text text-danger"></div>
             </div>
 
             <div class="col-md-6">
                 <label for="phoneNumber" class="form-label">Phone Number</label>
-                <input type="text" id="phoneNumber" name="phoneNumber" class="form-control" placeholder="1234567890"
+                <input type="text" id="phoneNumber" name="phoneNumber"
+                    class="form-control" placeholder="1234567890"
                     value="{{phoneNumber}}">
                 <div id="phoneError" class="form-text text-danger"></div>
             </div>
         </div>
         <div class="d-grid">
-            <button type="submit" class="btn btn-primary submit-button">Save Changes</button>
+            <button type="submit" class="btn btn-primary submit-button">Save
+                Changes</button>
         </div>
     </form>
     <!-- Toast container for notifications -->
@@ -54,7 +64,8 @@
 
 </main>
 
-<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBP-FJZsXytqUxzesnIEkrkUu4JoB1zO-M&libraries=places"></script>
+<script
+    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBP-FJZsXytqUxzesnIEkrkUu4JoB1zO-M&libraries=places"></script>
 
 <script>
   document.addEventListener('DOMContentLoaded', () => {

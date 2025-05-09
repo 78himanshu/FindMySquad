@@ -4,49 +4,67 @@
       <h2 class="mb-0">{{#if game}}Edit Game{{else}}Host a Game{{/if}}</h2>
     </div>
     <div class="card-body">
-      <form class="host-game-form" data-edit="{{#if game}}true{{else}}false{{/if}}" data-game-id="{{game._id}}">
+      <form class="host-game-form"
+        data-edit="{{#if game}}true{{else}}false{{/if}}"
+        data-game-id="{{game._id}}">
         <div class="mb-3">
-          <input type="text" name="title" class="form-control" placeholder="Title" value="{{game.title}}" />
+          <input type="text" name="title" class="form-control"
+            placeholder="Title" value="{{game.title}}" />
         </div>
 
         <div class="row g-3">
           <div class="col-md-4">
             <div class="mb-3">
               <select name="sport" id="sportSelect" class="form-select">
-                <option value="">Select Sport</option>
-                <option value="Soccer" {{#if (eq game.sport "Soccer" )}}selected{{/if}}>Soccer</option>
-                <option value="Basketball" {{#if (eq game.sport "Basketball" )}}selected{{/if}}>Basketball</option>
-                <option value="Baseball" {{#if (eq game.sport "Baseball" )}}selected{{/if}}>Baseball</option>
-                <option value="Tennis" {{#if (eq game.sport "Tennis" )}}selected{{/if}}>Tennis</option>
-                <option value="Swimming" {{#if (eq game.sport "Swimming" )}}selected{{/if}}>Swimming</option>
-                <option value="Running" {{#if (eq game.sport "Running" )}}selected{{/if}}>Running</option>
-                <option value="Cycling" {{#if (eq game.sport "Cycling" )}}selected{{/if}}>Cycling</option>
-                <option value="Hiking" {{#if (eq game.sport "Hiking" )}}selected{{/if}}>Hiking</option>
-                <option value="Golf" {{#if (eq game.sport "Golf" )}}selected{{/if}}>Golf</option>
-                <option value="Volleyball" {{#if (eq game.sport "Volleyball" )}}selected{{/if}}>Volleyball</option>
+                <option value>Select Sport</option>
+                <option value="Soccer" {{#if (eq game.sport "Soccer"
+                  )}}selected{{/if}}>Soccer</option>
+                <option value="Basketball" {{#if (eq game.sport "Basketball"
+                  )}}selected{{/if}}>Basketball</option>
+                <option value="Baseball" {{#if (eq game.sport "Baseball"
+                  )}}selected{{/if}}>Baseball</option>
+                <option value="Tennis" {{#if (eq game.sport "Tennis"
+                  )}}selected{{/if}}>Tennis</option>
+                <option value="Swimming" {{#if (eq game.sport "Swimming"
+                  )}}selected{{/if}}>Swimming</option>
+                <option value="Running" {{#if (eq game.sport "Running"
+                  )}}selected{{/if}}>Running</option>
+                <option value="Cycling" {{#if (eq game.sport "Cycling"
+                  )}}selected{{/if}}>Cycling</option>
+                <option value="Hiking" {{#if (eq game.sport "Hiking"
+                  )}}selected{{/if}}>Hiking</option>
+                <option value="Golf" {{#if (eq game.sport "Golf"
+                  )}}selected{{/if}}>Golf</option>
+                <option value="Volleyball" {{#if (eq game.sport "Volleyball"
+                  )}}selected{{/if}}>Volleyball</option>
               </select>
             </div>
           </div>
           <div class="col-md-4">
-            <input type="number" name="playersRequired" class="form-control" placeholder="Players"
+            <input type="number" name="playersRequired" class="form-control"
+              placeholder="Players"
               value="{{game.playersRequired}}" />
           </div>
           <div class="col-md-4">
-            <input type="number" name="costPerHead" class="form-control" placeholder="Cost per Head" min="0"
+            <input type="number" name="costPerHead" class="form-control"
+              placeholder="Cost per Head" min="0"
               value="{{game.costPerHead}}" />
           </div>
         </div>
 
         <div class="row g-3">
           <div class="col-md-4">
-            <input type="date" name="gameDate" class="form-control" value="{{formatDateInput game.startTime}}" />
+            <input type="date" name="gameDate" class="form-control"
+              value="{{formatDateInput game.startTime}}" />
           </div>
           <div class="col-md-4">
-            <input type="time" name="startTime" class="form-control" placeholder="Start Time"
+            <input type="time" name="startTime" class="form-control"
+              placeholder="Start Time"
               value="{{formatTimeInput game.startTime}}" />
           </div>
           <div class="col-md-4">
-            <input type="time" name="endTime" class="form-control" placeholder="End Time"
+            <input type="time" name="endTime" class="form-control"
+              placeholder="End Time"
               value="{{formatTimeInput game.endTime}}" />
           </div>
         </div>
@@ -55,24 +73,29 @@
           <div class="col-md-6">
             <div class="mb-3">
               <select name="skillLevel" class="form-select">
-                <option value="">Select Skill Level</option>
-                <option value="Beginner" {{#if (eq game.skillLevel "Beginner" )}}selected{{/if}}>Beginner</option>
-                <option value="Intermediate" {{#if (eq game.skillLevel "Intermediate" )}}selected{{/if}}>Intermediate
+                <option value>Select Skill Level</option>
+                <option value="Beginner" {{#if (eq game.skillLevel "Beginner"
+                  )}}selected{{/if}}>Beginner</option>
+                <option value="Intermediate" {{#if (eq game.skillLevel
+                  "Intermediate" )}}selected{{/if}}>Intermediate
                 </option>
-                <option value="Advanced" {{#if (eq game.skillLevel "Advanced" )}}selected{{/if}}>Advanced</option>
+                <option value="Advanced" {{#if (eq game.skillLevel "Advanced"
+                  )}}selected{{/if}}>Advanced</option>
               </select>
             </div>
           </div>
           <div class="col-md-6">
             <div class="mb-3">
-              <input type="text" id="game-location" name="location" class="form-control" placeholder="Enter a Location"
+              <input type="text" id="game-location" name="location"
+                class="form-control" placeholder="Enter a Location"
                 value="{{game.location}}" />
             </div>
           </div>
         </div>
 
         <div class="mb-3">
-          <input type="text" name="description" class="form-control" placeholder="Description"
+          <input type="text" name="description" class="form-control"
+            placeholder="Description"
             value="{{game.description}}" />
         </div>
 
@@ -87,16 +110,20 @@
         <div class="row mb-3">
           <div class="col-md-6 d-flex align-items-center">
             <div class="form-check">
-              <input class="form-check-input me-2" type="checkbox" value="1" name="bringEquipment" id="bringEquipment"
+              <input class="form-check-input me-2" type="checkbox" value="1"
+                name="bringEquipment" id="bringEquipment"
                 {{#if game.bringEquipment}}checked{{/if}} />
-              <label class="form-check-label" for="bringEquipment">Bring your own equipment</label>
+              <label class="form-check-label" for="bringEquipment">Bring your
+                own equipment</label>
             </div>
           </div>
           <div class="col-md-6 d-flex align-items-center">
             <div class="form-check">
-              <input class="form-check-input me-2" type="checkbox" value="1" name="costShared" id="costShared" {{#if
+              <input class="form-check-input me-2" type="checkbox" value="1"
+                name="costShared" id="costShared" {{#if
                 game.costShared}}checked{{/if}} />
-              <label class="form-check-label" for="costShared">Cost shared</label>
+              <label class="form-check-label" for="costShared">Cost
+                shared</label>
             </div>
           </div>
         </div>

@@ -11,11 +11,11 @@ const transporter = nodemailer.createTransport({
 });
 
 export async function sendGameEmail(to, subject, htmlContent) {
-    const mailOptions = {
-        from: `"FindMySquad" <${process.env.EMAIL_USER}>`,
-        to,
-        subject,
-        html: `
+  const mailOptions = {
+    from: `"FindMySquad" <${process.env.EMAIL_USER}>`,
+    to,
+    subject,
+    html: `
           <html>
             <body style="font-family: sans-serif; line-height: 1.5;">
               <h2>🎮 Game Confirmation</h2>
@@ -25,8 +25,8 @@ export async function sendGameEmail(to, subject, htmlContent) {
             </body>
           </html>
         `,
-      };
-      
+  };
+
   try {
     await transporter.sendMail(mailOptions);
     console.log("✅ Email sent to:", to);

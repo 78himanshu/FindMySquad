@@ -7,38 +7,39 @@
     <p><strong>Experience:</strong> {{session.experience}}</p>
     <p><strong>Workout Type:</strong> {{session.workoutType}}</p>
     <p><strong>Date & Time:</strong> {{session.formattedDateTime}}</p>
-    <p><strong>Slots:</strong> {{session.currentMembers}} / {{session.maxMembers}}</p>
+    <p><strong>Slots:</strong> {{session.currentMembers}} /
+      {{session.maxMembers}}</p>
 
     {{#if session.members.length}}
-      <p><strong>Members Joined:</strong></p>
-      <ul>
-        {{#each session.members}}
-          <li>{{this.username}}</li>
-        {{/each}}
-      </ul>
+    <p><strong>Members Joined:</strong></p>
+    <ul>
+      {{#each session.members}}
+      <li>{{this.username}}</li>
+      {{/each}}
+    </ul>
     {{else}}
-      <p><em>No members joined yet.</em></p>
+    <p><em>No members joined yet.</em></p>
     {{/if}}
 
     {{#if isLoggedIn}}
-      {{#if isHost}}
-        <form method="GET" action="/gymBuddy/edit/{{session._id}}">
-          <button>Edit</button>
-        </form>
-        <form method="POST" action="/gymBuddy/delete/{{session._id}}">
-          <button>Delete</button>
-        </form>
-      {{else if hasJoined}}
-        <form method="POST" action="/gymBuddy/leave/{{session._id}}">
-          <button>Leave</button>
-        </form>
-      {{else}}
-        <form method="POST" action="/gymBuddy/join/{{session._id}}">
-          <button>Join</button>
-        </form>
-      {{/if}}
+    {{#if isHost}}
+    <form method="GET" action="/gymBuddy/edit/{{session._id}}">
+      <button>Edit</button>
+    </form>
+    <form method="POST" action="/gymBuddy/delete/{{session._id}}">
+      <button>Delete</button>
+    </form>
+    {{else if hasJoined}}
+    <form method="POST" action="/gymBuddy/leave/{{session._id}}">
+      <button>Leave</button>
+    </form>
     {{else}}
-      <p><em><a href="/login">Login to Join</a></em></p>
+    <form method="POST" action="/gymBuddy/join/{{session._id}}">
+      <button>Join</button>
+    </form>
+    {{/if}}
+    {{else}}
+    <p><em><a href="/login">Login to Join</a></em></p>
     {{/if}}
   </div>
 </main>

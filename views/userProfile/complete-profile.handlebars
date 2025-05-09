@@ -1,123 +1,138 @@
 <main class="container my-5 pb-5">
-<h2 class="text-center mb-4">Complete Your Profile</h2>
+    <h2 class="text-center mb-4">Complete Your Profile</h2>
 
+    <form id="profileForm" class="mx-auto"
+        style="width: auto; max-width: none;">
+        <!-- First & Last Name -->
 
-<form id="profileForm" class="mx-auto" style="width: auto; max-width: none;">
-    <!-- First & Last Name -->
+        <div class="row mb-3 g-3">
+            <div class="col-md-4">
+                <label for="firstName" class="form-label">First Name</label>
+                <input type="text" name="firstName" id="firstName"
+                    class="form-control" placeholder="First Name">
+            </div>
+            <div class="col-md-4">
+                <label for="lastName" class="form-label">Last Name</label>
+                <input type="text" name="lastName" id="lastName"
+                    class="form-control" placeholder="Last Name">
 
-    <div class="row mb-3 g-3">
-        <div class="col-md-4">
-            <label for="firstName" class="form-label">First Name</label>
-            <input type="text" name="firstName" id="firstName" class="form-control" placeholder="First Name">
+            </div>
+            <div class="col-md-4">
+                <label for="gender" class="form-label">Gender</label>
+                <select class="form-select" name="gender" id="gender">
+                    <option value>Select Gender</option>
+                    <option value="Male">Male</option>
+                    <option value="Female">Female</option>
+                    <option value="Other">Other</option>
+                </select>
+            </div>
         </div>
-        <div class="col-md-4">
-            <label for="lastName" class="form-label">Last Name</label>
-            <input type="text" name="lastName" id="lastName" class="form-control" placeholder="Last Name">
 
-        </div>
-        <div class="col-md-4">
-            <label for="gender" class="form-label">Gender</label>
-            <select class="form-select" name="gender" id="gender">
-                <option value="">Select Gender</option>
-                <option value="Male">Male</option>
-                <option value="Female">Female</option>
-                <option value="Other">Other</option>
-            </select>
-        </div>
-    </div>
-
-    <!-- Profile Pic Radio -->
-    <label>Select a Profile Pic</label>
-    <div class="d-flex gap-3">
-        <label>
-            <input type="radio" name="profilePic" value="/images/profile1.PNG" hidden>
-            <img src="/images/profile1.PNG" class="img-thumbnail profile-option" width="60">
-        </label>
-        <label>
-            <input type="radio" name="profilePic" value="/images/profile2.jpg" hidden>
-            <img src="/images/profile2.jpg" class="img-thumbnail profile-option" width="60">
-        </label>
-        <label>
-            <input type="radio" name="profilePic" value="/images/profile3.jpg" hidden>
-            <img src="/images/profile3.jpg" class="img-thumbnail profile-option" width="60">
-        </label>
-        <label>
-            <input type="radio" name="profilePic" value="/images/profile4.jpg" hidden>
-            <img src="/images/profile4.jpg" class="img-thumbnail profile-option" width="60">
-        </label>
-    </div>
-
-    <!-- Location and phone number -->
-    <div class="row mt-4">
-    <div class="col-md-6">
-        <label for="city" class="form-label">City</label>
-        <input type="text" id="city" name="city" class="form-control" placeholder="Enter your city">
-    </div>
-    <div class="col-md-6">
-        <label for="phoneNumber" class="form-label">Phone Number</label>
-        <input type="text" id="phoneNumber" name="phoneNumber" class="form-control" placeholder="123-456-7890">
-    </div>
-    </div>
-
-    <!-- Bio -->
-    <textarea name="bio" id="bio" class="form-control mt-3" placeholder="Tell us about yourself..."></textarea>
-
-    <!-- Sports Checkboxes -->
-    <label class="mt-4">Select Sports:</label>
-    <div class="row row-cols-2 row-cols-md-4 g-2 mt-2" id="sportsList">
-        {{#each sportsList}}
-        <div class="col text-center">
-            <label class="btn btn-outline-success w-100">
-                <input type="checkbox" name="sportsInterests" value="{{this}}" class="d-none"> {{this}}
+        <!-- Profile Pic Radio -->
+        <label>Select a Profile Pic</label>
+        <div class="d-flex gap-3">
+            <label>
+                <input type="radio" name="profilePic"
+                    value="/images/profile1.PNG" hidden>
+                <img src="/images/profile1.PNG"
+                    class="img-thumbnail profile-option" width="60">
+            </label>
+            <label>
+                <input type="radio" name="profilePic"
+                    value="/images/profile2.jpg" hidden>
+                <img src="/images/profile2.jpg"
+                    class="img-thumbnail profile-option" width="60">
+            </label>
+            <label>
+                <input type="radio" name="profilePic"
+                    value="/images/profile3.jpg" hidden>
+                <img src="/images/profile3.jpg"
+                    class="img-thumbnail profile-option" width="60">
+            </label>
+            <label>
+                <input type="radio" name="profilePic"
+                    value="/images/profile4.jpg" hidden>
+                <img src="/images/profile4.jpg"
+                    class="img-thumbnail profile-option" width="60">
             </label>
         </div>
-        {{/each}}
-    </div>
 
-    <div class="mt-5">
-        <label class="form-label d-block mb-2">Select Workout Types:</label>
+        <!-- Location and phone number -->
+        <div class="row mt-4">
+            <div class="col-md-6">
+                <label for="city" class="form-label">City</label>
+                <input type="text" id="city" name="city" class="form-control"
+                    placeholder="Enter your city">
+            </div>
+            <div class="col-md-6">
+                <label for="phoneNumber" class="form-label">Phone Number</label>
+                <input type="text" id="phoneNumber" name="phoneNumber"
+                    class="form-control" placeholder="123-456-7890">
+            </div>
+        </div>
 
-        <div class="row row-cols-2 row-cols-md-4 g-2 mt-2" id="workoutList">
-            {{#each workoutTypes}}
+        <!-- Bio -->
+        <textarea name="bio" id="bio" class="form-control mt-3"
+            placeholder="Tell us about yourself..."></textarea>
+
+        <!-- Sports Checkboxes -->
+        <label class="mt-4">Select Sports:</label>
+        <div class="row row-cols-2 row-cols-md-4 g-2 mt-2" id="sportsList">
+            {{#each sportsList}}
             <div class="col text-center">
                 <label class="btn btn-outline-success w-100">
-                    <input type="checkbox" name="workoutTypes" value="{{this}}" class="d-none"> {{this}}
+                    <input type="checkbox" name="sportsInterests"
+                        value="{{this}}" class="d-none"> {{this}}
                 </label>
             </div>
             {{/each}}
         </div>
-    </div>
 
+        <div class="mt-5">
+            <label class="form-label d-block mb-2">Select Workout Types:</label>
 
-
-    <div class="mt-5">
-        <label class="form-label d-block mb-2">Select Your Gaming Interests:</label>
-
-        <div class="row row-cols-2 row-cols-md-4 g-2 mt-2" id="gamingList">
-            {{#each gamingOptions}}
-            <div class="col text-center">
-                <label class="btn btn-outline-success w-100">
-                    <input type="checkbox" name="gamingOptions" value="{{this}}" class="d-none"> {{this}}
-                </label>
+            <div class="row row-cols-2 row-cols-md-4 g-2 mt-2" id="workoutList">
+                {{#each workoutTypes}}
+                <div class="col text-center">
+                    <label class="btn btn-outline-success w-100">
+                        <input type="checkbox" name="workoutTypes"
+                            value="{{this}}" class="d-none"> {{this}}
+                    </label>
+                </div>
+                {{/each}}
             </div>
-            {{/each}}
         </div>
-    </div>
 
+        <div class="mt-5">
+            <label class="form-label d-block mb-2">Select Your Gaming
+                Interests:</label>
 
+            <div class="row row-cols-2 row-cols-md-4 g-2 mt-2" id="gamingList">
+                {{#each gamingOptions}}
+                <div class="col text-center">
+                    <label class="btn btn-outline-success w-100">
+                        <input type="checkbox" name="gamingOptions"
+                            value="{{this}}" class="d-none"> {{this}}
+                    </label>
+                </div>
+                {{/each}}
+            </div>
+        </div>
 
-    <button type="submit" class="btn btn-primary mt-4">Save Profile</button>
-</form>
+        <button type="submit" class="btn btn-primary mt-4">Save Profile</button>
+    </form>
 </main>
-
 
 <!-- Toast Container -->
 <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 9999">
-    <div id="toastMsg" class="toast align-items-center text-white bg-danger border-0" role="alert" aria-live="assertive"
+    <div id="toastMsg"
+        class="toast align-items-center text-white bg-danger border-0"
+        role="alert" aria-live="assertive"
         aria-atomic="true">
         <div class="d-flex">
             <div class="toast-body" id="toastBody">This is a message</div>
-            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"
+            <button type="button" class="btn-close btn-close-white me-2 m-auto"
+                data-bs-dismiss="toast"
                 aria-label="Close"></button>
         </div>
     </div>
@@ -257,8 +272,8 @@
 </script>
 
 <script
-  src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBP-FJZsXytqUxzesnIEkrkUu4JoB1zO-M&libraries=places&callback=initAutocomplete"
-  async defer></script>
+    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBP-FJZsXytqUxzesnIEkrkUu4JoB1zO-M&libraries=places&callback=initAutocomplete"
+    async defer></script>
 
 <script>
   function initAutocomplete() {

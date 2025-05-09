@@ -10,10 +10,12 @@
       {{formatTime game.startTime}} – {{formatTime game.endTime}}
     </p>
     <p><strong>Description:</strong> {{game.description}}</p>
-    <p><strong>Players:</strong> {{game.playersGoing}} / {{game.playersRequired}}</p>
+    <p><strong>Players:</strong> {{game.playersGoing}} /
+      {{game.playersRequired}}</p>
 
     <p><strong>Hosted By:</strong>
-      <a href="/profile/view/{{game.host._id}}" class="host-link">{{game.host.username}}</a>
+      <a href="/profile/view/{{game.host._id}}"
+        class="host-link">{{game.host.username}}</a>
     </p>
 
     {{#if joinedPlayers.length}}
@@ -21,17 +23,17 @@
     <ul>
       {{#each joinedPlayers}}
       <li>
-        <a href="/profile/userview/{{this._id}}" class="player-link">{{this.username}}</a>
+        <a href="/profile/userview/{{this._id}}"
+          class="player-link">{{this.username}}</a>
       </li>
       {{/each}}
     </ul>
     {{/if}}
 
-
-
   </div>
   <h3 style="text-align: center; margin-top: 10px;">📍 Game Location</h3>
-  <div id="single-game-map" style="height: 200px; width: 100%; max-width: 600px; margin: 15px auto; border: 1px solid #ccc; border-radius: 8px;"></div>
+  <div id="single-game-map"
+    style="height: 200px; width: 100%; max-width: 600px; margin: 15px auto; border: 1px solid #ccc; border-radius: 8px;"></div>
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 
@@ -55,7 +57,6 @@
     });
   </script>
 
-
   {{#if error}}
   <div class="error-message"
     style="color: red; background: #fbe9e9; padding: 10px; border: 1px solid #ff0000; margin-bottom: 10px;">
@@ -63,49 +64,52 @@
   </div>
   {{/if}}
 
-<div class="action-btn" style="margin-top: 20px;">
-  {{#if isLoggedIn}}
+  <div class="action-btn" style="margin-top: 20px;">
+    {{#if isLoggedIn}}
     {{#if (eq userId hostId)}}
-      <!-- Host actions -->
-      <a href="/host/edit/{{game._id}}" class="btn btn-warning" style="margin-right: 10px;">Edit</a>
-      <form action="/host/delete/{{game._id}}" method="POST" style="display:inline;">
-        <button type="submit" class="btn btn-danger">Delete</button>
-      </form>
+    <!-- Host actions -->
+    <a href="/host/edit/{{game._id}}" class="btn btn-warning"
+      style="margin-right: 10px;">Edit</a>
+    <form action="/host/delete/{{game._id}}" method="POST"
+      style="display:inline;">
+      <button type="submit" class="btn btn-danger">Delete</button>
+    </form>
 
     {{else if hasJoined}}
-      <!-- Joined user can leave -->
-      <form method="POST" action="/join/leave/{{game._id}}">
-        <button type="submit" class="btn btn-secondary">Leave Game</button>
-      </form>
+    <!-- Joined user can leave -->
+    <form method="POST" action="/join/leave/{{game._id}}">
+      <button type="submit" class="btn btn-secondary">Leave Game</button>
+    </form>
 
     {{else if gameAlreadyStarted}}
-      <!-- Game already started -->
-      <p class="text-danger fw-semibold mt-2">⏰ This game has already started. You can’t join it now.</p>
+    <!-- Game already started -->
+    <p class="text-danger fw-semibold mt-2">⏰ This game has already started. You
+      can’t join it now.</p>
 
     {{else if (gte (length game.players) game.playersRequired)}}
-      <!-- Session full -->
-      <p class="full-session">🚫 Session is Full</p>
+    <!-- Session full -->
+    <p class="full-session">🚫 Session is Full</p>
 
     {{else}}
-      <!-- Available to join -->
-      <form method="POST" action="/join">
-        <input type="hidden" name="gameId" value="{{game._id}}">
-        <button type="submit" class="btn btn-primary">Join Game</button>
-      </form>
+    <!-- Available to join -->
+    <form method="POST" action="/join">
+      <input type="hidden" name="gameId" value="{{game._id}}">
+      <button type="submit" class="btn btn-primary">Join Game</button>
+    </form>
     {{/if}}
 
-  {{else}}
+    {{else}}
     <!-- Not logged in -->
-    <a href="/login?redirect=/join/{{game._id}}" class="btn btn-secondary">Login to Join</a>
-  {{/if}}
-</div>
+    <a href="/login?redirect=/join/{{game._id}}" class="btn btn-secondary">Login
+      to Join</a>
+    {{/if}}
+  </div>
 
-
-
-<!-- chat Toggle Button -->
-{{#if hasJoined}}
+  <!-- chat Toggle Button -->
+  {{#if hasJoined}}
   <!-- Toggle Button -->
-  <button id="toggleChatBtn" class="btn btn-outline-primary">💬 Open Chat</button>
+  <button id="toggleChatBtn" class="btn btn-outline-primary">💬 Open
+    Chat</button>
 
   <!-- Chat UI -->
   <section id="chatSection" style="display: none; margin-top: 15px;">
@@ -113,24 +117,27 @@
 
     <!-- Chat Messages -->
     <div id="chatBox" class="chat-box"
-         style="height: 250px; overflow-y: auto; border: 1px solid #ccc; background: #f9f9f9; padding: 10px;"></div>
+      style="height: 250px; overflow-y: auto; border: 1px solid #ccc; background: #f9f9f9; padding: 10px;"></div>
 
     <!-- Chat Form -->
     <form id="chatForm" style="display: flex; margin-top: 10px;">
-      <input type="text" id="chatMessage" placeholder="Type your message..." required
-             style="flex: 1; padding: 5px;" />
-      <button type="submit" class="btn btn-success btn-sm" style="margin-left: 5px;">Send</button>
+      <input type="text" id="chatMessage" placeholder="Type your message..."
+        required
+        style="flex: 1; padding: 5px;" />
+      <button type="submit" class="btn btn-success btn-sm"
+        style="margin-left: 5px;">Send</button>
     </form>
 
     <!-- Chat Ended Message -->
-    <div id="chatEndedMessage" style="display: none; margin-top: 10px; color: red; font-weight: bold;">
+    <div id="chatEndedMessage"
+      style="display: none; margin-top: 10px; color: red; font-weight: bold;">
       🚫 This chat has ended as the game is over.
     </div>
   </section>
 
   <!-- Socket.IO Logic -->
-<script src="/socket.io/socket.io.js"></script>
-<script>
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
   const socket = io();
   const gameId = "{{game._id}}";
   const username = "{{username}}";
@@ -186,6 +193,6 @@
     chatInput.value = "";
   });
 </script>
-{{/if}}
+  {{/if}}
 
 </main>

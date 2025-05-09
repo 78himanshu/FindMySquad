@@ -1,7 +1,7 @@
 let serverBootTime = Date.now();
 
 import dotenv from "dotenv";
-dotenv.config(); // ✅ Load .env immediately
+dotenv.config();
 
 import express from "express";
 import path from "path";
@@ -9,7 +9,7 @@ import { fileURLToPath } from "url";
 import connectDB from "./config/mongoConnections.js";
 import { scheduleAllPendingReminders } from "./emailScheduler.js";
 
-// ✅ Wait for DB connection and schedule reminders BEFORE app setup
+// Wait for DB connection and schedule reminders BEFORE app setup
 await connectDB();
 await scheduleAllPendingReminders();
 
@@ -58,7 +58,6 @@ const hbs = exphbs.create({
     encodeURI: (str) => encodeURIComponent(str),
 
     array: (...args) => {
-      // Handlebars passes its options object as the last arg—drop it
       return args.slice(0, -1);
     },
 

@@ -10,5 +10,5 @@ export function checkNumber(y, input, min = 0) {
   if (typeof y !== "number" || isNaN(y) || y < min) {
     throw new Error(`${input} must be a number ≥ ${min}`);
   }
-  return y
+  return y;
 }

@@ -46,12 +46,6 @@ export default async function requireAuth(req, res, next) {
       res.locals.profilePic = "/images/default-avatar.png"; // fallback
     }
 
-    // console.log("✅ Middleware:", {
-    //   isLoggedIn: res.locals.isLoggedIn,
-    //   username: res.locals.username,
-    //   profilePic: res.locals.profilePic
-    // });
-
     next();
   } catch (err) {
     console.error("Auth Middleware Error:", err.message);

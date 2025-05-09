@@ -4,10 +4,8 @@ import { hostGameData } from "../data/index.js";
 import { checkString, checkNumber } from "../utils/helper.js";
 import requireAuth from "../middleware/auth.js";
 import axios from "axios";
-import { DateTime } from 'luxon';
-import xss from 'xss';
-
-
+import { DateTime } from "luxon";
+import xss from "xss";
 
 router
   .route("/")
@@ -33,14 +31,23 @@ router
       x.description = xss(x.description).trim();
       x.location = xss(x.location).trim();
       x.extraInfo = xss(x.extraInfo?.trim() || "");
-      x.bringEquipment = x.bringEquipment === "true" || x.bringEquipment === true;
+      x.bringEquipment =
+        x.bringEquipment === "true" || x.bringEquipment === true;
       x.costShared = x.costShared === "true" || x.costShared === true;
       x.playersRequired = Number(x.playersRequired);
       x.costPerHead = Number(x.costPerHead);
 
       const requiredFields = [
-        "title", "sport", "gameDate", "startTime", "endTime",
-        "skillLevel", "description", "location", "host", "userTimeZone"
+        "title",
+        "sport",
+        "gameDate",
+        "startTime",
+        "endTime",
+        "skillLevel",
+        "description",
+        "location",
+        "host",
+        "userTimeZone",
       ];
       for (const field of requiredFields) {
         const value = x[field];
@@ -49,7 +56,9 @@ router
           value === null ||
           (typeof value === "string" && value.trim() === "")
         ) {
-          return res.status(400).json({ success: false, error: `Missing or invalid: ${field}` });
+          return res
+            .status(400)
+            .json({ success: false, error: `Missing or invalid: ${field}` });
         }
       }
 
@@ -58,14 +67,20 @@ router
         let [hours, minutes] = time.split(":").map(Number);
         if (modifier === "PM" && hours !== 12) hours += 12;
         if (modifier === "AM" && hours === 12) hours = 0;
-        return `${hours.toString().padStart(2, "0")}:${minutes.toString().padStart(2, "0")}`;
+        return `${hours.toString().padStart(2, "0")}:${minutes
+          .toString()
+          .padStart(2, "0")}`;
       };
 
       const rawStart = convertTo24Hour(x.startTime);
       const rawEnd = convertTo24Hour(x.endTime);
 
-      const startDateTime = DateTime.fromISO(`${x.gameDate}T${rawStart}`, { zone: x.userTimeZone });
-      let endDateTime = DateTime.fromISO(`${x.gameDate}T${rawEnd}`, { zone: x.userTimeZone });
+      const startDateTime = DateTime.fromISO(`${x.gameDate}T${rawStart}`, {
+        zone: x.userTimeZone,
+      });
+      let endDateTime = DateTime.fromISO(`${x.gameDate}T${rawEnd}`, {
+        zone: x.userTimeZone,
+      });
 
       if (endDateTime <= startDateTime) {
         endDateTime = endDateTime.plus({ days: 1 });
@@ -73,20 +88,34 @@ router
 
       const now = DateTime.now().setZone(x.userTimeZone);
       if (startDateTime < now) {
-        return res.status(400).json({ success: false, error: "Cannot host games in the past (your local time)." });
+        return res
+          .status(400)
+          .json({
+            success: false,
+            error: "Cannot host games in the past (your local time).",
+          });
       }
 
       x.startTime = startDateTime.toUTC().toJSDate();
       x.endTime = endDateTime.toUTC().toJSDate();
 
       if (!Number.isFinite(x.playersRequired) || x.playersRequired < 1) {
-        return res.status(400).json({ success: false, error: "Players Required must be a number ≥ 1." });
+        return res
+          .status(400)
+          .json({
+            success: false,
+            error: "Players Required must be a number ≥ 1.",
+          });
       }
 
       if (!Number.isFinite(x.costPerHead) || x.costPerHead < 0) {
-        return res.status(400).json({ success: false, error: "Cost per Head must be a number ≥ 0." });
+        return res
+          .status(400)
+          .json({
+            success: false,
+            error: "Cost per Head must be a number ≥ 0.",
+          });
       }
-
 
       try {
         checkString(x.title, "Title");
@@ -98,8 +127,16 @@ router
         checkNumber(x.costPerHead, "Cost per Head", 0);
         //Adding further validations
         const allowedSports = [
-          "Soccer", "Basketball", "Baseball", "Tennis", "Swimming",
-          "Running", "Cycling", "Hiking", "Golf", "Volleyball"
+          "Soccer",
+          "Basketball",
+          "Baseball",
+          "Tennis",
+          "Swimming",
+          "Running",
+          "Cycling",
+          "Hiking",
+          "Golf",
+          "Volleyball",
         ];
         const allowedSkillLevels = ["Beginner", "Intermediate", "Advanced"];
 
@@ -107,19 +144,55 @@ router
           return res.status(400).json({ error: "Invalid sport selected" });
         }
         if (!allowedSkillLevels.includes(x.skillLevel)) {
-          return res.status(400).json({ error: "Invalid skill level selected" });
+          return res
+            .status(400)
+            .json({ error: "Invalid skill level selected" });
         }
         const badWords = [
-          "fuck", "shit", "bitch", "asshole", "dick", "pussy", "cunt", "sex",
-          "nigger", "nigga", "fag", "faggot", "slut", "whore", "bastard", "damn",
-          "bullshit", "crap", "motherfucker", "cock", "tit", "dildo", "rape",
-          "suck", "kill yourself", "kys", "die", "retard", "moron",
-          "@$$", "f*ck", "s3x", "sh!t", "b!tch", "d!ck", "w#ore", "r@pe"
+          "fuck",
+          "shit",
+          "bitch",
+          "asshole",
+          "dick",
+          "pussy",
+          "cunt",
+          "sex",
+          "nigger",
+          "nigga",
+          "fag",
+          "faggot",
+          "slut",
+          "whore",
+          "bastard",
+          "damn",
+          "bullshit",
+          "crap",
+          "motherfucker",
+          "cock",
+          "tit",
+          "dildo",
+          "rape",
+          "suck",
+          "kill yourself",
+          "kys",
+          "die",
+          "retard",
+          "moron",
+          "@$$",
+          "f*ck",
+          "s3x",
+          "sh!t",
+          "b!tch",
+          "d!ck",
+          "w#ore",
+          "r@pe",
         ];
         const lowered = x.description.toLowerCase();
         for (let word of badWords) {
           if (lowered.includes(word)) {
-            return res.status(400).json({ error: "Description contains inappropriate language." });
+            return res
+              .status(400)
+              .json({ error: "Description contains inappropriate language." });
           }
         }
       } catch (e) {
@@ -137,14 +210,16 @@ router
           !geoRes.data.results ||
           !geoRes.data.results[0]?.geometry?.location
         ) {
-          return res.status(400).json({ success: false, error: "Invalid address entered." });
+          return res
+            .status(400)
+            .json({ success: false, error: "Invalid address entered." });
         }
 
         const { lat, lng } = geoRes.data.results[0].geometry.location;
         const formattedAddress = geoRes.data.results[0].formatted_address;
         const geoLocation = {
           type: "Point",
-          coordinates: [lng, lat]
+          coordinates: [lng, lat],
         };
         x.location = formattedAddress;
         const newGame = await hostGameData.createGame(
@@ -167,47 +242,47 @@ router
         return res.json({
           success: true,
           message: "Game successfully hosted!",
-          gameId: newGame._id
+          gameId: newGame._id,
         });
-
       } catch (e) {
         console.error("Error in /host:", e.message || e);
-        return res.status(400).json({ success: false, error: e.message || "Unknown error occurred." });
+        return res
+          .status(400)
+          .json({
+            success: false,
+            error: e.message || "Unknown error occurred.",
+          });
       }
     } catch (e) {
       console.error("Error in /host:", e.message || e);
-      return res.status(400).json({ success: false, error: e.message || "Unknown error occurred." });
+      return res
+        .status(400)
+        .json({
+          success: false,
+          error: e.message || "Unknown error occurred.",
+        });
     }
-  }
-  );
-
-
-
-router
-  .route("/success")
-  .get((req, res) => {
-    res.render("hostGame/hostGameSuccess", {
-      title: "Game Hosted!",
-      layout: "main",
-      head: `<link rel="stylesheet" href="/css/hostGame.css">`,
-    });
   });
 
-router
-  .route("/form")
-  .get(requireAuth, (req, res) => {
-    const hostId = req.user.userID;
-    res.render("hostGame/hostGameForm", {
-      hostId,
-      title: "Host a Game",
-      layout: "main",
-      head: `
+router.route("/success").get((req, res) => {
+  res.render("hostGame/hostGameSuccess", {
+    title: "Game Hosted!",
+    layout: "main",
+    head: `<link rel="stylesheet" href="/css/hostGame.css">`,
+  });
+});
+
+router.route("/form").get(requireAuth, (req, res) => {
+  const hostId = req.user.userID;
+  res.render("hostGame/hostGameForm", {
+    hostId,
+    title: "Host a Game",
+    layout: "main",
+    head: `
           <link rel="stylesheet" href="/css/hostGame.css">
         `,
-    });
   });
-
-
+});
 
 // Edit Game Form
 router.get("/edit/:id", requireAuth, async (req, res) => {
@@ -236,8 +311,6 @@ router.get("/edit/:id", requireAuth, async (req, res) => {
   }
 });
 
-
-
 router.post("/edit/:id", requireAuth, async (req, res) => {
   try {
     console.log("Received body:", req.body);
@@ -255,18 +328,35 @@ router.post("/edit/:id", requireAuth, async (req, res) => {
       bringEquipment,
       costShared,
       extraInfo,
-      userTimeZone
+      userTimeZone,
     } = req.body;
 
     // Validation
     if (
-      !title || !sport || !gameDate || !startStr || !endStr ||
-      !description || !skillLevel || !location
+      !title ||
+      !sport ||
+      !gameDate ||
+      !startStr ||
+      !endStr ||
+      !description ||
+      !skillLevel ||
+      !location
     ) {
       return res.status(400).json({ error: "Missing required fields." });
     }
 
-    const allowedSports = ["Soccer", "Basketball", "Baseball", "Tennis", "Swimming", "Running", "Cycling", "Hiking", "Golf", "Volleyball"];
+    const allowedSports = [
+      "Soccer",
+      "Basketball",
+      "Baseball",
+      "Tennis",
+      "Swimming",
+      "Running",
+      "Cycling",
+      "Hiking",
+      "Golf",
+      "Volleyball",
+    ];
     const allowedSkills = ["Beginner", "Intermediate", "Advanced"];
     if (!allowedSports.includes(sport)) {
       return res.status(400).json({ error: "Invalid sport selected." });
@@ -276,17 +366,32 @@ router.post("/edit/:id", requireAuth, async (req, res) => {
     }
 
     const sanitizedDescription = xss(description.trim());
-    const badWords = ["fuck", "shit", "bitch", "rape", "kys", "kill yourself", "nigger", "faggot"];
+    const badWords = [
+      "fuck",
+      "shit",
+      "bitch",
+      "rape",
+      "kys",
+      "kill yourself",
+      "nigger",
+      "faggot",
+    ];
     const lowered = sanitizedDescription.toLowerCase();
     for (const word of badWords) {
       if (lowered.includes(word)) {
-        return res.status(400).json({ error: "Description contains inappropriate language." });
+        return res
+          .status(400)
+          .json({ error: "Description contains inappropriate language." });
       }
     }
 
     // Time parsing with Luxon
-    const rawStart = DateTime.fromISO(`${gameDate}T${startStr}`, { zone: userTimeZone });
-    let rawEnd = DateTime.fromISO(`${gameDate}T${endStr}`, { zone: userTimeZone });
+    const rawStart = DateTime.fromISO(`${gameDate}T${startStr}`, {
+      zone: userTimeZone,
+    });
+    let rawEnd = DateTime.fromISO(`${gameDate}T${endStr}`, {
+      zone: userTimeZone,
+    });
     if (rawEnd <= rawStart) rawEnd = rawEnd.plus({ days: 1 });
 
     const now = DateTime.now().setZone(userTimeZone);
@@ -306,20 +411,27 @@ router.post("/edit/:id", requireAuth, async (req, res) => {
       location: xss(location.trim()),
       bringEquipment: bringEquipment === "true" || bringEquipment === true,
       costShared: costShared === "true" || costShared === true,
-      extraInfo: xss(extraInfo || "")
+      extraInfo: xss(extraInfo || ""),
     };
 
     console.log("✅ Final updates:", updates);
 
-    const updatedGame = await hostGameData.updateGame(req.params.id, updates, req.user.userID);
+    const updatedGame = await hostGameData.updateGame(
+      req.params.id,
+      updates,
+      req.user.userID
+    );
 
-    return res.json({ success: true, message: "Game updated!", gameId: updatedGame._id });
+    return res.json({
+      success: true,
+      message: "Game updated!",
+      gameId: updatedGame._id,
+    });
   } catch (err) {
     console.error("❌ Edit error:", err);
     return res.status(400).json({ error: err.message });
   }
 });
-
 
 router.post("/delete/:id", requireAuth, async (req, res) => {
   try {
