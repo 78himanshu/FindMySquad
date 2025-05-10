@@ -1,183 +1,103 @@
 document.addEventListener("DOMContentLoaded", () => {
-  const modal = document.getElementById("rateModal");
+  const rateModal = new bootstrap.Modal(document.getElementById("rateModal"));
   const form = document.getElementById("rateForm");
   const fieldsWrap = document.getElementById("rateFields");
-  const toastWrap = document.getElementById("toast-container");
 
   document.querySelectorAll(".btn-rate").forEach((btn) => {
     btn.addEventListener("click", () => {
       const bookingId = btn.dataset.bookingId;
       const players = JSON.parse(btn.dataset.players);
-
-      console.log(players);
-
+      const hostId = btn.dataset.host;
       fieldsWrap.innerHTML = "";
+
       players.forEach((player) => {
+        if (String(player._id) === String(hostId)) return; // ⛔ Skip logged-in user
+
         const group = document.createElement("div");
-        group.className = "mb-2";
+        group.className = "mb-4";
+
+        // Stars: disabled if already rated
+        let starsHtml = `<div class="stars mb-2 ${player.hasBeenRated ? "disabled" : ""}" data-user-id="${player._id}">`;
+        for (let i = 1; i <= 5; i++) {
+          const selected = i <= player.ratedScore ? "selected" : "";
+          const dataAttr = player.hasBeenRated ? "" : `data-score="${i}"`;
+          starsHtml += `<i class="bi bi-star-fill star me-1 ${selected}" ${dataAttr}></i>`;
+        }
+        starsHtml += `</div>`;
+
+        const disabledAttr = player.hasBeenRated ? "disabled" : "";
 
         group.innerHTML = `
-          <label class="form-label fw-bold">${
-            player.username || "Player"
-          }:</label>
-          <select name="rating_${player.userId}" class="form-select"> 
-            <option value="">Rate...</option>
-            ${[5, 4, 3, 2, 1]
-              .map((n) => `<option value="${n}">${n} ★</option>`)
-              .join("")}
-          </select>
+          <label class="form-label fw-bold">${player.username}</label>
+          ${starsHtml}
+          <input type="hidden" name="rating_${player._id}" value="${player.hasBeenRated ? player.ratedScore : ""}">
+          <textarea name="review_${player._id}" class="form-control" rows="2" placeholder="Write a review..." ${disabledAttr}>${player.hasBeenRated ? player.review : ""}</textarea>
+          ${player.hasBeenRated ? '<p class="text-muted small fst-italic">You have already rated this player.</p>' : ""}
         `;
 
         fieldsWrap.appendChild(group);
       });
 
       form.dataset.bookingId = bookingId;
-      modal.style.display = "block";
+      rateModal.show();
     });
   });
 
-  // Cancel Rating
-  document.getElementById("rateCancel").addEventListener("click", () => {
-    modal.style.display = "none";
+  // Interactive Stars Logic
+  fieldsWrap.addEventListener("click", (e) => {
+    if (e.target.classList.contains("star") && !e.target.closest(".stars").classList.contains("disabled")) {
+      const clickedStar = e.target;
+      const selectedScore = parseInt(clickedStar.dataset.score);
+      const starsContainer = clickedStar.closest(".stars");
+      const userId = starsContainer.dataset.userId;
+
+      starsContainer.querySelectorAll(".star").forEach((star) => {
+        const score = parseInt(star.dataset.score);
+        star.classList.toggle("selected", score <= selectedScore);
+      });
+
+      const hiddenInput = document.querySelector(`input[name="rating_${userId}"]`);
+      if (hiddenInput) hiddenInput.value = selectedScore;
+    }
   });
 
-  // Submit Ratings
+  // Submit Review & Rating
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
     const bookingId = form.dataset.bookingId;
-    const ratings = [];
-
     const formData = new FormData(form);
+    const payload = { bookingId, ratings: [] };
 
-    formData.forEach((value, key) => {
-      if (key.startsWith("rating_") && value !== "") {
-        // Only if user actually rated
-        const userId = key.replace("rating_", "");
-        ratings.push({
-          userId: userId,
-          score: parseInt(value),
-        });
+    for (let [key, value] of formData.entries()) {
+      if (key.startsWith("rating_")) {
+        const userId = key.split("_")[1];
+        const rating = parseInt(value);
+        const review = formData.get(`review_${userId}`) || "";
+        if (rating > 0) {
+          payload.ratings.push({ userId, rating, review });
+        }
       }
-    });
-
-    if (!ratings.length) {
-      return showToast("Please select at least one rating.", "error");
     }
-
-    console.log("Submitting ratings:", ratings);
 
     try {
-      const res = await fetch("/profile/bookings/rate", {
+      const response = await fetch("/profile/bookings/rate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({ bookingId, ratings }),
+        body: JSON.stringify(payload),
       });
-      const result = await res.json();
-      if (!res.ok) throw new Error(result.error || "Failed to submit rating");
 
-      showToast("Ratings submitted successfully!", "success");
-      setTimeout(() => window.location.reload(), 1500);
+      const result = await response.json();
+
+      if (response.ok) {
+        alert("Ratings submitted successfully!");
+        rateModal.hide();
+        form.reset();
+      } else {
+        alert(result.message || "Something went wrong!");
+      }
     } catch (err) {
-      console.error(err);
-      showToast(err.message, "error");
+      console.error("AJAX Error:", err);
+      alert("Error submitting ratings. Please try again.");
     }
-  });
-
-  // Toast function
-  function showToast(msg, type = "info", delay = 4000) {
-    const toast = document.createElement("div");
-    toast.className = `toast toast--${type} show`;
-    toast.innerHTML = `${msg} <button class="btn-close ms-2" onclick="this.parentNode.remove()">×</button>`;
-    toastWrap.appendChild(toast);
-    setTimeout(() => toast.remove(), delay);
-  }
-});
-
-document.addEventListener("DOMContentLoaded", () => {
-  // Toggle rating panel
-  document.querySelectorAll(".rate-players-btn").forEach((btn) => {
-    btn.addEventListener("click", () => {
-      const bookingId = btn.getAttribute("data-booking-id");
-      const panel = document.getElementById(`rate-players-${bookingId}`);
-      panel.classList.toggle("d-none");
-    });
-  });
-
-  // Star selection
-  document.querySelectorAll(".stars:not(.disabled)").forEach((container) => {
-    const stars = container.querySelectorAll(".star");
-
-    stars.forEach((star) => {
-      star.addEventListener("mouseenter", () => {
-        const score = parseInt(star.dataset.score);
-        stars.forEach((s, i) => {
-          s.classList.toggle("selected", i < score);
-        });
-      });
-
-      container.addEventListener("mouseleave", () => {
-        const selectedScore = parseInt(container.dataset.selectedScore || 0);
-        stars.forEach((s, i) => {
-          s.classList.toggle("selected", i < selectedScore);
-        });
-      });
-
-      star.addEventListener("click", () => {
-        const score = parseInt(star.dataset.score);
-        container.dataset.selectedScore = score;
-        stars.forEach((s, i) => {
-          s.classList.toggle("selected", i < score);
-        });
-      });
-    });
-  });
-
-  // Submit ratings
-  document.querySelectorAll(".rate-form").forEach((form) => {
-    form.addEventListener("submit", async (e) => {
-      e.preventDefault();
-      const bookingId = form.dataset.bookingId;
-      const starsContainers = form.querySelectorAll(".stars");
-
-      const ratings = [];
-
-      starsContainers.forEach((container) => {
-        const userId = container.dataset.userId;
-        const score = parseInt(container.dataset.selectedScore || 0);
-        const alreadyRated = container.dataset.rated === "true";
-
-        if (!alreadyRated && score > 0) {
-          ratings.push({ userId, score });
-        }
-      });
-
-      if (ratings.length === 0) {
-        alert("Please select a rating for at least one player.");
-        return;
-      }
-
-      try {
-        const response = await fetch("/profile/bookings/rate", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ bookingId, ratings }),
-        });
-
-        const result = await response.json();
-        if (result.success) {
-          alert("Ratings submitted successfully!");
-          // Disable all after submission
-          starsContainers.forEach((c) => c.classList.add("disabled"));
-        } else {
-          alert("Failed to submit ratings. " + result.error);
-        }
-      } catch (err) {
-        console.error("Error submitting ratings:", err);
-        alert("Server error occurred.");
-      }
-    });
   });
 });

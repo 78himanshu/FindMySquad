@@ -14,6 +14,7 @@ router.get("/", (req, res) => {
     title: "GymBuddy Home",
     layout: "main",
     head: `<link rel="stylesheet" href="/css/gym.css">`,
+    profileCompleted: req.user?.profileCompleted || false,
     success: req.query.success,
   });
 });
@@ -22,13 +23,14 @@ router.get("/", (req, res) => {
 router
   .get("/create", requireAuth, (req, res) => {
     res.render("Gym/createSession", {
-      title: "",
+      title: "Create Gym Session",
       layout: "main",
       head: `<link rel="stylesheet" href="/css/gym.css">`,
       user: {
         username: req.user.username,
         userId: req.user.userId,
       },
+      profileCompleted: req.user?.profileCompleted || false,
       error: req.query.error,
     });
   })
@@ -38,7 +40,20 @@ router
       return res.status(400).json({ error: "Request body cannot be empty" });
     }
 
-    const { title, gym, description, date, startTime, endTime, gymlocation, experience, workoutType, hostedBy, maxMembers } = data;
+    console.log("data", data);
+    const {
+      title,
+      gymName,
+      description,
+      date,
+      startTime,
+      endTime,
+      gymlocation,
+      experience,
+      workoutType,
+      hostedBy,
+      maxMembers,
+    } = data;
 
     if (!ObjectId.isValid(hostedBy)) {
       return res.status(400).json({ error: "Invalid hostedBy ID" });
@@ -51,7 +66,7 @@ router
 
     if (
       !title ||
-      !gym ||
+      !gymName ||
       !date ||
       !startTime ||
       !endTime ||
@@ -69,7 +84,7 @@ router
       console.log("Raw inputs:", { date, startTime, endTime });
 
       checkString(title, "Title");
-      checkString(gym, "Gym");
+      checkString(gymName, "Gym Name");
       checkString(gymlocation, "Gym Location");
       checkString(experience, "Experience");
       checkString(workoutType, "Workout Type");
@@ -78,8 +93,7 @@ router
       const now = new Date();
       const parsedSessionDate = new Date(date);
 
-      const paddedStartTime =
-        startTime.length === 5 ? `${startTime}:00` : startTime;
+      const paddedStartTime = startTime.length === 5 ? `${startTime}:00` : startTime;
       const paddedEndTime = endTime.length === 5 ? `${endTime}:00` : endTime;
 
       const startDateTime = new Date(`${date}T${paddedStartTime}`);
@@ -117,10 +131,8 @@ router
       });
 
       const hasClash = existingSessions.some((s) => {
-        const sPaddedStart =
-          s.startTime.length === 5 ? `${s.startTime}:00` : s.startTime;
-        const sPaddedEnd =
-          s.endTime.length === 5 ? `${s.endTime}:00` : s.endTime;
+        const sPaddedStart = s.startTime.length === 5 ? `${s.startTime}:00` : s.startTime;
+        const sPaddedEnd = s.endTime.length === 5 ? `${s.endTime}:00` : s.endTime;
         const existingStart = new Date(`${s.date}T${sPaddedStart}`);
         const existingEnd = new Date(`${s.date}T${sPaddedEnd}`);
         return (
@@ -141,7 +153,7 @@ router
       // Log inputs for debugging
       console.log("Creating session with:", {
         title,
-        gym,
+        gymName,
         description,
         parsedSessionDate,
         startTime,
@@ -155,7 +167,7 @@ router
 
       await gymBuddyData.createGymSession(
         title,
-        gym,
+        gymName,
         description,
         date,
         paddedStartTime,
@@ -167,7 +179,13 @@ router
         Number(maxMembers)
       );
 
-      return res.redirect("/gymBuddy?success=Session created successfully");
+      return res.json({
+        success: true,
+        message: "Session created successfully",
+        redirectUrl: "/gymBuddy/mySessions",
+      });
+
+      // return res.redirect("/gymBuddy?success=Session created successfully");
     } catch (e) {
       console.error("🔥 Error creating session:", e);
       return res
@@ -175,6 +193,7 @@ router
         .json({ error: e?.message || "Failed to create session" });
     }
   });
+
 
 // find session
 router.get("/find", async (req, res) => {
@@ -238,7 +257,8 @@ router.get("/find", async (req, res) => {
     currentWorkoutType: workoutType || "",
     isLoggedIn: res.locals.isLoggedIn,
     error,
-    success,
+    profileCompleted: req.user?.profileCompleted || false,
+    success
   });
 });
 
@@ -403,6 +423,7 @@ router.get("/mySessions", requireAuth, async (req, res) => {
       username: req.user.username,
       hostedSessions,
       joinedSessions,
+      profileCompleted: req.user?.profileCompleted || false,
       isLoggedIn: true,
     });
   } catch (e) {
@@ -501,7 +522,11 @@ router.post("/update/:id", requireAuth, async (req, res) => {
     });
 
     await session.save();
-    res.redirect("/gymBuddy/mySessions");
+    return res.json({
+      success: true,
+      message: "Session updated successfully",
+      redirectUrl: "/gymBuddy/mySessions",
+    });
   } catch (e) {
     console.error("🔥 Error updating session:", e);
     res.status(500).render("error", { message: "Internal server error" });

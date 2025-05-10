@@ -53,7 +53,8 @@ router.get("/create", requireAuth, (req, res) => {
     title: "Create Tournament",
     games: esportsGames,
     username: req.user.username,
-    minDate,
+    profileCompleted: req.user?.profileCompleted || false,
+  minDate,
   });
 });
 // POST: Handle Form Submission

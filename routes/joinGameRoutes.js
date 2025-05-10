@@ -8,6 +8,7 @@ import { userProfileData } from "../data/index.js";
 import { sendGameEmail } from "../utils/emailHelper.js";
 import Reminder from "../models/Reminder.js";
 import { scheduleJobFromReminder } from "../emailScheduler.js";
+import requireAuth from "../middleware/auth.js";
 
 router
   .get("/", async (req, res) => {
@@ -38,7 +39,6 @@ router
               },
               //sport: { $in: userProfile.sportsInterests.map((a) => a.sport)},
               sport: { $in: userProfile.sportsInterests || [] },
-              skillLevel: userProfile.gymPreferences?.skillLevel || "Beginner",
             };
           } else {
             filters = {
@@ -161,9 +161,10 @@ router
         isLoggedIn: !!userId,
         title: "Join Games",
         layout: "main",
+        profileCompleted: req.user?.profileCompleted || false,
         head: `
               <link rel="stylesheet" href="/css/joinGame.css">
-              <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+              <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css">
               <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
                 `,
       });
@@ -230,8 +231,7 @@ router
       await sendGameEmail(
         user.email,
         `🎮 Game Confirmation: ${targetGame.title}`,
-        `<p>Hi ${user.username},</p><p>You have successfully joined <strong>${
-          targetGame.title
+        `<p>Hi ${user.username},</p><p>You have successfully joined <strong>${targetGame.title
         }</strong> on ${new Date(targetGame.startTime).toLocaleString()}.</p>`
       );
 
@@ -257,35 +257,85 @@ router
     }
   });
 
-router.get("/filter", auth, async (req, res) => {
+router.get("/filter", async (req, res) => {
   try {
-    const { city, sport, minPlayers, maxCost, skillLevel } = req.query;
+    const { sport, date, playersLeft, friendsOnly, skillLevel, minPlayers, maxCost, city } = req.query;
+    const userId = req.user?.userId;
     const filters = {};
 
-    if (city) filters.location = city;
-    if (sport) filters.sport = sport;
-    if (minPlayers) filters.playersRequired = { $gte: Number(minPlayers) };
-    if (maxCost) filters.costPerHead = { $lte: Number(maxCost) };
-    if (skillLevel) filters.skillLevel = skillLevel;
+    const now = new Date();
+    if (date === 'today') {
+      const endOfToday = new Date();
+      endOfToday.setHours(23, 59, 59, 999);
+      filters.startTime = { $gte: now, $lte: endOfToday };
+    } else if (date === '1+') {
+      const tomorrow = new Date(now);
+      tomorrow.setDate(tomorrow.getDate() + 1);
+      filters.startTime = { $gte: tomorrow };
+    } else if (date === '2+') {
+      const dayAfter = new Date(now);
+      dayAfter.setDate(dayAfter.getDate() + 2);
+      filters.startTime = { $gte: dayAfter };
+    }
 
-    filters.dateTime = { $gte: new Date() };
+    if (sport) {
+      filters.sport = { $in: Array.isArray(sport) ? sport : [sport] };
+    }
 
-    const allGames = await hostGameData.getAllGames(filters);
-    allGames.sort((a, b) => new Date(a.startTime) - new Date(b.startTime));
-    const plainAll = allGames.map((g) => g.toObject());
+    if (playersLeft) {
+      filters.$expr = {
+        $gt: [{ $subtract: ["$playersRequired", { $size: "$players" }] }, Number(playersLeft) - 1]
+      };
+    }
 
-    res.render("joinGame/joinGameForm", {
-      recommendedGames: [],
-      allGames: plainAll,
-      userId: req.user.userId,
-      title: "Join Games",
-      layout: "main",
-      head: `
-                  <link rel="stylesheet" href="/css/joinGame.css">
-                `,
-    });
+    if (friendsOnly === "true" && req.user) {
+      const userProfile = await userProfileData.getProfile(req.user.userId);
+      if (userProfile?.following?.length) {
+        filters.host = { $in: userProfile.following };
+      } else {
+        filters.host = { $in: [] }; // No friends
+      }
+    }
+
+    if (skillLevel && ["Beginner", "Intermediate", "Advanced"].includes(skillLevel)) {
+      filters.skillLevel = skillLevel;
+    }
+
+    if (minPlayers) {
+      filters.playersRequired = { ...(filters.playersRequired || {}), $gte: Number(minPlayers) };
+    }
+
+    if (maxCost) {
+      filters.costPerHead = { $lte: Number(maxCost) };
+    }
+
+    if (city) {
+      filters.location = new RegExp(city, "i"); // partial match
+    }
+
+    const games = await hostGameData.getAllGames(filters);
+    const plainGames = games
+      .filter(g => new Date(g.endTime) > now)
+      .sort((a, b) => new Date(a.startTime) - new Date(b.startTime))
+      .map(g => g.toObject());
+
+    // res.render("joinGame/joinGameForm", {
+    //   recommendedGames: [],
+    //   allGames: plainAll,
+    //   userId: req.user.userId,
+    //   title: "Join Games",
+    //   layout: "main",
+    //   profileCompleted: req.user?.profileCompleted || false,
+    //   head: `
+    //               <link rel="stylesheet" href="/css/joinGame.css">
+    //               <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    //               <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    //             `,
+    // });
+    res.json({ games: plainGames });
   } catch (error) {
-    res.status(500).send(e.message);
+    console.error("🔥 Filter route error:", error);
+    res.status(500).send(error.message);
   }
 });
 
@@ -294,13 +344,14 @@ router.get("/success", (req, res) => {
     title: "Successfully Joined",
     message: "You have successfully joined the game!",
     layout: "main",
+    profileCompleted: req.user?.profileCompleted || false,
     head: `
               <link rel="stylesheet" href="/css/joinGame.css">
             `,
   });
 });
 
-router.get("/:id", async (req, res) => {
+router.get("/:id", requireAuth, async (req, res) => {
   //http://localhost:8080/join/67f970e5d5c97b58736c31be
   try {
     const gameId = req.params.id;
@@ -349,8 +400,12 @@ router.get("/:id", async (req, res) => {
 
     const gameAlreadyStarted = new Date(game.startTime).getTime() <= Date.now();
 
+    const [lng, lat] = game.geoLocation.coordinates;
+
     res.render("joinGame/gameDetails", {
       game: game.toObject(),
+      lat,
+      lng,
       hostId: game.host._id.toString(),
       isLoggedIn,
       userId,
@@ -362,6 +417,7 @@ router.get("/:id", async (req, res) => {
       error: req.query.error || null,
       username: req.user?.username || null,
       layout: "main",
+      profileCompleted: req.user?.profileCompleted || false,
       head: `<link rel="stylesheet" href="/css/joinGame.css">`,
     });
   } catch (e) {

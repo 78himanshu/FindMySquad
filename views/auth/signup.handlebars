@@ -7,7 +7,9 @@
     <form class="form form--signup" id="signupForm" novalidate>
       <!-- Username Field -->
       <div class="form__group">
-        <label class="form__label" for="username">Username</label>
+        <label class="form__label" for="username">
+          Username <span style="color: red;">*</span>
+        </label>
         <input class="form__input" id="username" name="username" type="text"
           placeholder="Enter your username" value="{{username}}">
         <div id="usernameError" class="form__error"></div>
@@ -15,7 +17,9 @@
 
       <!-- Email Field -->
       <div class="form__group">
-        <label class="form__label" for="email">Email</label>
+        <label class="form__label" for="email">
+          Email <span style="color: red;">*</span>
+        </label>
         <input class="form__input" id="email" name="email" type="email"
           placeholder="you@example.com" value="{{email}}">
         <div id="emailError" class="form__error"></div>
@@ -23,7 +27,9 @@
 
       <!-- Password Field -->
       <div class="form__group password-wrapper">
-        <label class="form__label" for="password">Password</label>
+        <label class="form__label" for="password">
+          Password <span style="color: red;">*</span>
+        </label>
         <div class="form__input-container">
           <input class="form__input" id="password" name="password"
             type="password" placeholder="••••••••">
@@ -39,8 +45,9 @@
 
       <!-- Confirm Password Field -->
       <div class="form__group password-wrapper">
-        <label class="form__label" for="passwordConfirm">Confirm
-          Password</label>
+        <label class="form__label" for="passwordConfirm">
+          Confirm Password <span style="color: red;">*</span>
+        </label>
         <div class="form__input-container">
           <input class="form__input" id="passwordConfirm" name="passwordConfirm"
             type="password" placeholder="••••••••">
@@ -62,6 +69,7 @@
     </form>
   </div>
 </div>
+
 
 {{!-- <div class="row justify-content-center">
   <div class="col-lg-6 col-md-8">

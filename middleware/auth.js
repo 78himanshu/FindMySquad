@@ -29,8 +29,9 @@ export default async function requireAuth(req, res, next) {
     req.user = {
       userID: decoded.userId, // Required by routes
       username: decoded.username, // Optional
+      profileCompleted: decoded.profileCompleted || false 
     };
-
+    res.locals.profileCompleted = decoded.profileCompleted || false; 
     // ✅ Pass user info to Handlebars
     const userCookie = req.cookies.user;
 

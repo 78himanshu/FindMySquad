@@ -10,16 +10,6 @@
           <small class="text-muted">{{ gender}}</small>
         </div>
 
-        {{!-- NEW: Follow/Unfollow Button (only when viewing someone else)
-        {{#unless isOwn}}
-        <form method="POST" action="/profile/{{#if isFollowing}}unfollow{{else}}follow{{/if}}/{{userId}}">
-          <button type="submit" class="btn {{#if isFollowing}}btn-secondary{{else}}btn-primary{{/if}}">
-            {{#if isFollowing}}Unfollow{{else}}Follow{{/if}}
-          </button>
-        </form>
-        {{/unless}}
-        --}}
-
         {{#if isOwn}}
         <!-- Do not show Follow button if it’s your own profile -->
         {{else}}
@@ -28,23 +18,18 @@
         </button>
         {{/if}}
 
-
         <ul class="list-group list-group-flush">
           <li class="list-group-item bg-success text-white fw-semibold nav-btn" data-target="overview">
             <i class="bi bi-bookmark-fill me-2"></i> Overview
           </li>
-
           {{#if isOwn}}
-          <ul class="list-group list-group-flush">
-            <li class="list-group-item nav-btn" data-target="edit">
-              <i class="bi bi-pencil me-2"></i> Edit Profile
-            </li>
-            <li class="list-group-item nav-btn" data-target="bookings">
-              <i class="bi bi-reply me-2"></i> Show All Bookings
-            </li>
-          </ul>
+          <li class="list-group-item nav-btn" data-target="edit">
+            <i class="bi bi-pencil me-2"></i> Edit Profile
+          </li>
+          <li class="list-group-item nav-btn" data-target="bookings">
+            <i class="bi bi-reply me-2"></i> Show All Bookings
+          </li>
           {{/if}}
-
         </ul>
       </div>
     </div>
@@ -76,8 +61,8 @@
 
             <div class="mb-3">
               <strong>Location:</strong>
-              {{#if location.city}}{{ location.city}}, {{/if}}{{ location.state}}
-              {{ location.zipCode}}
+              {{#if location.city}}{{ location.city}}, {{/if}}{{
+              location.state}} {{ location.zipCode}}
             </div>
 
             <div class="align-items-center d-flex justify-content-center mt-4 row text-center">
@@ -95,22 +80,17 @@
               </div>
               <div class="col-md-3">
                 <div class="text-center mt-3">
-
                   {{#if ratingCount}}
                   <p class="mb-0 fs-5">{{averageRating}} / 5</p>
-                  <small class="text-muted">Based on {{ratingCount}} rating{{#unless (eq ratingCount
-                    1)}}s{{/unless}}</small>
+                  <small class="text-muted">Based on {{ratingCount}}
+                    rating{{#unless (eq ratingCount 1)}}s{{/unless}}</small>
                   {{else}}
                   <p class="text-muted">No ratings yet</p>
                   {{/if}}
-
                   <h5>⭐ Average Rating</h5>
                 </div>
               </div>
             </div>
-
-
-
           </div>
 
           {{#if achievements.length}}
@@ -123,7 +103,6 @@
 
         <!-- Section: Edit Profile -->
         <div id="section-edit" class="d-none">
-          <h4 class="fw-semibold px-2">Edit Your Profile</h4>
           {{> editProfileForm }}
         </div>
 
@@ -141,14 +120,10 @@
 
           <p>🎮 <strong>Esports Bookings:</strong> Coming soon!</p>
         </div>
-
-
       </div>
     </div>
   </div>
 </div>
-</div>
-
 
 <script>
   document.addEventListener('DOMContentLoaded', () => {
@@ -159,13 +134,11 @@
       btn.addEventListener('click', function () {
         const target = this.getAttribute('data-target');
 
-        // ✅ Fix: Redirect immediately to /profile/bookings when clicked
         if (target === 'bookings') {
           window.location.href = '/profile/bookings';
-          return; // ⬅️ very important to exit early
+          return;
         }
 
-        // Otherwise toggle internal sections
         sections.forEach(id => {
           const el = document.getElementById(`section-${id}`);
           if (el) el.classList.add('d-none');
@@ -173,12 +146,10 @@
         const sectionEl = document.getElementById(`section-${target}`);
         if (sectionEl) sectionEl.classList.remove('d-none');
 
-        // Sidebar highlight
         navButtons.forEach(b => b.classList.remove('bg-success', 'text-white'));
         this.classList.add('bg-success', 'text-white');
       });
     });
-
 
     const followButton = document.getElementById('followButton');
     if (followButton) {
@@ -199,11 +170,9 @@
           const result = await res.json();
 
           if (res.ok) {
-            // ✅ Toggle Follow/Following
             followButton.innerText = isFollowing ? 'Follow' : 'Following';
             showToast(`${isFollowing ? 'Unfollowed' : 'Followed'} successfully! 🎉`, true);
           } else {
-            // ❌ Handle server error like "Already following"
             showToast(result.error || 'Something went wrong.', false);
           }
         } catch (err) {
@@ -213,7 +182,6 @@
     }
   });
 
-  // Popup message (basic version)
   function showToast(message, isSuccess) {
     const color = isSuccess ? 'green' : 'red';
     const toast = document.createElement('div');
@@ -234,7 +202,5 @@
     }, 2000);
   }
 </script>
-
-
 
 <script src="/js/userProfile.js"></script>
