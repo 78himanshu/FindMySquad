@@ -2,6 +2,8 @@ import { Router } from "express";
 const router = Router();
 import { authUserData } from "../data/index.js";
 import { checkString } from "../utils/helper.js";
+import jwt from 'jsonwebtoken';
+import xss from 'xss';
 
 router
   .route("/signup")
@@ -21,7 +23,10 @@ router
   })
   .post(async (req, res) => {
     try {
-      const { username, email, password, confirmPassword } = req.body;
+      const username = xss(req.body.username).trim();
+      const email = xss(req.body.email).trim();
+      const password = xss(req.body.password).trim();
+      const confirmPassword = xss(req.body.confirmPassword).trim();
 
       if (!username || !email || !password || !confirmPassword) {
         return res.status(400).json({ error: "All fields are required" });
@@ -67,7 +72,9 @@ router
   })
   .post(async (req, res) => {
     try {
-      const { email, password, redirect } = req.body; // <-- added for redirect
+      const email = xss(req.body.email).trim();
+      const password = xss(req.body.password).trim();
+      const redirect = xss(req.body.redirect || "").trim();
 
       if (!email || !password) {
         return res
@@ -78,10 +85,13 @@ router
       checkString(email, "email");
       checkString(password, "password");
 
-      const { token, user, profilePic } = await authUserData.login(
+      const {token, user, profilePic } = await authUserData.login(
         email,
         password
       );
+
+      console.log("✅ Setting token cookie:", token);
+      console.log("✅ Token payload:", jwt.decode(token));
 
       console.log(token, user, profilePic);
 
@@ -107,7 +117,7 @@ router
       if (!user.profileCompleted) {
         redirectTo = "/profile/addprofile";
       }
-
+      console.log(redirectTo, "test redirectTo:");
       return res.status(200).json({
         message: "Login successful",
         redirect: redirectTo,

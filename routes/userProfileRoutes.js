@@ -5,11 +5,13 @@ import verifyToken from "../middleware/auth.js";
 import { checkString } from "../utils/helper.js";
 import Userlist from "../models/User.js";
 import mongoose from "mongoose";
+// import { userProfileData } from "../data/index.js";
 import UserProfile from "../models/userProfile.js";
 const ObjectId = mongoose.Types.ObjectId;
 //import { geocodeCity } from '../utils/geocode.js';
 import { format } from "date-fns";
 import axios from "axios";
+import xss from 'xss';
 
 const router = Router();
 
@@ -29,19 +31,17 @@ router
   })
   .post(verifyToken, async (req, res) => {
     try {
-      const {
-        firstName,
-        lastName,
-        bio,
-        gender,
-        profilePic,
-        sportsInterests,
-        gymPreferences,
-        gamingInterests,
-        city,
-        phoneNumber,
-        //geoLocation
-      } = req.body;
+      const firstName = xss(req.body.firstName).trim();
+      const lastName = xss(req.body.lastName).trim();
+      const bio = xss(req.body.bio || "").trim();
+      const gender = xss(req.body.gender).trim();
+      const profilePic = xss(req.body.profilePic).trim();
+      const city = xss(req.body.city || "").trim();
+      const phoneNumber = xss(req.body.phoneNumber || "").trim();
+
+      const sportsInterests = req.body.sportsInterests.map(i => xss(i.trim()));
+      const gymPreferences = req.body.gymPreferences.map(i => xss(i.trim()));
+      const gamingInterests = req.body.gamingInterests.map(i => xss(i.trim()));
 
       console.log(">>>", req.body);
 
@@ -201,6 +201,8 @@ router.route("/view").get(verifyToken, async (req, res) => {
       averageRating: profile.averageRating,
       ratingCount: profile.ratingCount,
       phoneNumber: profile.phoneNumber,
+      city: profile.location?.city || "",
+      ratings: profile.ratings,
       isOwn, // 👈 pass true
       isFollowing, // 👈 pass false
       head: `<link rel="stylesheet" href="/css/userProfile.css">`,
@@ -251,6 +253,7 @@ router.route("/addprofile").get(verifyToken, async (req, res) => {
   res.render("userProfile/complete-profile", {
     title: "Complete Profile",
     layout: "main",
+    disableNav: true,
     error: req.query.error,
     username: req.username || null || "",
     email: req.query.email || "",
@@ -325,9 +328,11 @@ router.get("/bookings", verifyToken, async (req, res) => {
               username: user ? user.username : "Unknown",
               hasBeenRated: !!existingRating,
               ratedScore: existingRating?.score || 0,
+              review: existingRating?.review || ""
             };
           })
         );
+
 
         const formattedDateTime = game.startTime
           ? format(new Date(game.startTime), "eee MMM dd, yyyy h:mm a")
@@ -349,6 +354,8 @@ router.get("/bookings", verifyToken, async (req, res) => {
     const futureGameBookings = allGameBookingsEnriched.filter(
       (game) => new Date(game.endTime) >= now
     );
+
+    console.log("pastGameBookings", pastGameBookings)
 
     const allGymBookingsEnriched = await Promise.all(
       allGymBookings.map(async (session) => {
@@ -412,56 +419,75 @@ router.get("/bookings", verifyToken, async (req, res) => {
 
 // ————— Rate Players API ——————
 
-router.post("/bookings/rate", verifyToken, async (req, res) => {
-  const raterId = req.user.userID; // Ensure this is a valid ObjectId
-  const { bookingId, ratings } = req.body;
+// router.post("/bookings/rate", verifyToken, async (req, res) => {
+//   const raterId = req.user.userID; // Ensure this is a valid ObjectId
+//   const { bookingId, ratings } = req.body;
 
+//   try {
+//     if (!bookingId || !ratings || !Array.isArray(ratings)) {
+//       return res.status(400).json({ error: "Missing bookingId or ratings" });
+//     }
+
+//     for (const r of ratings) {
+//       const ratedUserId = r.userId;
+//       const score = r.score;
+
+//       // Validate ObjectId
+//       if (!ObjectId.isValid(ratedUserId)) {
+//         console.error(`Invalid rated user ID: ${ratedUserId}`);
+//         continue; // Skip invalid entries
+//       }
+
+//       // Find the UserProfile of the rated user
+//       const profile = await UserProfile.findOne({ userId: ratedUserId });
+//       if (!profile) {
+//         console.error(`No profile found for user ID: ${ratedUserId}`);
+//         continue; // Skip if profile not found
+//       }
+
+//       // Add the new rating
+//       profile.ratings.push({
+//         rater: new ObjectId(raterId), // Ensure rater is an ObjectId
+//         score: score,
+//         bookingId: new ObjectId(bookingId),
+//       });
+
+//       // Update rating count and average rating
+//       profile.ratingCount = profile.ratings.length;
+//       profile.averageRating =
+//         profile.ratings.reduce((sum, rating) => sum + rating.score, 0) /
+//         profile.ratingCount;
+
+//       await profile.save();
+//     }
+
+//     return res.json({ success: true });
+//   } catch (e) {
+//     console.error("Error saving ratings:", e);
+//     return res
+//       .status(500)
+//       .json({ error: "An error occurred while saving ratings." });
+//   }
+// });
+
+router.post("/bookings/rate", verifyToken, async (req, res) => {
   try {
-    if (!bookingId || !ratings || !Array.isArray(ratings)) {
+    const raterId = req.user.userID;
+    const { bookingId, ratings } = req.body;
+
+    if (!bookingId || !Array.isArray(ratings)) {
       return res.status(400).json({ error: "Missing bookingId or ratings" });
     }
 
-    for (const r of ratings) {
-      const ratedUserId = r.userId;
-      const score = r.score;
+    const result = await userProfileData.ratePlayers(raterId, ratings, bookingId);
 
-      // Validate ObjectId
-      if (!ObjectId.isValid(ratedUserId)) {
-        console.error(`Invalid rated user ID: ${ratedUserId}`);
-        continue; // Skip invalid entries
-      }
-
-      // Find the UserProfile of the rated user
-      const profile = await UserProfile.findOne({ userId: ratedUserId });
-      if (!profile) {
-        console.error(`No profile found for user ID: ${ratedUserId}`);
-        continue; // Skip if profile not found
-      }
-
-      // Add the new rating
-      profile.ratings.push({
-        rater: new ObjectId(raterId), // Ensure rater is an ObjectId
-        score: score,
-        bookingId: new ObjectId(bookingId),
-      });
-
-      // Update rating count and average rating
-      profile.ratingCount = profile.ratings.length;
-      profile.averageRating =
-        profile.ratings.reduce((sum, rating) => sum + rating.score, 0) /
-        profile.ratingCount;
-
-      await profile.save();
-    }
-
-    return res.json({ success: true });
-  } catch (e) {
-    console.error("Error saving ratings:", e);
-    return res
-      .status(500)
-      .json({ error: "An error occurred while saving ratings." });
+    res.json({ success: true, result });
+  } catch (err) {
+    console.error("Rating failed:", err);
+    res.status(500).json({ error: "Internal Server Error" });
   }
 });
+
 
 // ————— Show Rate Players Form ——————
 router.get("/bookings/rate/:bookingId", verifyToken, async (req, res) => {
@@ -507,6 +533,18 @@ router.get("/view/:targetUserId", verifyToken, async (req, res) => {
     const isFollowing = profile.followers
       .map((f) => f.toString())
       .includes(req.user.userID);
+    const enrichedRatings = await Promise.all(
+      profile.ratings.map(async (r) => {
+        const raterUser = await Userlist.findById(r.rater).select("username");
+        return {
+          username: raterUser?.username || "Unknown",
+          score: r.score,
+          review: r.review,
+        };
+      })
+    );
+
+
 
     res.render("userProfile/view", {
       title: `${profile.profile.firstName} ${profile.profile.lastName}`,
@@ -527,6 +565,7 @@ router.get("/view/:targetUserId", verifyToken, async (req, res) => {
       following: profile.following,
       averageRating: profile.averageRating,
       ratingCount: profile.ratingCount,
+      receivedRatings: enrichedRatings,
       isOwn,
       isFollowing,
       head: `<link rel="stylesheet" href="/css/userProfile.css">`,
@@ -543,6 +582,18 @@ router.get("/userview/:targetUserId", verifyToken, async (req, res) => {
     const isFollowing = profile.followers
       .map((f) => f.toString())
       .includes(req.user.userID);
+
+    const enrichedRatings = await Promise.all(
+      profile.ratings.map(async (r) => {
+        const raterUser = await Userlist.findById(r.rater).select("username");
+        return {
+          username: raterUser?.username || "Unknown",
+          score: r.score,
+          review: r.review,
+        };
+      })
+    );
+
 
     res.render("userProfile/userview", {
       title: `${profile.profile.firstName} ${profile.profile.lastName}`,
@@ -564,7 +615,7 @@ router.get("/userview/:targetUserId", verifyToken, async (req, res) => {
         following: profile.following,
         averageRating: profile.averageRating,
         ratingCount: profile.ratingCount,
-
+        receivedRatings: enrichedRatings,
         isOwn,
         isFollowing,
       },

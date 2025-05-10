@@ -148,3 +148,22 @@
     font-weight: bold;
   }
   
+  .filter-sidebar {
+    width: 250px;
+    float: left;
+    margin-right: 20px;
+    padding: 15px;
+    background-color: #f7f7f7;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+  }
+  .filter-sidebar label {
+    font-weight: bold;
+    display: block;
+    margin-top: 10px;
+  }
+  .filter-sidebar input,
+  .filter-sidebar select {
+    width: 100%;
+    margin-bottom: 10px;
+  }

@@ -143,3 +143,23 @@ function showToast(message, type = "info", duration = 5000) {
 }
 
 window.initAutocomplete = initAutocomplete;
+
+document
+  .getElementById("editProfileForm")
+  .addEventListener("submit", function (e) {
+    const phoneInput = document.getElementById("phoneNumber");
+    const phoneError = document.getElementById("phoneError");
+
+    const phonePattern =
+      /^(\+?1\s?)?(\(\d{3}\)|\d{3})[\s.-]?\d{3}[\s.-]?\d{4}$/;
+
+    if (!phonePattern.test(phoneInput.value.trim())) {
+      e.preventDefault();
+      phoneError.textContent =
+        "Please enter a valid phone number (e.g., 123-456-7890, (123) 456-7890)";
+      phoneInput.classList.add("is-invalid");
+    } else {
+      phoneError.textContent = "";
+      phoneInput.classList.remove("is-invalid");
+    }
+  });

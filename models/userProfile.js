@@ -87,6 +87,7 @@ const userProfileSchema = new mongoose.Schema({
       },
       score: { type: Number, min: 1, max: 5, required: true },
       bookingId: { type: mongoose.Schema.Types.ObjectId, required: true },
+      review: { type: String, default: "" },
     },
   ],
   ratingCount: { type: Number, default: 0 },

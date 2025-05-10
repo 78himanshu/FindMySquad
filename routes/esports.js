@@ -384,6 +384,7 @@ router.get(
         canCreate,
         canJoin,
         error,
+        profileCompleted: req.user?.profileCompleted || false,
         backgroundImage: getGameImage(tournament.game),
       });
     } catch (err) {

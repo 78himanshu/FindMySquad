@@ -43,11 +43,17 @@ export const login = async (email, password) => {
       userId: user._id.toString(),
       username: user.username,
       profilePic,
+      profileCompleted: user.profileCompleted || false
     },
     process.env.JWT_SECRET,
     { expiresIn: "2h" }
   );
-
+  console.log("🪪 Payload in token:", {
+    userId: user._id.toString(),
+    username: user.username,
+    profilePic,
+    profileCompleted: user.profileCompleted || false
+  });
   return {
     token,
     user: {

@@ -1,4 +1,4 @@
-<main class="container py-5">
+<div class="container py-5">
   <div class="row justify-content-center">
     <div class="col-md-6 col-lg-5">
       <div class="card shadow-sm p-4">
@@ -8,28 +8,33 @@
 
           <!-- HIDDEN REDIRECT INPUT HERE -->
           <input type="hidden" name="redirect" id="redirectInput"
-            value="{{redirect}}" />
+            value="{{redirect}}">
+
           <!-- Email -->
           <div class="mb-3">
-            <label for="email" class="form-label">E-mail</label>
+            <label for="email" class="form-label">
+              E-mail <span style="color: red;">*</span>
+            </label>
             <input
               type="email"
               class="form-control"
               id="email"
               name="email"
-              placeholder="you@example.com" />
+              placeholder="you@example.com">
             <div id="emailError" class="form-text text-danger"></div>
           </div>
 
           <!-- Password -->
           <div class="mb-4">
-            <label for="password" class="form-label">Password</label>
+            <label for="password" class="form-label">
+              Password <span style="color: red;">*</span>
+            </label>
             <input
               type="password"
               class="form-control"
               id="password"
               name="password"
-              placeholder="••••••••" />
+              placeholder="••••••••">
             <div id="passwordError" class="form-text text-danger"></div>
           </div>
 
@@ -46,5 +51,4 @@
       </div>
     </div>
   </div>
-
-</main>
+</div>

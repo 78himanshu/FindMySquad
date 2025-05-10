@@ -6,6 +6,7 @@ import { checkString } from "../utils/helper.js";
 import Userlist from "../models/User.js";
 import mongoose from "mongoose";
 
+
 export const createProfile = async (userId, data) => {
   console.log(">>>", userId);
   const existing = await UserProfile.findOne({ userId });
@@ -83,24 +84,58 @@ export const deleteProfile = async (userId) => {
   return true;
 };
 
-export const ratePlayers = async (raterId, ratingsArray) => {
-  for (let { userId, score } of ratingsArray) {
-    if (!ObjectId.isValid(userId)) throw "Invalid rated user ID";
+
+export const ratePlayers = async (raterId, ratingsArray, bookingId) => {
+  if (!ObjectId.isValid(raterId)) throw "Invalid rater ID";
+  if (!ObjectId.isValid(bookingId)) throw "Invalid booking ID";
+
+  const results = [];
+
+  for (let { userId, rating, review } of ratingsArray) {
+    if (!ObjectId.isValid(userId)) {
+      results.push({ userId, success: false, error: "Invalid userId" });
+      continue;
+    }
 
     const profile = await UserProfile.findOne({ userId: new ObjectId(userId) });
-    if (!profile) throw `No profile for user ${userId}`;
+    if (!profile) {
+      results.push({ userId, success: false, error: "Profile not found" });
+      continue;
+    }
 
-    profile.ratings.push({ rater: new ObjectId(raterId), score });
+    // Check for duplicate rating
+    const alreadyRated = profile.ratings.find(
+      (r) =>
+        r.rater.toString() === raterId &&
+        r.bookingId.toString() === bookingId.toString()
+    );
 
-    profile.ratingCount++;
+    if (alreadyRated) {
+      results.push({ userId, success: false, error: "Already rated" });
+      continue;
+    }
 
+    // Add new rating
+    profile.ratings.push({
+      rater: new ObjectId(raterId),
+      score: rating,
+      review: review || "",
+      bookingId: new ObjectId(bookingId),
+    });
+
+    // Update counts
+    profile.ratingCount = profile.ratings.length;
     profile.averageRating =
-      (profile.averageRating * (profile.ratingCount - 1) + score) /
-      profile.ratingCount;
+      profile.ratings.reduce((sum, r) => sum + r.score, 0) / profile.ratingCount;
 
     await profile.save();
+
+    results.push({ userId, success: true });
   }
+
+  return results;
 };
+
 
 /**
  * Have userId follow targetUserId.
