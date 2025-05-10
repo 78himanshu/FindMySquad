@@ -8,6 +8,7 @@ import { userProfileData } from "../data/index.js";
 import { sendGameEmail } from "../utils/emailHelper.js";
 import Reminder from "../models/Reminder.js";
 import { scheduleJobFromReminder } from "../emailScheduler.js";
+import requireAuth from "../middleware/auth.js";
 
 router
   .get("/", async (req, res) => {
@@ -163,7 +164,7 @@ router
         profileCompleted: req.user?.profileCompleted || false,
         head: `
               <link rel="stylesheet" href="/css/joinGame.css">
-              <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+              <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css">
               <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
                 `,
       });
@@ -351,7 +352,7 @@ router.get("/success", (req, res) => {
   });
 });
 
-router.get("/:id", async (req, res) => {
+router.get("/:id", requireAuth, async (req, res) => {
   //http://localhost:8080/join/67f970e5d5c97b58736c31be
   try {
     const gameId = req.params.id;

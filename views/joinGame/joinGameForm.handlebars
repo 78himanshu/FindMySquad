@@ -1,26 +1,35 @@
-<main class="games-section container">
+<div class="games-section container">
   {{#if error}}
   <div id="top-error" class="alert alert-danger error-msg">{{error}}</div>
   {{/if}}
 
   {{#if success}}
-  <div class="alert" class="alert-success success-msg">{{success}}</div>
+  <div class="alert alert-success success-msg">{{success}}</div>
   {{/if}}
+
   <!-- Tabs Section -->
   <div class="game-tabs">
-    <button class="tab-button" onclick="showSection('calendar')">Calendar</button>
-    <button class="tab-button active" onclick="showSection('mySports')">My Sports</button>
+    <button class="tab-button"
+      onclick="showSection('calendar-section')">Calendar</button>
+    <button class="tab-button active" onclick="showSection('mySports')">My
+      Sports</button>
   </div>
 
   <!-- Calendar Section -->
-  <section id="calendar" class="tab-content" style="display: none;">
+  <section id="calendar-section" class="tab-content" style="display: none;">
+    <h2 class="visually-hidden">Calendar View</h2>
     <div id="calendar-container">
       <div id="calendar"></div>
     </div>
   </section>
 
-  <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.css" rel="stylesheet" />
+  <!-- Map Section -->
+  <section id="map-section">
+    <h2 class="visually-hidden">Game Locations Map</h2>
+    <div id="game-map" style="height: 400px; margin-bottom: 20px;"></div>
+  </section>
 
+<<<<<<< HEAD
   <div id="game-map" style="height: 400px; margin-bottom: 20px;"></div>
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
@@ -139,9 +148,15 @@ const games = {{{json allGames}}};
 </aside>
 
   <!-- My Sports Section (default visible) -->
+=======
+  <!-- My Sports Section -->
+>>>>>>> fd4a801 (added validation for handlerbars and few changes in host and join game)
   <section id="mySports" class="tab-content" style="display: block;">
-    <section>
-      <h2 class="section-heading">Recommended Games</h2>
+    <h2 class="visually-hidden">My Sports Section</h2>
+
+    <section aria-labelledby="recommended-heading">
+      <h2 id="recommended-heading" class="section-heading">Recommended
+        Games</h2>
       {{#if recommendedGames.length}}
       <div class="game-grid">
         {{#each recommendedGames}}
@@ -150,23 +165,24 @@ const games = {{{json allGames}}};
             <h3>{{this.title}}</h3>
             <p>Sport: {{this.sport}}</p>
             <p>Location: {{this.location}}</p>
-            <p>
-              Date: {{formatDate this.startTime}} |
-              Time: {{formatTime this.startTime}} - {{formatTime this.endTime}}
-            </p>
+            <p>Date: {{formatDate this.startTime}} | Time: {{formatTime
+              this.startTime}} - {{formatTime this.endTime}}</p>
           </a>
         </div>
         {{/each}}
       </div>
       {{else}}
       <div class="no-match-box">
-        <p class="no-match">Oops...No Match Found for this Selection Criteria</p>
-        <p>You can host an activity & we will shout-out to the community to join in :)</p>
+        <p class="no-match">Oops...No Match Found for this Selection
+          Criteria</p>
+        <p>You can host an activity & we will shout-out to the community to join
+          in :)</p>
         <a href="/host/form" class="btn btn-success">Create Game</a>
       </div>
       {{/if}}
     </section>
 
+<<<<<<< HEAD
     <!-- All Games -->
     <section>
       <h2 class="section-heading">All Games</h2>
@@ -206,13 +222,53 @@ const games = {{{json allGames}}};
             {{/if}}
           </div>
           {{/each}}
+=======
+    <section aria-labelledby="allgames-heading">
+      <h2 id="allgames-heading" class="section-heading">All Games</h2>
+      <div class="game-grid">
+        {{#each allGames}}
+        <div class="game-card">
+          <a href="/join/{{this._id}}">
+            <h3>{{this.title}}</h3>
+            <p>Sport: {{this.sport}}</p>
+            <p>Location: {{this.location}}</p>
+            <p>Date: {{formatDate this.startTime}} | Time: {{formatTime
+              this.startTime}} - {{formatTime this.endTime}}</p>
+            {{#if this.host.username}}
+            <p>Hosted By: {{this.host.username}}</p>
+            {{/if}}
+          </a>
+
+          {{#if (eq ../hostId this.host._id)}}
+          <a href="/host/edit/{{this._id}}" class="btn btn-warning">Edit</a>
+          <form action="/host/delete/{{this._id}}" method="POST"
+            style="display:inline;"
+            onsubmit="return confirm('Are you sure you want to delete this game?')">
+            <button type="submit" class="btn btn-danger">Delete</button>
+          </form>
+          {{else}}
+          {{#if (includes ../joinedGameIdStrings (toString this._id))}}
+          <form action="/join/leave/{{this._id}}" method="POST">
+            <button type="submit" class="btn btn-secondary">Leave</button>
+          </form>
+          {{else if (gte (length this.players) this.playersRequired)}}
+          <p class="full-session">🚫 Session is Full</p>
+          {{/if}}
+          {{/if}}
+>>>>>>> fd4a801 (added validation for handlerbars and few changes in host and join game)
         </div>
     </section>
   </section>
 
+  <!-- Styles -->
+  <link rel="stylesheet"
+    href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.css">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css">
 
-  <!-- JS Scripts -->
-  <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js"></script>
+  <!-- Scripts -->
+  <script
+    src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js"></script>
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
   <script>
     function showSection(sectionId) {
       const sections = document.querySelectorAll('.tab-content');
@@ -222,10 +278,12 @@ const games = {{{json allGames}}};
       buttons.forEach(btn => btn.classList.remove('active'));
 
       const activeTab = document.getElementById(sectionId);
-      activeTab.style.display = 'block';
-      event.target.classList.add('active');
+      if (activeTab) {
+        activeTab.style.display = 'block';
+        event.target.classList.add('active');
+      }
 
-      if (sectionId === 'calendar' && window._myCalendarInstance) {
+      if (sectionId === 'calendar-section' && window._myCalendarInstance) {
         setTimeout(() => {
           window._myCalendarInstance.render();
         }, 10);
@@ -244,14 +302,43 @@ const games = {{{json allGames}}};
           right: "dayGridMonth,timeGridWeek,timeGridDay"
         },
         events: {{{ json calendarEvents }}}
-  });
+      });
 
-    calendar.render();
+      calendar.render();
+      window._myCalendarInstance = calendar;
 
-    window._myCalendarInstance = calendar;
-});
+      const mapContainer = document.getElementById('game-map');
+      if (mapContainer) {
+        let defaultLat = 40.7128;
+        let defaultLng = -74.0060;
+        const cookieMatch = document.cookie.match(/user_location=([^;]+)/);
+        if (cookieMatch) {
+          try {
+            const loc = JSON.parse(decodeURIComponent(cookieMatch[1]));
+            if (loc.lat && loc.lng) {
+              defaultLat = loc.lat;
+              defaultLng = loc.lng;
+            }
+          } catch (e) {
+            console.warn('Could not parse location cookie');
+          }
+        }
 
-    document.addEventListener('DOMContentLoaded', function () {
+        const map = L.map('game-map').setView([defaultLat, defaultLng], 12);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+          attribution: '© OpenStreetMap contributors'
+        }).addTo(map);
+
+        const games = {{{json allGames}}};
+        games.forEach(game => {
+          if (game.geoLocation && game.geoLocation.coordinates) {
+            const [lng, lat] = game.geoLocation.coordinates;
+            L.marker([lat, lng]).addTo(map)
+              .bindPopup(`<strong>${game.title}</strong><br>${game.sport}<br><a href="/join/${game._id}">View Game</a>`);
+          }
+        });
+      }
+
       const topError = document.getElementById('top-error');
       if (topError) {
         setTimeout(() => {
@@ -260,6 +347,7 @@ const games = {{{json allGames}}};
       }
     });
   </script>
+<<<<<<< HEAD
 
 <script>
   document.getElementById("filter-form").addEventListener("submit", async function (e) {
@@ -337,3 +425,6 @@ const games = {{{json allGames}}};
 
 
 </main>
+=======
+</div>
+>>>>>>> fd4a801 (added validation for handlerbars and few changes in host and join game)

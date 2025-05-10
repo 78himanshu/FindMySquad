@@ -117,7 +117,7 @@ router
       if (!user.profileCompleted) {
         redirectTo = "/profile/addprofile";
       }
-
+      console.log(redirectTo, "test redirectTo:");
       return res.status(200).json({
         message: "Login successful",
         redirect: redirectTo,
@@ -128,7 +128,6 @@ router
           profileCompleted: user.profileCompleted,
           profilepic: user.profilePic || "/images/default-avatar.png",
         },
-        redirect: redirect || "/", // Included redirect in the response
       });
     } catch (error) {
       return res.status(400).json({

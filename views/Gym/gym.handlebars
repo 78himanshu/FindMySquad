@@ -1,75 +1,7 @@
-<style>
-  .hero-section {
-    background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)),
-      url('/images/gym_bg_new.jpg') center/cover no-repeat;
-    height: 100vh;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    text-align: center;
-    color: #fff;
-    font-family: 'Segoe UI', sans-serif;
-  }
+{{#*inline "head"}}
+<link rel="stylesheet" href="/css/gymHome.css">
+{{/inline}}
 
-  .hero-content {
-    background: rgba(0, 0, 0, 0.65);
-    padding: 2.5rem;
-    border-radius: 16px;
-    max-width: 620px;
-    width: 90%;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-  }
-
-  .hero-content h1 {
-    font-size: 2.75rem;
-    font-weight: 700;
-    margin-bottom: 1rem;
-  }
-
-  .hero-content h1 span {
-    color: #22d3ee;
-  }
-
-  .hero-content p {
-    font-size: 1.15rem;
-    margin-bottom: 2rem;
-    color: #d1d5db;
-  }
-
-  .btn-group {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 1rem;
-  }
-
-  .btn-primary {
-    background: linear-gradient(to right, #06b6d4, #3b82f6);
-    color: #fff;
-    border: none;
-    padding: 0.75rem 1.5rem;
-    font-size: 1rem;
-    font-weight: 600;
-    border-radius: 10px;
-    transition: all 0.3s ease-in-out;
-    text-decoration: none;
-  }
-
-  .btn-primary:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(59, 130, 246, 0.5);
-  }
-
-  @media (max-width: 600px) {
-    .hero-content h1 {
-      font-size: 2rem;
-    }
-
-    .hero-content p {
-      font-size: 1rem;
-    }
-  }
-</style>
 <section class="hero-section">
   <div class="hero-content">
     <h1>Welcome to <span>GymBuddy</span>! 🏋️‍♂️</h1>

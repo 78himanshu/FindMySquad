@@ -1,4 +1,4 @@
-<main class="py-4">
+<div class="py-4">
   <div class="host-game-container">
     <h1>Create Tournament</h1>
     <form id="createTournamentForm" action="/tournaments/create" method="POST"
@@ -28,25 +28,22 @@
       <input
         type="date"
         name="date"
-        placeholder="Date"
         required
         min="{{minDate}}"
-        value="{{formData.date}}" />
+        value="{{formData.date}}">
 
       <!-- Start & End Time -->
       <div class="form-row">
         <input
           type="time"
           name="startTime"
-          placeholder="Start Time"
           required
-          value="{{formData.startTime}}" />
+          value="{{formData.startTime}}">
         <input
           type="time"
           name="endTime"
-          placeholder="End Time"
           required
-          value="{{formData.endTime}}" />
+          value="{{formData.endTime}}">
       </div>
 
       <!-- Skill Level -->
@@ -64,11 +61,11 @@
       <input
         type="number"
         name="maxTeams"
-        placeholder="Max Teams (1–100)"
         min="1"
         max="100"
         required
-        value="{{formData.maxTeams}}" />
+        value="{{formData.maxTeams}}"
+        placeholder="Max Teams (1–100)">
 
       <!-- Tournament Description -->
       <textarea
@@ -89,12 +86,11 @@
       <button type="submit" class="submit-btn">Create Tournament</button>
     </form>
   </div>
-</main>
+</div>
 
 <script>
   document.addEventListener('DOMContentLoaded', () => {
     const dateInput = document.querySelector('input[name="date"]');
-    // Ensure min-date
     dateInput.min = '{{minDate}}';
 
     const form = document.getElementById('createTournamentForm');

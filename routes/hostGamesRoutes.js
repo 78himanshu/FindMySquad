@@ -90,33 +90,53 @@ router
 
       const now = DateTime.now().setZone(x.userTimeZone);
       if (startDateTime < now) {
-        return res
-          .status(400)
-          .json({
-            success: false,
-            error: "Cannot host games in the past (your local time).",
-          });
+        return res.status(400).json({
+          success: false,
+          error: "Cannot host games in the past (your local time).",
+        });
       }
 
       x.startTime = startDateTime.toUTC().toJSDate();
       x.endTime = endDateTime.toUTC().toJSDate();
 
+      //  Prevent games that span more than one day
+      if (
+        startDateTime.toFormat("yyyy-MM-dd") !==
+        endDateTime.toFormat("yyyy-MM-dd")
+      ) {
+        return res.status(400).json({
+          success: false,
+          error:
+            "Game cannot span across multiple calendar days. Please ensure start and end time are on the same day.",
+        });
+      }
+
+      // Prevent hosting if user has already joined a game at that time
+      const joinedGames = await joinGameData.getJoinedGamesByUser(x.host);
+      const hasConflict = joinedGames.some((g) => {
+        const gStart = new Date(g.startTime);
+        const gEnd = new Date(g.endTime);
+        return x.startTime < gEnd && x.endTime > gStart;
+      });
+
+      if (hasConflict) {
+        return res.status(400).json({
+          success: false,
+          error: "You have already joined a game that overlaps with this time.",
+        });
+      }
       if (!Number.isFinite(x.playersRequired) || x.playersRequired < 1) {
-        return res
-          .status(400)
-          .json({
-            success: false,
-            error: "Players Required must be a number ≥ 1.",
-          });
+        return res.status(400).json({
+          success: false,
+          error: "Players Required must be a number ≥ 1.",
+        });
       }
 
       if (!Number.isFinite(x.costPerHead) || x.costPerHead < 0) {
-        return res
-          .status(400)
-          .json({
-            success: false,
-            error: "Cost per Head must be a number ≥ 0.",
-          });
+        return res.status(400).json({
+          success: false,
+          error: "Cost per Head must be a number ≥ 0.",
+        });
       }
 
       try {
@@ -248,21 +268,17 @@ router
         });
       } catch (e) {
         console.error("Error in /host:", e.message || e);
-        return res
-          .status(400)
-          .json({
-            success: false,
-            error: e.message || "Unknown error occurred.",
-          });
-      }
-    } catch (e) {
-      console.error("Error in /host:", e.message || e);
-      return res
-        .status(400)
-        .json({
+        return res.status(400).json({
           success: false,
           error: e.message || "Unknown error occurred.",
         });
+      }
+    } catch (e) {
+      console.error("Error in /host:", e.message || e);
+      return res.status(400).json({
+        success: false,
+        error: e.message || "Unknown error occurred.",
+      });
     }
   });
 
@@ -398,6 +414,14 @@ router.post("/edit/:id", requireAuth, async (req, res) => {
       zone: userTimeZone,
     });
     if (rawEnd <= rawStart) rawEnd = rawEnd.plus({ days: 1 });
+
+    // Prevent games that span more than one calendar day
+    if (rawStart.toFormat("yyyy-MM-dd") !== rawEnd.toFormat("yyyy-MM-dd")) {
+      return res.status(400).json({
+        error:
+          "Game cannot span across multiple calendar days. Please ensure start and end time are on the same day.",
+      });
+    }
 
     const now = DateTime.now().setZone(userTimeZone);
     if (rawStart < now) {
