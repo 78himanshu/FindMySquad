@@ -1,34 +1,40 @@
+// bookings.js
+
 document.addEventListener("DOMContentLoaded", () => {
   const modal = document.getElementById("rateModal");
   const form = document.getElementById("rateForm");
   const fieldsWrap = document.getElementById("rateFields");
   const toastWrap = document.getElementById("toast-container");
 
+  // Open modal with players list
   document.querySelectorAll(".btn-rate").forEach((btn) => {
     btn.addEventListener("click", () => {
       const bookingId = btn.dataset.bookingId;
       const players = JSON.parse(btn.dataset.players);
 
-      console.log(players);
-
       fieldsWrap.innerHTML = "";
       players.forEach((player) => {
-        const group = document.createElement("div");
-        group.className = "mb-2";
+        if (!player.isHost) {
+          const group = document.createElement("div");
+          group.className = "mb-3";
 
-        group.innerHTML = `
-          <label class="form-label fw-bold">${
-            player.username || "Player"
-          }:</label>
-          <select name="rating_${player.userId}" class="form-select"> 
-            <option value="">Rate...</option>
-            ${[5, 4, 3, 2, 1]
-              .map((n) => `<option value="${n}">${n} ★</option>`)
+          const html = `
+            <label class="form-label fw-bold">${player.username}:</label>
+            <div class="d-flex align-items-center mb-1 star-container" data-user-id="${player.userId}">
+              ${[1, 2, 3, 4, 5]
+              .map(
+                (n) => `
+                <i class="bi bi-star star me-1" data-score="${n}" style="cursor:pointer;font-size:1.2rem;"></i>
+              `
+              )
               .join("")}
-          </select>
-        `;
+            </div>
+            <textarea class="form-control review-input" name="review_${player.userId}" placeholder="Write a short review..."></textarea>
+          `;
 
-        fieldsWrap.appendChild(group);
+          group.innerHTML = html;
+          fieldsWrap.appendChild(group);
+        }
       });
 
       form.dataset.bookingId = bookingId;
@@ -36,148 +42,95 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
-  // Cancel Rating
-  document.getElementById("rateCancel").addEventListener("click", () => {
-    modal.style.display = "none";
+  // // Close modal
+  // document.getElementById("rateCancel").addEventListener("click", () => {
+  //   modal.style.display = "none";
+  // });
+
+  // Star selection logic
+  form.addEventListener("mouseover", (e) => {
+    if (e.target.classList.contains("star")) {
+      const container = e.target.closest(".star-container");
+      const score = parseInt(e.target.dataset.score);
+      highlightStars(container, score);
+    }
   });
 
-  // Submit Ratings
+  form.addEventListener("mouseout", (e) => {
+    if (e.target.classList.contains("star")) {
+      const container = e.target.closest(".star-container");
+      resetStars(container);
+    }
+  });
+
+  form.addEventListener("click", (e) => {
+    if (e.target.classList.contains("star")) {
+      const container = e.target.closest(".star-container");
+      container.dataset.selectedScore = e.target.dataset.score;
+      highlightStars(container, parseInt(e.target.dataset.score));
+    }
+  });
+
+  function highlightStars(container, score) {
+    const stars = container.querySelectorAll(".star");
+    stars.forEach((star, i) => {
+      star.classList.toggle("text-warning", i < score);
+    });
+  }
+
+  function resetStars(container) {
+    const score = parseInt(container.dataset.selectedScore || 0);
+    const stars = container.querySelectorAll(".star");
+    stars.forEach((star, i) => {
+      star.classList.toggle("text-warning", i < score);
+    });
+  }
+
+  // Submit review form
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
     const bookingId = form.dataset.bookingId;
+    const containers = form.querySelectorAll(".star-container");
     const ratings = [];
 
-    const formData = new FormData(form);
+    containers.forEach((container) => {
+      const userId = container.dataset.userId;
+      const score = parseInt(container.dataset.selectedScore || 0);
+      const review = form.querySelector(`[name='review_${userId}']`).value.trim();
 
-    formData.forEach((value, key) => {
-      if (key.startsWith("rating_") && value !== "") {
-        // Only if user actually rated
-        const userId = key.replace("rating_", "");
-        ratings.push({
-          userId: userId,
-          score: parseInt(value),
-        });
+      if (score > 0 || review) {
+        ratings.push({ userId, score, review });
       }
     });
 
-    if (!ratings.length) {
-      return showToast("Please select at least one rating.", "error");
+    if (ratings.length === 0) {
+      showToast("Please provide at least one rating or review.", "error");
+      return;
     }
-
-    console.log("Submitting ratings:", ratings);
 
     try {
       const res = await fetch("/profile/bookings/rate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        credentials: "include",
         body: JSON.stringify({ bookingId, ratings }),
       });
-      const result = await res.json();
-      if (!res.ok) throw new Error(result.error || "Failed to submit rating");
 
-      showToast("Ratings submitted successfully!", "success");
-      setTimeout(() => window.location.reload(), 1500);
+      const result = await res.json();
+      if (!res.ok) throw new Error(result.error || "Failed to submit.");
+
+      showToast("Feedback submitted successfully!", "success");
+      setTimeout(() => location.reload(), 1200);
     } catch (err) {
       console.error(err);
       showToast(err.message, "error");
     }
   });
 
-  // Toast function
   function showToast(msg, type = "info", delay = 4000) {
     const toast = document.createElement("div");
     toast.className = `toast toast--${type} show`;
-    toast.innerHTML = `${msg} <button class="btn-close ms-2" onclick="this.parentNode.remove()">×</button>`;
+    toast.innerHTML = `${msg} <button class="btn-close ms-2" onclick="this.parentNode.remove()">&times;</button>`;
     toastWrap.appendChild(toast);
     setTimeout(() => toast.remove(), delay);
   }
-});
-
-document.addEventListener("DOMContentLoaded", () => {
-  // Toggle rating panel
-  document.querySelectorAll(".rate-players-btn").forEach((btn) => {
-    btn.addEventListener("click", () => {
-      const bookingId = btn.getAttribute("data-booking-id");
-      const panel = document.getElementById(`rate-players-${bookingId}`);
-      panel.classList.toggle("d-none");
-    });
-  });
-
-  // Star selection
-  document.querySelectorAll(".stars:not(.disabled)").forEach((container) => {
-    const stars = container.querySelectorAll(".star");
-
-    stars.forEach((star) => {
-      star.addEventListener("mouseenter", () => {
-        const score = parseInt(star.dataset.score);
-        stars.forEach((s, i) => {
-          s.classList.toggle("selected", i < score);
-        });
-      });
-
-      container.addEventListener("mouseleave", () => {
-        const selectedScore = parseInt(container.dataset.selectedScore || 0);
-        stars.forEach((s, i) => {
-          s.classList.toggle("selected", i < selectedScore);
-        });
-      });
-
-      star.addEventListener("click", () => {
-        const score = parseInt(star.dataset.score);
-        container.dataset.selectedScore = score;
-        stars.forEach((s, i) => {
-          s.classList.toggle("selected", i < score);
-        });
-      });
-    });
-  });
-
-  // Submit ratings
-  document.querySelectorAll(".rate-form").forEach((form) => {
-    form.addEventListener("submit", async (e) => {
-      e.preventDefault();
-      const bookingId = form.dataset.bookingId;
-      const starsContainers = form.querySelectorAll(".stars");
-
-      const ratings = [];
-
-      starsContainers.forEach((container) => {
-        const userId = container.dataset.userId;
-        const score = parseInt(container.dataset.selectedScore || 0);
-        const alreadyRated = container.dataset.rated === "true";
-
-        if (!alreadyRated && score > 0) {
-          ratings.push({ userId, score });
-        }
-      });
-
-      if (ratings.length === 0) {
-        alert("Please select a rating for at least one player.");
-        return;
-      }
-
-      try {
-        const response = await fetch("/profile/bookings/rate", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ bookingId, ratings }),
-        });
-
-        const result = await response.json();
-        if (result.success) {
-          alert("Ratings submitted successfully!");
-          // Disable all after submission
-          starsContainers.forEach((c) => c.classList.add("disabled"));
-        } else {
-          alert("Failed to submit ratings. " + result.error);
-        }
-      } catch (err) {
-        console.error("Error submitting ratings:", err);
-        alert("Server error occurred.");
-      }
-    });
-  });
 });

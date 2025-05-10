@@ -37,7 +37,7 @@ router
       const profilePic = xss(req.body.profilePic).trim();
       const city = xss(req.body.city || "").trim();
       const phoneNumber = xss(req.body.phoneNumber || "").trim();
-      
+
       const sportsInterests = req.body.sportsInterests.map(i => xss(i.trim()));
       const gymPreferences = req.body.gymPreferences.map(i => xss(i.trim()));
       const gamingInterests = req.body.gamingInterests.map(i => xss(i.trim()));
@@ -200,6 +200,7 @@ router.route("/view").get(verifyToken, async (req, res) => {
       averageRating: profile.averageRating,
       ratingCount: profile.ratingCount,
       phoneNumber: profile.phoneNumber,
+      city: profile.location?.city || "",
       isOwn, // 👈 pass true
       isFollowing, // 👈 pass false
       head: `<link rel="stylesheet" href="/css/userProfile.css">`,
