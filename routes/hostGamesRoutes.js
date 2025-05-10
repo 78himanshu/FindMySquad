@@ -419,6 +419,28 @@ router.post("/edit/:id", requireAuth, async (req, res) => {
       extraInfo: xss(extraInfo || ""),
     };
 
+    const apiKey = process.env.GOOGLE_MAPS_API_KEY;
+    const encodedLoc = encodeURIComponent(updates.location);
+    const geoRes = await axios.get(
+      `https://maps.googleapis.com/maps/api/geocode/json?address=${encodedLoc}&key=${apiKey}`
+    );
+
+    if (
+      !geoRes.data ||
+      !geoRes.data.results ||
+      !geoRes.data.results[0]?.geometry?.location
+    ) {
+      return res.status(400).json({
+        error: "Invalid location address — unable to update coordinates.",
+      });
+    }
+
+    const { lat, lng } = geoRes.data.results[0].geometry.location;
+    updates.geoLocation = {
+      type: "Point",
+      coordinates: [lng, lat],
+    };
+
     console.log("✅ Final updates:", updates);
 
     const updatedGame = await hostGameData.updateGame(
