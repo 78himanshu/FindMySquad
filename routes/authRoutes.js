@@ -38,7 +38,6 @@ router
         return res.status(400).json({ error: "Passwords do not match" });
       }
 
-      checkString(username, "username");
       checkString(email, "email");
       checkString(password, "password");
 
@@ -55,13 +54,13 @@ router
       return res.status(400).json({ error: error.message || "Signup failed" });
     }
   });
-
 router
   .route("/login")
   .get((req, res) => {
     res.render("auth/login", {
       title: "Login",
       layout: "main",
+      redirect: req.query.redirect || "/",
       error: req.query.error,
       redirect: req.query.redirect || "",
       head: `
@@ -129,6 +128,7 @@ router
           profileCompleted: user.profileCompleted,
           profilepic: user.profilePic || "/images/default-avatar.png",
         },
+        redirect: redirect || "/", // Included redirect in the response
       });
     } catch (error) {
       return res.status(400).json({
