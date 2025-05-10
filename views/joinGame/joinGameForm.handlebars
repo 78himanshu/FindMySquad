@@ -73,77 +73,79 @@ const games = {{{json allGames}}};
   </script>
 
   <!-- Filter Sidebar -->
-<aside class="filter-sidebar">
-  <form id="filter-form" action="/join/filter" method="get">
-    <h4>Filter Games</h4>
+  <aside class="filter-sidebar">
+    <form id="filter-form" action="/join/filter" method="get">
+      <h4>Filter Games</h4>
 
-    <!-- Sport -->
-    <label for="sport">Sport:</label>
-    <select name="sport" id="sport">
-      <option value="">-- Select --</option>
-      <option value="Soccer">Soccer</option>
-      <option value="Basketball">Basketball</option>
-      <option value="Baseball">Baseball</option>
-      <option value="Tennis">Tennis</option>
-      <option value="Swimming">Swimming</option>
-      <option value="Running">Running</option>
-      <option value="Cycling">Cycling</option>
-      <option value="Hiking">Hiking</option>
-      <option value="Golf">Golf</option>
-      <option value="Volleyball">Volleyball</option>
-    </select>
+      <!-- Sport -->
+      <label for="sport">Sport:</label>
+      <select name="sport" id="sport">
+        <option value>-- Select --</option>
+        <option value="Soccer">Soccer</option>
+        <option value="Basketball">Basketball</option>
+        <option value="Baseball">Baseball</option>
+        <option value="Tennis">Tennis</option>
+        <option value="Swimming">Swimming</option>
+        <option value="Running">Running</option>
+        <option value="Cycling">Cycling</option>
+        <option value="Hiking">Hiking</option>
+        <option value="Golf">Golf</option>
+        <option value="Volleyball">Volleyball</option>
+      </select>
 
-    <!-- Date -->
-    <label for="date">Date:</label>
-    <select name="date" id="date">
-      <option value="">-- Any --</option>
-      <option value="today">Today</option>
-      <option value="1+">Coming in 1+ days</option>
-      <option value="2+">Coming in 2+ days</option>
-    </select>
+      <!-- Date -->
+      <label for="date">Date:</label>
+      <select name="date" id="date">
+        <option value>-- Any --</option>
+        <option value="today">Today</option>
+        <option value="1+">Coming in 1+ days</option>
+        <option value="2+">Coming in 2+ days</option>
+      </select>
 
-    <!-- Players Left -->
-    <label for="playersLeft">Players Left:</label>
-    <select name="playersLeft" id="playersLeft">
-      <option value="">-- Any --</option>
-      {{#each (range 1 10)}}
+      <!-- Players Left -->
+      <label for="playersLeft">Players Left:</label>
+      <select name="playersLeft" id="playersLeft">
+        <option value>-- Any --</option>
+        {{#each (range 1 10)}}
         <option value="{{this}}">{{this}}+</option>
-      {{/each}}
-    </select>
+        {{/each}}
+      </select>
 
-    <!-- Skill Level -->
-    <label for="skillLevel">Skill Level:</label>
-    <select name="skillLevel" id="skillLevel">
-      <option value="">-- Any --</option>
-      <option value="Beginner">Beginner</option>
-      <option value="Intermediate">Intermediate</option>
-      <option value="Advanced">Advanced</option>
-    </select>
+      <!-- Skill Level -->
+      <label for="skillLevel">Skill Level:</label>
+      <select name="skillLevel" id="skillLevel">
+        <option value>-- Any --</option>
+        <option value="Beginner">Beginner</option>
+        <option value="Intermediate">Intermediate</option>
+        <option value="Advanced">Advanced</option>
+      </select>
 
-    <!-- Min Players -->
-    <label for="minPlayers">Min Players Required:</label>
-    <input type="number" name="minPlayers" id="minPlayers" min="1" />
+      <!-- Min Players -->
+      <label for="minPlayers">Min Players Required:</label>
+      <input type="number" name="minPlayers" id="minPlayers" min="1" />
 
-    <!-- Max Cost -->
-    <label for="maxCost">Max Cost Per Head ($):</label>
-    <input type="number" name="maxCost" id="maxCost" min="0" />
+      <!-- Max Cost -->
+      <label for="maxCost">Max Cost Per Head ($):</label>
+      <input type="number" name="maxCost" id="maxCost" min="0" />
 
-    <!-- City -->
-    <label for="city">City:</label>
-    <input type="text" name="city" id="city" placeholder="e.g., Jersey City" />
+      <!-- City -->
+      <label for="city">City:</label>
+      <input type="text" name="city" id="city"
+        placeholder="e.g., Jersey City" />
 
-    {{#if isLoggedIn}}
+      {{#if isLoggedIn}}
       <!-- Friends -->
       <label>
         <input type="checkbox" name="friendsOnly" value="true" />
         Games hosted by friends
       </label>
-    {{/if}}
+      {{/if}}
 
-    <button type="submit" class="btn btn-primary">Apply Filters</button>
-    <button type="button" id="resetFilters" class="btn btn-secondary">Reset Filters</button>
-  </form>
-</aside>
+      <button type="submit" class="btn btn-primary">Apply Filters</button>
+      <button type="button" id="resetFilters" class="btn btn-secondary">Reset
+        Filters</button>
+    </form>
+  </aside>
 
   <!-- My Sports Section (default visible) -->
   <section id="mySports" class="tab-content" style="display: block;">
@@ -181,42 +183,43 @@ const games = {{{json allGames}}};
     <section>
       <h2 class="section-heading">All Games</h2>
       <div id="all-games-container" class="game-grid">
-          {{#each allGames}}
-          <div class="game-card">
-            <a href="/join/{{this._id}}">
-              <h3>{{this.title}}</h3>
-              <p>Sport: {{this.sport}}</p>
-              <p>Location: {{this.location}}</p>
-              <p>
-                Date: {{formatDate this.startTime}} |
-                Time: {{formatTime this.startTime}} - {{formatTime this.endTime}}
-              </p>
-              {{#if this.host.username}}
-              <p>Hosted By: {{this.host.username}}</p>
-              {{/if}}
-            </a>
+        {{#each allGames}}
+        <div class="game-card">
+          <a href="/join/{{this._id}}">
+            <h3>{{this.title}}</h3>
+            <p>Sport: {{this.sport}}</p>
+            <p>Location: {{this.location}}</p>
+            <p>
+              Date: {{formatDate this.startTime}} |
+              Time: {{formatTime this.startTime}} - {{formatTime this.endTime}}
+            </p>
+            {{#if this.host.username}}
+            <p>Hosted By: {{this.host.username}}</p>
+            {{/if}}
+          </a>
 
-            {{#if (eq ../hostId this.host._id)}}
-            <!-- Host: Edit/Delete buttons -->
-            <a href="/host/edit/{{this._id}}" class="btn btn-warning">Edit</a>
-            <form action="/host/delete/{{this._id}}" method="POST" style="display:inline;"
-              onsubmit="return confirm('Are you sure you want to delete this game?')">
-              <button type="submit" class="btn btn-danger">Delete</button>
-            </form>
-            {{else}}
-            {{#if (includes ../joinedGameIdStrings (toString this._id))}}
-            <!-- Already joined -->
-            <form action="/join/leave/{{this._id}}" method="POST">
-              <button type="submit" class="btn btn-secondary">Leave</button>
-            </form>
-            {{else if (gte (length this.players) this.playersRequired)}}
-            <!-- Session full and not joined -->
-            <p class="full-session">🚫 Session is Full</p>
-            {{/if}}
-            {{/if}}
-          </div>
-          {{/each}}
+          {{#if (eq ../hostId this.host._id)}}
+          <!-- Host: Edit/Delete buttons -->
+          <a href="/host/edit/{{this._id}}" class="btn btn-warning">Edit</a>
+          <form action="/host/delete/{{this._id}}" method="POST"
+            style="display:inline;"
+            onsubmit="return confirm('Are you sure you want to delete this game?')">
+            <button type="submit" class="btn btn-danger">Delete</button>
+          </form>
+          {{else}}
+          {{#if (includes ../joinedGameIdStrings (toString this._id))}}
+          <!-- Already joined -->
+          <form action="/join/leave/{{this._id}}" method="POST">
+            <button type="submit" class="btn btn-secondary">Leave</button>
+          </form>
+          {{else if (gte (length this.players) this.playersRequired)}}
+          <!-- Session full and not joined -->
+          <p class="full-session">🚫 Session is Full</p>
+          {{/if}}
+          {{/if}}
         </div>
+        {{/each}}
+      </div>
     </section>
   </section>
 
@@ -308,7 +311,7 @@ const games = {{{json allGames}}};
     });
   </script>
 
-<script>
+  <script>
   document.getElementById("filter-form").addEventListener("submit", async function (e) {
     e.preventDefault();
 
@@ -380,7 +383,5 @@ const games = {{{json allGames}}};
     }
   });
 </script>
-
-
 
 </main>

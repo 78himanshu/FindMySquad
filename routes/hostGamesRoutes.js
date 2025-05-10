@@ -1,6 +1,6 @@
 import { Router } from "express";
 const router = Router();
-import { hostGameData } from "../data/index.js";
+import { hostGameData, getJoinedGamesByUser } from "../data/index.js";
 import { checkString, checkNumber } from "../utils/helper.js";
 import requireAuth from "../middleware/auth.js";
 import axios from "axios";
@@ -112,7 +112,7 @@ router
       }
 
       // Prevent hosting if user has already joined a game at that time
-      const joinedGames = await joinGameData.getJoinedGamesByUser(x.host);
+      const joinedGames = await getJoinedGamesByUser(x.host);
       const hasConflict = joinedGames.some((g) => {
         const gStart = new Date(g.startTime);
         const gEnd = new Date(g.endTime);
