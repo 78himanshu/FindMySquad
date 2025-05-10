@@ -231,8 +231,7 @@ router
       await sendGameEmail(
         user.email,
         `🎮 Game Confirmation: ${targetGame.title}`,
-        `<p>Hi ${user.username},</p><p>You have successfully joined <strong>${
-          targetGame.title
+        `<p>Hi ${user.username},</p><p>You have successfully joined <strong>${targetGame.title
         }</strong> on ${new Date(targetGame.startTime).toLocaleString()}.</p>`
       );
 
@@ -401,8 +400,12 @@ router.get("/:id", requireAuth, async (req, res) => {
 
     const gameAlreadyStarted = new Date(game.startTime).getTime() <= Date.now();
 
+    const [lng, lat] = game.geoLocation.coordinates;
+
     res.render("joinGame/gameDetails", {
       game: game.toObject(),
+      lat,
+      lng,
       hostId: game.host._id.toString(),
       isLoggedIn,
       userId,

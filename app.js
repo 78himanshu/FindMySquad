@@ -187,12 +187,12 @@ app.use((req, res, next) => {
         profilePic: decoded.profilePic || "/images/default-avatar.png",
         profileCompleted: decoded.profileCompleted || false
       };
-      
+
       res.locals.isLoggedIn = true;
       res.locals.username = decoded.username;
       res.locals.profilePic =
         decoded.profilePic || "/images/default-avatar.png";
-      res.locals.userId      = decoded.userId;
+      res.locals.userId = decoded.userId;
       res.locals.profileCompleted = decoded.profileCompleted || false;
     } catch (err) {
       res.locals.isLoggedIn = false;

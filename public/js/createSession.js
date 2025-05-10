@@ -1,55 +1,105 @@
-// Set min datetime to current time for session creation
-// const dateTimeInput = document.getElementById("dateTime");
-// if (dateTimeInput) {
-//   const now = new Date();
-//   now.setMinutes(now.getMinutes() - now.getTimezoneOffset()); // Fix timezone offset
-//   const localDatetime = now.toISOString().slice(0, 16);
-//   dateTimeInput.min = localDatetime;
-// }
-
-
 document.addEventListener("DOMContentLoaded", () => {
-  const form = document.querySelector("form");
+  const form = document.querySelector("#gym-session-form");
+
+  const hostId = form.hostedBy?.value;
+  const isEditMode = form.dataset.edit === "true";
+  const sessionId = form.dataset.sessionId;
 
   const showToastError = (msg) => {
     if (typeof showToast === "function") {
-      showToast(msg, "error");
+      showToast(msg, false); // Assuming false = error
     } else {
       alert(msg);
     }
   };
 
-  form.addEventListener("submit", (e) => {
+  if (!hostId) {
+    window.location.href = "/login?redirect=/gymBuddy/create";
+  }
+
+  form.addEventListener("submit", async (e) => {
     e.preventDefault();
 
-    const title = form.title.value.trim();
+    const gym_title = form.gym_title.value.trim();
+    const gymName = form.gymlocation.value.trim();
     const description = form.description.value.trim();
-    const date = form.date.value;
+    const date = form.querySelector("input[name='sessionDate']")?.value || form.date?.value;
     const startTime = form.startTime.value;
     const endTime = form.endTime.value;
-    const gym = form.gym.value.trim();
     const gymLocation = form.gymlocation.value.trim();
     const experience = form.experience.value;
     const workoutType = form.workoutType.value;
     const maxMembers = form.maxMembers.value;
 
-    if (!title) return showToastError("Workout title is required.");
+    console.log("form data", {
+      gym_title,
+      gymName,
+      description,
+      date,
+      startTime,
+      endTime,
+      gymLocation,
+      experience,
+      workoutType,
+      maxMembers,
+    });
+
+
+    // 🛡️ Validations
+    if (!gym_title) return showToastError("Workout title is required.");
+    if (!gymName) return showToastError("gym  is required.");
     if (!description) return showToastError("Description is required.");
     if (!date) return showToastError("Please select a date.");
     if (!startTime || !endTime) return showToastError("Start and end times are required.");
-    if (new Date(`${date}T${startTime}`) >= new Date(`${date}T${endTime}`)) {
-      return showToastError("End time must be after start time.");
-    }
-    if (new Date(`${date}T${startTime}`) < new Date()) {
-      return showToastError("Start time cannot be in the past.");
-    }
-    if (!gym) return showToastError("Gym name is required.");
-    if (!gymLocation) return showToastError("Gym location is required.");
-    if (!experience) return showToastError("Select your experience level.");
-    if (!workoutType) return showToastError("Select a workout type.");
-    if (!maxMembers) return showToastError("Select max number of members.");
 
-    form.submit(); // Submit only if all validations pass
+    const start = new Date(`${date}T${startTime}`);
+    const end = new Date(`${date}T${endTime}`);
+    if (start >= end) return showToastError("End time must be after start time.");
+    if (start < new Date()) return showToastError("Start time cannot be in the past.");
+
+    if (!gymLocation) return showToastError("Gym location is required.");
+    if (!experience) return showToastError("Please select your experience level.");
+    if (!workoutType) return showToastError("Please select a workout type.");
+    if (!maxMembers) return showToastError("Please select number of members.");
+
+    const formData = {
+      title: gym_title,
+      gymName,
+      description,
+      date,
+      startTime,
+      endTime,
+      gymlocation: gymLocation,
+      experience,
+      workoutType,
+      maxMembers,
+      hostedBy: hostId,
+    };
+
+    const endpoint = isEditMode ? `/gymBuddy/update/${sessionId}` : "/gymBuddy/create";
+
+    try {
+      const response = await fetch(endpoint, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
+
+      const data = await response.json();
+      console.log(">>>>>", data);
+
+      if (!response.ok) throw new Error(data.error || "Failed to save gym session.");
+
+      showToast(`Gym session successfully ${isEditMode ? "updated" : "created"}!`, true);
+
+      setTimeout(() => {
+        window.location.href = data.redirectUrl || `/gymBuddy/view/${data.sessionId || sessionId}`;
+      }, 1500);
+    } catch (err) {
+      console.error("AJAX error:", err);
+      showToastError(err.message);
+    }
   });
 });
-

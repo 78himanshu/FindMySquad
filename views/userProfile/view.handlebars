@@ -4,8 +4,7 @@
     <div class="col-md-3">
       <div class="card border rounded shadow-sm">
         <div class="card-body text-center">
-          <img src="{{avatar}}" alt="avatar" class="rounded-circle mb-3"
-            width="90" height="90">
+          <img src="{{avatar}}" alt="avatar" class="rounded-circle mb-3" width="90" height="90">
           <h5 class="fw-semibold mb-1">{{firstName}} {{ lastName}}</h5>
           <small class="text-muted d-block">{{ email}}</small>
           <small class="text-muted">{{ gender}}</small>
@@ -20,8 +19,7 @@
         {{/if}}
 
         <ul class="list-group list-group-flush">
-          <li class="list-group-item bg-success text-white fw-semibold nav-btn"
-            data-target="overview">
+          <li class="list-group-item bg-success text-white fw-semibold nav-btn" data-target="overview">
             <i class="bi bi-bookmark-fill me-2"></i> Overview
           </li>
           {{#if isOwn}}
@@ -48,20 +46,17 @@
 
             <div class="mb-3">
               <strong>Sports Interests:</strong>
-              {{#each sportsInterests}}<span
-                class="badge bg-primary me-1">{{this}}</span>{{/each}}
+              {{#each sportsInterests}}<span class="badge bg-primary me-1">{{this}}</span>{{/each}}
             </div>
 
             <div class="mb-3">
               <strong>Gym Preferences:</strong>
-              {{#each gymPreferences}}<span
-                class="badge bg-success me-1">{{this}}</span>{{/each}}
+              {{#each gymPreferences}}<span class="badge bg-success me-1">{{this}}</span>{{/each}}
             </div>
 
             <div class="mb-3">
               <strong>Gaming Interests:</strong>
-              {{#each gamingInterests}}<span
-                class="badge bg-warning text-dark me-1">{{this}}</span>{{/each}}
+              {{#each gamingInterests}}<span class="badge bg-warning text-dark me-1">{{this}}</span>{{/each}}
             </div>
 
             <div class="mb-3">
@@ -70,8 +65,7 @@
               location.state}} {{ location.zipCode}}
             </div>
 
-            <div
-              class="align-items-center d-flex justify-content-center mt-4 row text-center">
+            <div class="align-items-center d-flex justify-content-center mt-4 row text-center">
               <div class="col-md-3">
                 <h5>{{ karmaPoints}}</h5>
                 <p class="text-muted">Karma Points</p>

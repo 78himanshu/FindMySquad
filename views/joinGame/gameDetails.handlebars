@@ -13,8 +13,7 @@
       {{game.playersRequired}}</p>
 
     <p><strong>Hosted By:</strong>
-      <a href="/profile/view/{{game.host._id}}"
-        class="host-link">{{game.host.username}}</a>
+      <a href="/profile/view/{{game.host._id}}" class="host-link">{{game.host.username}}</a>
     </p>
 
     {{#if joinedPlayers.length}}
@@ -22,8 +21,7 @@
     <ul>
       {{#each joinedPlayers}}
       <li>
-        <a href="/profile/userview/{{this._id}}"
-          class="player-link">{{this.username}}</a>
+        <a href="/profile/userview/{{this._id}}" class="player-link">{{this.username}}</a>
       </li>
       {{/each}}
     </ul>
@@ -32,115 +30,122 @@
   </div>
   <h3 style="text-align: center; margin-top: 10px;">📍 Game Location</h3>
   <div id="single-game-map"
-    style="height: 200px; width: 100%; max-width: 600px; margin: 15px auto; border: 1px solid #ccc; border-radius: 8px;"></div>
+    style="height: 200px; width: 100%; max-width: 600px; margin: 15px auto; border: 1px solid #ccc; border-radius: 8px;">
+  </div>
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css">
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 
-  <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      const mapDiv = document.getElementById('single-game-map');
-      if (!mapDiv) return;
-
-      const lat = {{{game.geoLocation.coordinates.[1]}}};
-      const lng = {{{game.geoLocation.coordinates.[0]}}};
-      const title = "{{game.title}}";
-      const sport = "{{game.sport}}";
-
-      const map = L.map('single-game-map').setView([lat, lng], 13);
-      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '© OpenStreetMap contributors'
-      }).addTo(map);
-
-      L.marker([lat, lng]).addTo(map)
-        .bindPopup(`<strong>${title}</strong><br>${sport}`).openPopup();
-    });
-  </script>
-
-  {{#if error}}
-  <div class="error-message"
-    style="color: red; background: #fbe9e9; padding: 10px; border: 1px solid #ff0000; margin-bottom: 10px;">
-    {{error}}
+  <!-- Game Info Card -->
+  <div class="card shadow-sm border-0 mb-4">
+    <div class="card-body">
+      <div class="row g-3">
+        <div class="col-md-6">
+          <p><strong>🏅 Sport:</strong> {{game.sport}}</p>
+          <p><strong>📍 Location:</strong> {{game.location}}</p>
+          <p><strong>📆 Date & Time:</strong> {{formatDate game.startTime}} | {{formatTime game.startTime}} –
+            {{formatTime game.endTime}}</p>
+          <p><strong>👥 Players:</strong> {{game.playersGoing}} / {{game.playersRequired}}</p>
+        </div>
+        <div class="col-md-6">
+          <p><strong>📝 Description:</strong> {{game.description}}</p>
+          <p><strong>🏠 Hosted By:</strong>
+            <a href="/profile/view/{{game.host._id}}" class="text-decoration-none fw-semibold text-dark">
+              {{game.host.username}}
+            </a>
+          </p>
+          {{#if joinedPlayers.length}}
+          <p><strong>✅ Joined Players:</strong></p>
+          <ul class="list-unstyled">
+            {{#each joinedPlayers}}
+            <li><a href="/profile/userview/{{this._id}}" class="text-primary">{{this.username}}</a></li>
+            {{/each}}
+          </ul>
+          {{/if}}
+        </div>
+      </div>
+    </div>
   </div>
+
+  <!-- Game Map -->
+  <div class="mb-4 text-center">
+    <h5 class="text-secondary">📌 Game Location</h5>
+    <div id="single-game-map" style="height: 250px; border-radius: 8px;"></div>
+  </div>
+
+  <!-- Action Buttons -->
+  {{#if error}}
+  <div class="alert alert-danger">{{error}}</div>
   {{/if}}
 
-  <div class="action-btn" style="margin-top: 20px;">
+  <div class="text-center mb-4">
     {{#if isLoggedIn}}
     {{#if (eq userId hostId)}}
-    <!-- Host actions -->
-    <a href="/host/edit/{{game._id}}" class="btn btn-warning"
-      style="margin-right: 10px;">Edit</a>
-    <form action="/host/delete/{{game._id}}" method="POST"
-      style="display:inline;">
+    <a href="/host/edit/{{game._id}}" class="btn btn-warning me-2">Edit</a>
+    <form action="/host/delete/{{game._id}}" method="POST" style="display:inline;">
       <button type="submit" class="btn btn-danger">Delete</button>
     </form>
-
     {{else if hasJoined}}
-    <!-- Joined user can leave -->
     <form method="POST" action="/join/leave/{{game._id}}">
       <button type="submit" class="btn btn-secondary">Leave Game</button>
     </form>
-
     {{else if gameAlreadyStarted}}
-    <!-- Game already started -->
-    <p class="text-danger fw-semibold mt-2">⏰ This game has already started. You
-      can’t join it now.</p>
-
+    <p class="text-danger mt-2 fw-semibold">⏰ This game has already started.</p>
     {{else if (gte (length game.players) game.playersRequired)}}
-    <!-- Session full -->
-    <p class="full-session">🚫 Session is Full</p>
-
+    <p class="text-danger mt-2 fw-semibold">🚫 Session is Full</p>
     {{else}}
-    <!-- Available to join -->
     <form method="POST" action="/join">
       <input type="hidden" name="gameId" value="{{game._id}}">
-      <button type="submit" class="btn btn-primary">Join Game</button>
+      <button type="submit" class="btn btn-success">Join Game</button>
     </form>
     {{/if}}
-
     {{else}}
-    <!-- Not logged in -->
-    <a href="/login?redirect=/join/{{game._id}}" class="btn btn-secondary">Login
-      to Join</a>
+    <a href="/login?redirect=/join/{{game._id}}" class="btn btn-outline-primary">Login to Join</a>
     {{/if}}
   </div>
 
-  <!-- chat Toggle Button -->
+  <!-- Chat Section -->
   {{#if hasJoined}}
-  <!-- Toggle Button -->
-  <button id="toggleChatBtn" class="btn btn-outline-primary">💬 Open
-    Chat</button>
+  <div class="text-center">
+    <button id="toggleChatBtn" class="btn btn-outline-primary mb-3">💬 Open Chat</button>
+  </div>
 
-  <!-- Chat UI -->
-  <section id="chatSection" style="display: none; margin-top: 15px;">
-    <h3>🗨️ Game Chat</h3>
-
-    <!-- Chat Messages -->
-    <div id="chatBox" class="chat-box"
-      style="height: 250px; overflow-y: auto; border: 1px solid #ccc; background: #f9f9f9; padding: 10px;"></div>
-
-    <!-- Chat Form -->
-    <form id="chatForm" style="display: flex; margin-top: 10px;">
-      <input type="text" id="chatMessage" placeholder="Type your message..."
-        required
-        style="flex: 1; padding: 5px;" />
-      <button type="submit" class="btn btn-success btn-sm"
-        style="margin-left: 5px;">Send</button>
-    </form>
-
-    <!-- Chat Ended Message -->
-    <div id="chatEndedMessage"
-      style="display: none; margin-top: 10px; color: red; font-weight: bold;">
-      🚫 This chat has ended as the game is over.
+  <section id="chatSection" style="display: none;">
+    <div class="card shadow-sm mb-4">
+      <div class="card-body">
+        <h5 class="card-title">🗨️ Game Chat</h5>
+        <div id="chatBox" class="border rounded p-2 mb-3" style="height: 250px; overflow-y: auto; background: #f8f9fa;">
+        </div>
+        <form id="chatForm" class="d-flex">
+          <input type="text" id="chatMessage" class="form-control me-2" placeholder="Type your message..." required />
+          <button type="submit" class="btn btn-success">Send</button>
+        </form>
+        <div id="chatEndedMessage" class="text-danger fw-bold mt-2" style="display: none;">
+          🚫 This chat has ended as the game is over.
+        </div>
+      </div>
     </div>
   </section>
+  {{/if}}
 
-  <!-- Socket.IO Logic -->
-  <script src="/socket.io/socket.io.js"></script>
-  <script>
+</div>
+=======
+<!-- Scripts -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+<script src="/socket.io/socket.io.js"></script>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const lat = {{{ game.geoLocation.coordinates.[1]}
+  }};
+  const lng = {{{ game.geoLocation.coordinates.[0]}}};
+  const map = L.map('single-game-map').setView([lat, lng], 13);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+  L.marker([lat, lng]).addTo(map).bindPopup("{{game.title}}").openPopup();
+
   const socket = io();
   const gameId = "{{game._id}}";
   const username = "{{username}}";
-
   const toggleBtn = document.getElementById("toggleChatBtn");
   const chatSection = document.getElementById("chatSection");
   const chatBox = document.getElementById("chatBox");
@@ -148,50 +153,41 @@
   const chatInput = document.getElementById("chatMessage");
   const endedMsg = document.getElementById("chatEndedMessage");
 
-  toggleBtn.addEventListener("click", () => {
+  toggleBtn?.addEventListener("click", () => {
     chatSection.style.display = chatSection.style.display === "none" ? "block" : "none";
   });
 
-  // Join chat room and ask server for past messages
   socket.emit("joinGameChat", { gameId, userId: "{{userId}}" });
 
-  // Load previously saved messages from DB
   socket.on("previousMessages", (messages) => {
     messages.forEach((msg) => {
-      const time = new Date(msg.timestamp).toLocaleTimeString([], {
-        hour: "2-digit",
-        minute: "2-digit"
-      });
+      const time = new Date(msg.timestamp).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
       const msgDiv = document.createElement("div");
-      msgDiv.innerHTML = `<strong>${msg.username}:</strong> ${msg.message} <small style="color:gray;">${time}</small>`;
+      msgDiv.innerHTML = `<strong>${msg.username}:</strong> ${msg.message} <small class="text-muted">${time}</small>`;
       chatBox.appendChild(msgDiv);
     });
     chatBox.scrollTop = chatBox.scrollHeight;
   });
 
-  // Show live incoming messages
   socket.on("receiveMessage", (msg) => {
     const msgDiv = document.createElement("div");
-    msgDiv.innerHTML = `<strong>${msg.username}:</strong> ${msg.message} <small style="color:gray;">${msg.time}</small>`;
+    msgDiv.innerHTML = `<strong>${msg.username}:</strong> ${msg.message} <small class="text-muted">${msg.time}</small>`;
     chatBox.appendChild(msgDiv);
     chatBox.scrollTop = chatBox.scrollHeight;
   });
 
-  // Disable chat when session expires
   socket.on("chatClosed", () => {
     chatForm.style.display = "none";
     endedMsg.style.display = "block";
   });
 
-  // Handle message submission
-  chatForm.addEventListener("submit", (e) => {
+  chatForm?.addEventListener("submit", (e) => {
     e.preventDefault();
     const msg = chatInput.value.trim();
     if (!msg) return;
     socket.emit("sendMessage", { gameId, username, message: msg });
     chatInput.value = "";
   });
+    });
 </script>
-  {{/if}}
-
-</div>
+</main>
