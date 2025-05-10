@@ -20,6 +20,11 @@ body {
   font-size: 1.8rem;
 }
 
+#costShared,
+#bringEquipment {
+  width: 0px;
+}
+
 .host-game-form {
   display: flex;
   flex-direction: column;

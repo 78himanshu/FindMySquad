@@ -14,8 +14,7 @@
           <p class="card-text"><strong>Location:</strong> {{location}}</p>
 
           {{#ifCond players.length '>' 1}}
-          <button class="btn btn-primary btn-sm mb-2 rate-players-btn"
-            data-booking-id="{{_id}}">
+          <button class="btn btn-primary btn-sm mb-2 rate-players-btn" data-booking-id="{{_id}}">
             Rate Players
           </button>
           {{/ifCond}}
@@ -27,26 +26,28 @@
               <div class="rating-section mb-2">
                 <a href="/profile/userview/{{_id}}"
                   class="d-block mb-1 fw-semibold text-decoration-none text-dark">{{username}}</a>
-                <div class="stars {{#if hasBeenRated}}disabled{{/if}}"
-                  data-user-id="{{_id}}"
+                <div class="stars {{#if hasBeenRated}}disabled{{/if}}" data-user-id="{{_id}}"
                   data-rated="{{hasBeenRated}}">
                   {{#each (range 1 5)}}
-                  <i
-                    class="bi bi-star-fill star {{#if (lte this ../ratedScore)}}selected{{/if}}"
+                  <i class="bi bi-star-fill star {{#if (lte this ../ratedScore)}}selected{{/if}}"
                     data-score="{{this}}"></i>
                   {{/each}}
                 </div>
 
+                <!-- Review input field -->
+                <textarea class="form-control mt-2 review-input" name="review_{{_id}}" rows="2"
+                  placeholder="Write a short review...">{{#if hasBeenRated}}{{ratedReview}}{{/if}}</textarea>
+
                 {{#if hasBeenRated}}
-                <input type="hidden" name="ratings[]"
-                  value='{{json (object "userId" _id "score" ratedScore)}}' />
+                <input type="hidden" name="ratings[]" value='{{json (object "userId" _id "score" ratedScore)}}' />
                 {{/if}}
               </div>
               {{/ifCond}}
               {{/each}}
-
-              <button type="submit" class="btn btn-success btn-sm">Submit
-                Ratings</button>
+              <button class="btn btn-primary btn-sm mb-2 btn-rate" data-bs-toggle="modal" data-bs-target="#rateModal"
+                data-booking-id="{{_id}}" data-players='{{json players}}'>
+                Rate Players
+              </button>
             </form>
           </div>
         </div>
@@ -54,8 +55,12 @@
     </div>
     {{/each}}
   </div>
+  {{else}}
+  <h4 class="mb-3">Past Games</h4>
+  <p class="text-muted text-center">You have no past game bookings yet.</p>
   {{/if}}
 
+  <hr>
   <!-- Past Gym Sessions -->
   {{#if pastGymBookings.length}}
   <h4 class="mt-5 mb-3">Past Gym Sessions</h4>
@@ -69,8 +74,7 @@
           <p class="card-text"><strong>Gym:</strong> {{gym}}</p>
 
           {{#ifCond players.length '>' 1}}
-          <button class="btn btn-primary btn-sm mb-2 rate-players-btn"
-            data-booking-id="{{_id}}">
+          <button class="btn btn-primary btn-sm mb-2 rate-players-btn" data-booking-id="{{_id}}">
             Rate Players
           </button>
           {{/ifCond}}
@@ -82,26 +86,29 @@
               <div class="rating-section mb-2">
                 <a href="/profile/userview/{{_id}}"
                   class="d-block mb-1 fw-semibold text-decoration-none text-dark">{{username}}</a>
-                <div class="stars {{#if hasBeenRated}}disabled{{/if}}"
-                  data-user-id="{{_id}}"
+                <div class="stars {{#if hasBeenRated}}disabled{{/if}}" data-user-id="{{_id}}"
                   data-rated="{{hasBeenRated}}">
                   {{#each (range 1 5)}}
-                  <i
-                    class="bi bi-star-fill star {{#if (lte this ../ratedScore)}}selected{{/if}}"
+                  <i class="bi bi-star-fill star {{#if (lte this ../ratedScore)}}selected{{/if}}"
                     data-score="{{this}}"></i>
                   {{/each}}
                 </div>
 
+                <!-- Review input field -->
+                <textarea class="form-control mt-2 review-input" name="review_{{_id}}" rows="2"
+                  placeholder="Write a short review...">{{#if hasBeenRated}}{{ratedReview}}{{/if}}</textarea>
+
                 {{#if hasBeenRated}}
-                <input type="hidden" name="ratings[]"
-                  value='{{json (object "userId" _id "score" ratedScore)}}' />
+                <input type="hidden" name="ratings[]" value='{{json (object "userId" _id "score" ratedScore)}}' />
                 {{/if}}
               </div>
               {{/ifCond}}
               {{/each}}
 
-              <button type="submit" class="btn btn-success btn-sm">Submit
-                Ratings</button>
+              <button class="btn btn-primary btn-sm mb-2 btn-rate" data-bs-toggle="modal" data-bs-target="#rateModal"
+                data-booking-id="{{_id}}" data-players='{{json players}}'>
+                Rate Players
+              </button>
             </form>
           </div>
         </div>
@@ -109,7 +116,12 @@
     </div>
     {{/each}}
   </div>
+  {{else}}
+  <h4 class="mt-5 mb-3">Past Gym Sessions</h4>
+  <p class="text-muted text-center">You have no past gym sessions yet.</p>
   {{/if}}
+
+  <hr>
 
   <!-- Future Games and Sessions -->
   {{#if futureGameBookings.length}}
@@ -127,7 +139,11 @@
     </div>
     {{/each}}
   </div>
+  {{else}}
+  <h4 class="mt-5 mb-3">Upcoming Games</h4>
+  <p class="text-muted text-center">No upcoming games booked.</p>
   {{/if}}
+
 
   {{#if futureGymBookings.length}}
   <h4 class="mt-5 mb-3">Upcoming Gym Sessions</h4>
@@ -144,7 +160,37 @@
     </div>
     {{/each}}
   </div>
+  {{else}}
+  <h4 class="mt-5 mb-3">Upcoming Gym Sessions</h4>
+  <p class="text-muted text-center">No upcoming gym sessions booked.</p>
   {{/if}}
 </div>
 
+<!-- Rating & Review Modal -->
+<div class="modal fade" id="rateModal" tabindex="-1" aria-labelledby="rateModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable">
+    <div class="modal-content">
+      <form id="rateForm">
+        <div class="modal-header bg-success text-white">
+          <h5 class="modal-title" id="rateModalLabel">Rate and Review Players</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+
+        <div class="modal-body" id="rateFields">
+          <!-- Rating fields will be injected here -->
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" id="rateCancel">Cancel</button>
+          <button type="submit" class="btn btn-success">Submit</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+
+
 <script src="/js/bookings.js"></script>
+<!-- Bootstrap Bundle with Popper (for modal functionality) -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
