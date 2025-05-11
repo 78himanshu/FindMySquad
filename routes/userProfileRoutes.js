@@ -203,6 +203,7 @@ router.route("/view").get(verifyToken, async (req, res) => {
       phoneNumber: profile.phoneNumber,
       city: profile.location?.city || "",
       ratings: profile.ratings,
+      achievements: profile.achievements || "",
       isOwn, // 👈 pass true
       isFollowing, // 👈 pass false
       head: `<link rel="stylesheet" href="/css/userProfile.css">`,

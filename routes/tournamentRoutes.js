@@ -2,6 +2,8 @@ import express from "express";
 import Tournament from "../models/tournament.js";
 import { requireAuth } from "../middleware/authMiddleware.js"; // Optional middleware
 import { updateKarmaPoints } from "../utils/karmaHelper.js";
+import { evaluateAchievements } from "../utils/achievementHelper.js";
+
 const router = express.Router();
 
 const minDate = new Date().toISOString().split("T")[0];
@@ -191,6 +193,8 @@ router.post("/create", requireAuth, async (req, res) => {
       teams: [],
     });
     await updateKarmaPoints(req.user.userId, 15);
+    await evaluateAchievements(req.user.userId);
+
     return res.redirect(
       `/esports/game/${encodeURIComponent(game)}?tournamentCreated=1`
     );

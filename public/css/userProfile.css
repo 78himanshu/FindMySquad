@@ -52,3 +52,40 @@ label {
   pointer-events: none;
   opacity: 0.6;
 }
+
+
+/* ============================= */
+/* === Achievements Styling ==== */
+/* ============================= */
+
+.achievement-section {
+  margin-top: 30px;
+}
+
+.achievement-section h5 {
+  font-weight: 600;
+  margin-bottom: 15px;
+}
+
+.achievement-badge {
+  width: 80px;
+  height: 80px;
+  border-radius: 10px;
+  object-fit: contain;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+
+.achievement-badge:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+.badge-label {
+  margin-top: 6px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  text-transform: capitalize;
+  color: #333;
+  text-align: center;
+}

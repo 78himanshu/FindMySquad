@@ -7,6 +7,8 @@ import { ObjectId } from "mongodb";
 import { format } from "date-fns";
 import Gym from "../models/Gym.js";
 import { updateKarmaPoints } from "../utils/karmaHelper.js";
+import { evaluateAchievements } from "../utils/achievementHelper.js";
+
 
 // Home
 router.get("/", (req, res) => {
@@ -313,6 +315,7 @@ router.post("/join/:id", requireAuth, async (req, res) => {
     sessionToJoin.currentMembers = sessionToJoin.members.length;
 
     await updateKarmaPoints(userId, 10);
+    await evaluateAchievements(userId);
 
     await sessionToJoin.save();
 
@@ -339,6 +342,7 @@ router.post("/leave/:id", requireAuth, async (req, res) => {
     session.currentMembers = session.members.length;
 
     await updateKarmaPoints(userId, -10);
+    await evaluateAchievements(userId);
 
     await session.save();
 
@@ -553,6 +557,10 @@ router.post("/delete/:id", requireAuth, async (req, res) => {
         .status(403)
         .render("error", { message: "Unauthorized to delete this session" });
     }
+
+    await updateKarmaPoints(session.hostedBy.toString(), -15);
+    await evaluateAchievements(session.hostedBy.toString());
+
 
     await Gym.deleteOne({ _id: id });
     res.redirect("/gymBuddy/mySessions");

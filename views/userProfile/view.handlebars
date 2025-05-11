@@ -65,6 +65,24 @@
               location.state}} {{ location.zipCode}}
             </div>
 
+            
+            {{#if achievements.length}}
+  <div class="mt-4 achievement-section">
+    <h5 class="fw-semibold mb-2">🏆 Achievements</h5>
+    <div class="d-flex flex-wrap gap-4 justify-content-start">
+      {{#each achievements}}
+        <div class="text-center">
+          <img 
+            src="/images/badges/{{this}}.png" 
+            alt="{{formatBadgeName this}} badge" 
+            class="achievement-badge" />
+          <div class="badge-label">{{formatBadgeName this}}</div>
+        </div>
+      {{/each}}
+    </div>
+  </div>
+{{/if}}
+
             <div class="align-items-center d-flex justify-content-center mt-4 row text-center">
               <div class="col-md-3">
                 <h5>{{ karmaPoints}}</h5>
@@ -93,13 +111,9 @@
             </div>
           </div>
 
-          {{#if achievements.length}}
-          <div class="mt-4">
-            <strong>Achievements:</strong>
-            <ul>{{#each achievements}}<li>{{this}}</li>{{/each}}</ul>
-          </div>
-          {{/if}}
-        </div>
+          
+
+
 
         <!-- Section: Edit Profile -->
         <div id="section-edit" class="d-none">

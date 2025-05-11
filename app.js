@@ -62,6 +62,15 @@ const hbs = exphbs.create({
       return args.slice(0, -1);
     },
 
+    formatBadgeName: function (badge) {
+      if (!badge) return '';
+      return badge
+        .replace(/([a-z])([A-Z])/g, '$1 $2')   // split camelCase
+        .replace(/_/g, ' ')                    // replace underscores
+        .replace(/\b\w/g, c => c.toUpperCase()); // capitalize first letter
+    },
+    
+
     formatDate: (datetime) => {
       if (!datetime) return "";
       return new Date(datetime).toLocaleDateString("en-US", {

@@ -3,6 +3,8 @@ import { ObjectId } from "mongodb";
 import { checkString } from "../utils/helper.js";
 import UserProfile from "../models/userProfile.js";
 import { updateKarmaPoints } from "../utils/karmaHelper.js";
+import { evaluateAchievements } from "../utils/achievementHelper.js";
+
 import "../models/User.js";
 import fetch from "node-fetch";
 
@@ -99,6 +101,7 @@ export const createGymSession = async (
   }
 
   await updateKarmaPoints(hostedBy, 15);
+  await evaluateAchievements(hostedBy);
 
   return saved;
 };
@@ -146,11 +149,26 @@ export const updateGymSession = async (sessionId, updates) => {
   return updated;
 };
 
+// export const deleteGymSession = async (sessionId) => {
+//   if (!ObjectId.isValid(sessionId)) throw "Invalid session ID";
+
+//   const deleted = await Gym.findByIdAndDelete(sessionId);
+//   if (!deleted) throw "Gym session not found or already deleted";
+//   return deleted;
+// };
+
 export const deleteGymSession = async (sessionId) => {
   if (!ObjectId.isValid(sessionId)) throw "Invalid session ID";
 
-  const deleted = await Gym.findByIdAndDelete(sessionId);
+  const deleted = await Gym.findById(sessionId);
   if (!deleted) throw "Gym session not found or already deleted";
+  
+  const hostedBy = deleted.hostedBy.toString();
+  
+  await updateKarmaPoints(hostedBy, -15);
+  await Gym.findByIdAndDelete(sessionId);
+  await evaluateAchievements(hostedBy);
+  
   return deleted;
 };
 

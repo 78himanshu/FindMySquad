@@ -3,6 +3,7 @@ import Tournament from "../models/tournament.js";
 import User from "../models/User.js";
 import { requireAuth } from "../middleware/authMiddleware.js";
 import { updateKarmaPoints } from "../utils/karmaHelper.js";
+import { evaluateAchievements } from '../utils/achievementHelper.js';
 
 const router = Router();
 
@@ -521,6 +522,7 @@ router.post(
           players: [userId],
         });
         await updateKarmaPoints(userId, 10);
+        await evaluateAchievements(userId);
       } else if (action === "join") {
         const team = tournament.teams.id(joinTeamId);
         if (!team) return res.status(404).send("Team not found.");
@@ -529,6 +531,7 @@ router.post(
         }
         team.players.push(userId);
         await updateKarmaPoints(userId, 10);
+        await evaluateAchievements(userId);
       }
 
       await tournament.save();
@@ -568,6 +571,8 @@ router.post(
         for (const member of team.players) {
           if (member.toString() !== userId) {
             await updateKarmaPoints(member.toString(), -10);
+            await evaluateAchievements(member.toString());
+
           }
         }
       } else {
@@ -582,6 +587,8 @@ router.post(
       }
 
       await updateKarmaPoints(userId, -10);
+      await evaluateAchievements(userId);
+
 
       await tournament.save();
       res.redirect(`/esports/${req.params.tournamentId}/register-team`);
@@ -624,11 +631,15 @@ router.post(
         // deduct karma from everyone who was on that team
         for (const mId of allMemberIds) {
           await updateKarmaPoints(mId, -10);
+          await evaluateAchievements(mId);
+
         }
       } else {
         // Otherwise just remove that one member
         team.players = team.players.filter((p) => p.toString() !== memberId);
         await updateKarmaPoints(memberId, -10);
+        await evaluateAchievements(memberId);
+
 
         // If that was the last member, clean up the empty team
         if (team.players.length === 0) {
@@ -666,6 +677,8 @@ router.post(
 
       for (const member of team.players) {
         if (member) await updateKarmaPoints(member.toString(), -10);
+        await evaluateAchievements(member.toString());
+
       }
 
       tournament.teams = tournament.teams.filter(
@@ -692,12 +705,15 @@ router.post("/:tournamentId/delete", requireAuth, async (req, res, next) => {
     }
 
     await updateKarmaPoints(t.creator.toString(), -15); // Host loses 15
+    await evaluateAchievements(t.creator.toString());
 
     // All other players lose 10 (skip host)
     for (const team of t.teams) {
       for (const playerId of team.players) {
         if (playerId && playerId.toString() !== t.creator.toString()) {
           await updateKarmaPoints(playerId.toString(), -10);
+          await evaluateAchievements(playerId.toString());
+
         }
       }
     }

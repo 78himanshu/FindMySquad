@@ -1,6 +1,7 @@
 import Game from "../models/hostGame.js";
 import { ObjectId } from "mongodb";
 import { updateKarmaPoints } from "../utils/karmaHelper.js";
+import { evaluateAchievements } from "../utils/achievementHelper.js";
 
 export const joinGame = async (gameId, userId) => {
   if (!ObjectId.isValid(gameId) || !ObjectId.isValid(userId)) {
@@ -33,6 +34,7 @@ export const joinGame = async (gameId, userId) => {
   game.playersGoing = game.playersGoing + 1;
 
   await updateKarmaPoints(userId, 10);
+  await evaluateAchievements(userId);
 
   await game.save();
 
@@ -69,6 +71,7 @@ export const leaveGame = async (gameId, userId) => {
 
   await updateKarmaPoints(userId, -10);
   await game.save();
+  await evaluateAchievements(userId);
   //adding return statement
   return game;
 };

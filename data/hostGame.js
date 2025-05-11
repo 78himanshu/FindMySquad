@@ -3,6 +3,7 @@ import { ObjectId } from "mongodb";
 import { checkNumber, checkString } from "../utils/helper.js";
 import UserProfile from "../models/userProfile.js";
 import { updateKarmaPoints } from "../utils/karmaHelper.js";
+import { evaluateAchievements } from "../utils/achievementHelper.js";
 
 export const createGame = async (
   title,
@@ -89,6 +90,7 @@ export const createGame = async (
 
   const savedGame = await newGame.save();
   await updateKarmaPoints(host, 15);
+  await evaluateAchievements(host);
 
   return savedGame;
 };
@@ -195,6 +197,7 @@ export async function deleteGame(gameId, userID) {
   if (!gameId) throw new Error("Game ID is required");
   await updateKarmaPoints(userID, -15);
   await Game.findByIdAndDelete(gameId);
+  await evaluateAchievements(userID);
 }
 
 export const upcomingGames = async () => {
