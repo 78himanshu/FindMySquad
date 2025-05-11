@@ -84,6 +84,15 @@ hr {
   }
 }
 
+.stars .bi-star-fill.selected {
+  color: gold;
+}
+
+.stars .bi-star {
+  color: lightgray;
+}
+
+
 .stars {
   display: inline-block;
 }

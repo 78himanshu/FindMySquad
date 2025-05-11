@@ -200,10 +200,29 @@ export async function deleteGame(gameId, userID) {
   await evaluateAchievements(userID);
 }
 
-export const upcomingGames = async () => {
-  const upcomingGames = await Game.find({
-    startTime: { $gte: new Date() }, // games starting now or in future
-  }).sort({ startTime: 1 });
+export const getUpcomingGames = async () => {
+  const games = await Game.find({
+    startTime: { $gte: new Date() },
+  })
+    .sort({ startTime: 1 })
+    .lean();
 
-  return upcomingGames;
+  const enriched = await Promise.all(
+    games.map(async (game) => {
+      // look up the host’s profile
+      const profile = await UserProfile.findOne(
+        { userId: game.host },
+        { "profile.avatar": 1, _id: 0 }
+      ).lean();
+
+      return {
+        ...game,
+        hostAvatarUrl:
+          profile?.profile?.avatar ||
+          "/images/default-avatar.png",
+      };
+    })
+  );
+
+  return enriched;
 };

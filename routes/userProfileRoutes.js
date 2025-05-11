@@ -476,13 +476,31 @@ router.post("/bookings/rate", verifyToken, async (req, res) => {
     const raterId = req.user.userID;
     const { bookingId, ratings } = req.body;
 
-    if (!bookingId || !Array.isArray(ratings)) {
-      return res.status(400).json({ error: "Missing bookingId or ratings" });
+    for (let { userId, rating, review } of ratings) {
+      // try to update an existing rating
+      const updateResult = await UserProfile.updateOne(
+        { userId, "ratings.bookingId": bookingId, "ratings.rater": raterId },
+        {
+          $set: {
+            "ratings.$.score": rating,
+            "ratings.$.review": review
+          }
+        }
+      );
+
+      if (updateResult.matchedCount === 0) {
+        // no existing rating found → push a new rating object
+        await UserProfile.updateOne(
+          { userId },
+          {
+            $push: {
+              ratings: { bookingId, rater: raterId, score: rating, review }
+            }
+          }
+        );
+      }
     }
-
-    const result = await userProfileData.ratePlayers(raterId, ratings, bookingId);
-
-    res.json({ success: true, result });
+    res.json({ success: true });
   } catch (err) {
     console.error("Rating failed:", err);
     res.status(500).json({ error: "Internal Server Error" });

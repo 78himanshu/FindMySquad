@@ -3,30 +3,22 @@
   <form id="editProfileForm" novalidate>
     <div class="row">
       <div class="col-md-4">
-        <label for="firstName" class="form-label">First Name <span
-            class="text-danger">*</span></label>
-        <input type="text" id="firstName" name="firstName" class="form-control"
-          value="{{firstName}}">
+        <label for="firstName" class="form-label">First Name <span class="text-danger">*</span></label>
+        <input type="text" id="firstName" name="firstName" class="form-control" value="{{firstName}}">
         <div id="firstNameError" class="form-text text-danger"></div>
       </div>
       <div class="col-md-4">
-        <label for="lastName" class="form-label">Last Name <span
-            class="text-danger">*</span></label>
-        <input type="text" id="lastName" name="lastName" class="form-control"
-          value="{{lastName}}">
+        <label for="lastName" class="form-label">Last Name <span class="text-danger">*</span></label>
+        <input type="text" id="lastName" name="lastName" class="form-control" value="{{lastName}}">
         <div id="lastNameError" class="form-text text-danger"></div>
       </div>
       <div class="col-md-4">
-        <label for="gender" class="form-label">Gender <span
-            class="text-danger">*</span></label>
+        <label for="gender" class="form-label">Gender <span class="text-danger">*</span></label>
         <select id="gender" name="gender" class="form-select">
           <option value>Select Gender</option>
-          <option value="Male" {{#if (eq gender
-            "Male")}}selected{{/if}}>Male</option>
-          <option value="Female" {{#if (eq gender
-            "Female")}}selected{{/if}}>Female</option>
-          <option value="Other" {{#if (eq gender
-            "Other")}}selected{{/if}}>Other</option>
+          <option value="Male" {{#if (eq gender "Male" )}}selected{{/if}}>Male</option>
+          <option value="Female" {{#if (eq gender "Female" )}}selected{{/if}}>Female</option>
+          <option value="Other" {{#if (eq gender "Other" )}}selected{{/if}}>Other</option>
         </select>
         <div id="genderError" class="form-text text-danger"></div>
       </div>
@@ -34,30 +26,21 @@
 
     <div class="mb-3">
       <label for="bio" class="form-label">Bio</label>
-      <textarea id="bio" name="bio" class="form-control"
-        rows="3">{{bio}}</textarea>
+      <textarea id="bio" name="bio" class="form-control" rows="3">{{bio}}</textarea>
       <div id="bioError" class="form-text text-danger"></div>
     </div>
 
     <div class="row mb-4">
       <div class="col-md-6">
-        <label for="autocomplete" class="form-label">Location <span
-            class="text-danger">*</span></label>
-        <input type="text" id="autocomplete" name="city" class="form-control"
-          placeholder="Enter your location" value="{{location.city}}">
+        <label for="autocomplete" class="form-label">Location <span class="text-danger">*</span></label>
+        <input type="text" id="autocomplete" name="city" class="form-control" placeholder="Enter your location"
+          value="{{location.city}}">
         <div id="cityError" class="form-text text-danger"></div>
       </div>
       <div class="col-md-6">
-        <label for="phoneNumber" class="form-label">Phone Number <span
-            class="text-danger">*</span></label>
-        <input
-          type="tel"
-          id="phoneNumber"
-          name="phoneNumber"
-          class="form-control"
-          placeholder="Enter a valid phone number"
-          value="{{phoneNumber}}"
-          required />
+        <label for="phoneNumber" class="form-label">Phone Number <span class="text-danger">*</span></label>
+        <input type="tel" id="phoneNumber" name="phoneNumber" class="form-control"
+          placeholder="Enter a valid phone number" value="{{phoneNumber}}" />
         <div id="phoneError" class="form-text text-danger"></div>
         <small class="form-text text-muted">Format: 123-456-7890</small>
         <div id="phoneError" class="form-text text-danger"></div>

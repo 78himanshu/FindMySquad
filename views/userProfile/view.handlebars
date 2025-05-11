@@ -65,23 +65,21 @@
               location.state}} {{ location.zipCode}}
             </div>
 
-            
+
             {{#if achievements.length}}
-  <div class="mt-4 achievement-section">
-    <h5 class="fw-semibold mb-2">🏆 Achievements</h5>
-    <div class="d-flex flex-wrap gap-4 justify-content-start">
-      {{#each achievements}}
-        <div class="text-center">
-          <img 
-            src="/images/badges/{{this}}.png" 
-            alt="{{formatBadgeName this}} badge" 
-            class="achievement-badge" />
-          <div class="badge-label">{{formatBadgeName this}}</div>
-        </div>
-      {{/each}}
-    </div>
-  </div>
-{{/if}}
+            <div class="mt-4 achievement-section">
+              <h5 class="fw-semibold mb-2">🏆 Achievements</h5>
+              <div class="d-flex flex-wrap gap-4 justify-content-start">
+                {{#each achievements}}
+                <div class="text-center">
+                  <img src="/images/badges/{{this}}.png" alt="{{formatBadgeName this}} badge"
+                    class="achievement-badge" />
+                  <div class="badge-label">{{formatBadgeName this}}</div>
+                </div>
+                {{/each}}
+              </div>
+            </div>
+            {{/if}}
 
             <div class="align-items-center d-flex justify-content-center mt-4 row text-center">
               <div class="col-md-3">
@@ -111,110 +109,110 @@
             </div>
           </div>
 
-          
 
 
 
-        <!-- Section: Edit Profile -->
-        <div id="section-edit" class="d-none">
-          {{> editProfileForm }}
-        </div>
 
-        <!-- Section: Bookings -->
-        <div id="section-bookings" class="d-none">
-          <h4 class="fw-semibold m-3">Your Bookings</h4>
+          <!-- Section: Edit Profile -->
+          <div id="section-edit" class="d-none">
+            {{> editProfileForm }}
+          </div>
 
-          <p>🎾 <strong>Game Bookings</strong></p>
-          <p><strong>Future Games:</strong> No upcoming games.</p>
-          <p><strong>Past Games:</strong> No past games.</p>
+          <!-- Section: Bookings -->
+          <div id="section-bookings" class="d-none">
+            <h4 class="fw-semibold m-3">Your Bookings</h4>
 
-          <p>🐕‍🦺 <strong>Gym Bookings</strong></p>
-          <p><strong>Future Sessions:</strong> No upcoming sessions.</p>
-          <p><strong>Past Sessions:</strong> No past sessions.</p>
+            <p>🎾 <strong>Game Bookings</strong></p>
+            <p><strong>Future Games:</strong> No upcoming games.</p>
+            <p><strong>Past Games:</strong> No past games.</p>
 
-          <p>🎮 <strong>Esports Bookings:</strong> Coming soon!</p>
+            <p>🐕‍🦺 <strong>Gym Bookings</strong></p>
+            <p><strong>Future Sessions:</strong> No upcoming sessions.</p>
+            <p><strong>Past Sessions:</strong> No past sessions.</p>
+
+            <p>🎮 <strong>Esports Bookings:</strong> Coming soon!</p>
+          </div>
         </div>
       </div>
     </div>
   </div>
-</div>
 
-<script>
-  document.addEventListener('DOMContentLoaded', () => {
-    const navButtons = document.querySelectorAll('.nav-btn');
-    const sections = ['overview', 'edit'];
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const navButtons = document.querySelectorAll('.nav-btn');
+      const sections = ['overview', 'edit'];
 
-    navButtons.forEach(btn => {
-      btn.addEventListener('click', function () {
-        const target = this.getAttribute('data-target');
+      navButtons.forEach(btn => {
+        btn.addEventListener('click', function () {
+          const target = this.getAttribute('data-target');
 
-        if (target === 'bookings') {
-          window.location.href = '/profile/bookings';
-          return;
-        }
+          if (target === 'bookings') {
+            window.location.href = '/profile/bookings';
+            return;
+          }
 
-        sections.forEach(id => {
-          const el = document.getElementById(`section-${id}`);
-          if (el) el.classList.add('d-none');
+          sections.forEach(id => {
+            const el = document.getElementById(`section-${id}`);
+            if (el) el.classList.add('d-none');
+          });
+          const sectionEl = document.getElementById(`section-${target}`);
+          if (sectionEl) sectionEl.classList.remove('d-none');
+
+          navButtons.forEach(b => b.classList.remove('bg-success', 'text-white'));
+          this.classList.add('bg-success', 'text-white');
         });
-        const sectionEl = document.getElementById(`section-${target}`);
-        if (sectionEl) sectionEl.classList.remove('d-none');
-
-        navButtons.forEach(b => b.classList.remove('bg-success', 'text-white'));
-        this.classList.add('bg-success', 'text-white');
       });
+
+      const followButton = document.getElementById('followButton');
+      if (followButton) {
+        followButton.addEventListener('click', async () => {
+          const targetUserId = followButton.dataset.userId;
+          const isFollowing = followButton.innerText.trim() === 'Following';
+          const action = isFollowing ? 'unfollow' : 'follow';
+
+          try {
+            const res = await fetch(`/profile/${action}/${targetUserId}`, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json'
+              },
+              credentials: 'include'
+            });
+
+            const result = await res.json();
+
+            if (res.ok) {
+              followButton.innerText = isFollowing ? 'Follow' : 'Following';
+              showToast(`${isFollowing ? 'Unfollowed' : 'Followed'} successfully! 🎉`, true);
+            } else {
+              showToast(result.error || 'Something went wrong.', false);
+            }
+          } catch (err) {
+            showToast('Server error. Please try again.', false);
+          }
+        });
+      }
     });
 
-    const followButton = document.getElementById('followButton');
-    if (followButton) {
-      followButton.addEventListener('click', async () => {
-        const targetUserId = followButton.dataset.userId;
-        const isFollowing = followButton.innerText.trim() === 'Following';
-        const action = isFollowing ? 'unfollow' : 'follow';
+    function showToast(message, isSuccess) {
+      const color = isSuccess ? 'green' : 'red';
+      const toast = document.createElement('div');
+      toast.textContent = message;
+      toast.style.position = 'fixed';
+      toast.style.top = '20px';
+      toast.style.right = '20px';
+      toast.style.background = color;
+      toast.style.color = 'white';
+      toast.style.padding = '10px 15px';
+      toast.style.borderRadius = '8px';
+      toast.style.zIndex = 9999;
+      toast.style.fontSize = '14px';
+      document.body.appendChild(toast);
 
-        try {
-          const res = await fetch(`/profile/${action}/${targetUserId}`, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json'
-            },
-            credentials: 'include'
-          });
-
-          const result = await res.json();
-
-          if (res.ok) {
-            followButton.innerText = isFollowing ? 'Follow' : 'Following';
-            showToast(`${isFollowing ? 'Unfollowed' : 'Followed'} successfully! 🎉`, true);
-          } else {
-            showToast(result.error || 'Something went wrong.', false);
-          }
-        } catch (err) {
-          showToast('Server error. Please try again.', false);
-        }
-      });
+      setTimeout(() => {
+        toast.remove();
+      }, 2000);
     }
-  });
+  </script>
 
-  function showToast(message, isSuccess) {
-    const color = isSuccess ? 'green' : 'red';
-    const toast = document.createElement('div');
-    toast.textContent = message;
-    toast.style.position = 'fixed';
-    toast.style.top = '20px';
-    toast.style.right = '20px';
-    toast.style.background = color;
-    toast.style.color = 'white';
-    toast.style.padding = '10px 15px';
-    toast.style.borderRadius = '8px';
-    toast.style.zIndex = 9999;
-    toast.style.fontSize = '14px';
-    document.body.appendChild(toast);
-
-    setTimeout(() => {
-      toast.remove();
-    }, 2000);
-  }
-</script>
-
-<script src="/js/userProfile.js"></script>
+  <script src="/js/userProfile.js"></script>

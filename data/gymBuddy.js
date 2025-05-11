@@ -4,6 +4,7 @@ import { checkString } from "../utils/helper.js";
 import UserProfile from "../models/userProfile.js";
 import { updateKarmaPoints } from "../utils/karmaHelper.js";
 import { evaluateAchievements } from "../utils/achievementHelper.js";
+import GymSession from "../models/Gym.js";
 
 import "../models/User.js";
 import fetch from "node-fetch";
@@ -149,26 +150,19 @@ export const updateGymSession = async (sessionId, updates) => {
   return updated;
 };
 
-// export const deleteGymSession = async (sessionId) => {
-//   if (!ObjectId.isValid(sessionId)) throw "Invalid session ID";
-
-//   const deleted = await Gym.findByIdAndDelete(sessionId);
-//   if (!deleted) throw "Gym session not found or already deleted";
-//   return deleted;
-// };
 
 export const deleteGymSession = async (sessionId) => {
   if (!ObjectId.isValid(sessionId)) throw "Invalid session ID";
 
   const deleted = await Gym.findById(sessionId);
   if (!deleted) throw "Gym session not found or already deleted";
-  
+
   const hostedBy = deleted.hostedBy.toString();
-  
+
   await updateKarmaPoints(hostedBy, -15);
   await Gym.findByIdAndDelete(sessionId);
   await evaluateAchievements(hostedBy);
-  
+
   return deleted;
 };
 
@@ -181,4 +175,35 @@ export const getJoinedSessionsByUser = async (userId) => {
   if (!ObjectId.isValid(userId)) throw "Invalid user ID";
   // Assumes your Gym schema has a `members: [ObjectId]` field
   return await Gym.find({ members: userId }).populate("hostedBy", "username");
+};
+
+export const getUpcomingSessions = async () => {
+  try {
+    const now = new Date();
+    const sessions = await GymSession.find({ startTime: { $gt: now } })
+      .sort({ dateTime: 1 })
+      .lean();
+    const getgymData = await Promise.all(
+      sessions.map(async (session) => {
+        // look up just the avatar field
+        const profile = await UserProfile.findOne(
+          { userId: session.hostedBy },
+          { "profile.avatar": 1, _id: 0 }
+        )
+          .lean();
+
+        return {
+          ...session,
+          hostAvatarUrl:
+            profile?.profile?.avatar ||
+            "/images/default-avatar.png",
+        };
+      })
+    );
+
+    return getgymData;
+  } catch (err) {
+    console.error("Error fetching upcoming gym sessions:", err);
+    return [];
+  }
 };

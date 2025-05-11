@@ -227,6 +227,7 @@ export const getTopKarmaUsers = async () => {
       {
         "profile.firstName": 1,
         "profile.lastName": 1,
+        "profile.avatar": 1,
         userId: 1,
         karmaPoints: 1,
         _id: 0,
