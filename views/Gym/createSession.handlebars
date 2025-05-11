@@ -24,7 +24,7 @@
 
         <div class="row g-3">
           <div class="col-md-4">
-            <input type="date" name="date" class="form-control" value="{{date}}" />
+            <input type="date" name="date" class="form-control" min="{{today}}" value="{{date}}" />
           </div>
           <div class="col-md-4">
             <input type="time" name="startTime" class="form-control" value="{{startTime}}" />
@@ -113,6 +113,31 @@
         }
       });
     }
+     document.querySelectorAll("form").forEach((form) => {
+    const dateInput = form.querySelector('input[type="date"]');
+    const timeInputs = form.querySelectorAll('input[type="time"]');
+    if (!dateInput || timeInputs.length === 0) return;
+
+    // always disallow dates before today
+    const today = new Date().toISOString().split("T")[0];
+    dateInput.setAttribute("min", today);
+
+    function updateMinTimes() {
+      // when date === today, lock times >= now
+      const isToday = dateInput.value === today;
+      const minTime = isToday
+        ? (() => {
+            const now = new Date();
+            return now.toTimeString().slice(0,5); // "HH:MM"
+          })()
+        : "00:00";
+
+      timeInputs.forEach((ti) => ti.setAttribute("min", minTime));
+    }
+
+    // re-run when date changes (and on load)
+    dateInput.addEventListener("change", updateMinTimes);
+    updateMinTimes();
   });
 </script>
 <script src="/js/createSession.js"></script>
