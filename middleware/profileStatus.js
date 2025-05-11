@@ -8,9 +8,21 @@ export const attachProfileStatus = async (req, res, next) => {
 
   try {
     const profile = await userProfileData.getProfile(req.user.userId);
-    res.locals.profileCompleted = !!(profile?.profile?.firstName && profile?.location?.city);
+    res.locals.profileCompleted = !!(
+      profile?.profile?.firstName && profile?.location?.city
+    );
   } catch (e) {
-    console.error("Error checking profile completion:", e);
+    const errorMessage =
+      (typeof e === "string" && e.toLowerCase()) ||
+      (typeof e?.message === "string" && e.message.toLowerCase()) ||
+      "";
+
+    const isExpected = errorMessage.includes("profile not found");
+
+    if (!isExpected) {
+      console.error(" Unexpected error in attachProfileStatus:", e);
+    }
+
     res.locals.profileCompleted = false;
   }
 

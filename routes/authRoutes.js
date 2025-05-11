@@ -2,8 +2,8 @@ import { Router } from "express";
 const router = Router();
 import { authUserData } from "../data/index.js";
 import { checkString } from "../utils/helper.js";
-import jwt from 'jsonwebtoken';
-import xss from 'xss';
+import jwt from "jsonwebtoken";
+import xss from "xss";
 
 router
   .route("/signup")
@@ -85,7 +85,7 @@ router
       checkString(email, "email");
       checkString(password, "password");
 
-      const {token, user, profilePic } = await authUserData.login(
+      const { token, user, profilePic } = await authUserData.login(
         email,
         password
       );
@@ -128,7 +128,7 @@ router
           profileCompleted: user.profileCompleted,
           profilepic: user.profilePic || "/images/default-avatar.png",
         },
-        redirect: redirect || "/", // Included redirect in the response
+        // redirect: redirect || "/", // Included redirect in the response
       });
     } catch (error) {
       return res.status(400).json({
