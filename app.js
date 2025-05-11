@@ -239,6 +239,18 @@ app.use((req, res, next) => {
   next();
 });
 
+app.use((req, res, next) => {
+  // pick up any ?success= or ?error= query params
+  res.locals.success     = req.query.success    || "";
+  res.locals.error       = req.query.error      || "";
+  // tournament toasts
+  res.locals.justCreated = req.query.tournamentCreated === "1";
+  res.locals.justDeleted = req.query.tournamentDeleted === "1";
+  // footer year
+  res.locals.currentYear = new Date().getFullYear();
+  next();
+});
+
 app.use(attachProfileStatus);
 
 // Routes
