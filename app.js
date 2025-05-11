@@ -77,6 +77,17 @@ const hbs = exphbs.create({
         .replace(/\b\w/g, c => c.toUpperCase()); // capitalize first letter
     },
     
+    badgeImageName: function (badge) {
+      if (!badge) return 'default.png';
+      const map = {
+        "Pro Host": "prohost.png",
+        "Host": "host.png",
+        "Rookie": "rookie.png",
+        "Advanced": "advanced.png",
+        "Leader": "leader.png"
+      };
+      return map[badge] || 'default.png';
+    },
 
     formatDate: (datetime) => {
       if (!datetime) return "";

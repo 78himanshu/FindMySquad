@@ -72,7 +72,9 @@
               <div class="d-flex flex-wrap gap-4 justify-content-start">
                 {{#each achievements}}
                 <div class="text-center">
-                  <img src="/images/badges/{{this}}.png" alt="{{formatBadgeName this}} badge"
+                  <img 
+                    src="/images/badges/{{badgeImageName this}}" 
+                    alt="{{formatBadgeName this}} badge"
                     class="achievement-badge" />
                   <div class="badge-label">{{formatBadgeName this}}</div>
                 </div>
