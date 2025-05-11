@@ -6,6 +6,8 @@
     {{!-- Page Title --}}
     {{#if isCreator}}
     <h1 class="text-center mb-4">Manage Teams</h1>
+    {{else if isTeamLeader}}
+    <h1 class="text-center mb-4">Manage Teams</h1>
     {{else}}
     <h1 class="text-center mb-4">Register Team</h1>
     {{/if}}
@@ -152,13 +154,9 @@
     </form>
     {{/if}}
 
-    {{!-- b) Show “no teams yet” if none exist --}}
-    {{#unless tournament.teams.length}}
-    <p class="text-muted">No teams have been created yet.</p>
-    {{/unless}}
 
     {{!-- c) Join-team grid (while any team has slots) --}}
-    {{#if canJoin}}
+    {{#if hasOpenSlot}}
     <h5 class="text-center mb-3">Or Join an Existing Team</h5>
     <div class="row g-3">
       {{#each tournament.teams}}
@@ -186,12 +184,18 @@
       {{/each}}
     </div>
 
-    {{!-- d) “all slots full” message --}}
-    {{else if tournament.teams.length}}
-    <p class="text-center text-muted">All slots in existing teams are full.</p>
-    {{/if}}
+      {{else if hasTimeConflict}}
+      <p class="text-center text-danger">
+        You’re already registered in a tournament that overlaps this time.
+      </p>
+      {{else if tournament.teams.length}}
+      <p class="text-center text-muted">
+        All slots in existing teams are full.
+      </p>
 
+      {{else}}
+      <p class="text-muted">No teams have been created yet.</p>
+      {{/if}}
     {{/if}}
-
   </div>
 </div>

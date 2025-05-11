@@ -222,6 +222,7 @@ router.get("/game/:gameName", async (req, res, next) => {
     const userId = req.user?.userId;
 
     allTournaments.forEach((t) => {
+      const teams = Array.isArray(t.teams) ? t.teams : [];
       // build full Date objects for start & end
       //const dateStr       = t.date.toISOString().split('T')[0];
       // const startDateTime = new Date(`${dateStr}T${t.startTime}`);
@@ -238,30 +239,39 @@ router.get("/game/:gameName", async (req, res, next) => {
       const hasStarted = now >= startDateTime;
       const hasEnded = now > endDateTime;
       const isOngoing = hasStarted && !hasEnded;
-      const teamCount = Array.isArray(t.teams) ? t.teams.length : 0;
+      const teamCount = teams.length;
       t.teamCount = teamCount;
       const maxSlots = t.maxTeams || 0;
+
+      const isParticipant =
+        userId &&
+        teams.some((team) =>
+          Array.isArray(team.players) &&
+          team.players.some((p) => p.toString() === userId)
+        );
 
       // attach flags for template
       t.hasStarted = hasStarted;
       t.hasEnded = hasEnded;
       t.isOngoing = isOngoing;
       t.isCreator = userId && t.creator._id.toString() === userId;
-      t.teamCount = (t.teams || []).length;
       // only mark full when you've hit maxTeams AND every team is itself at capacity
       const maxTeams = t.maxTeams || 0;
-      const playersPerTeam = parseInt(t.format[0], 10);
+      const playersPerTeam = parseInt(t.format.split("v")[0], 10);
       // can still create brand-new teams?
       const canCreate = teamCount < maxTeams;
       // is there at least one team that still has room?
-      const hasOpenSlot = (t.teams || []).some(
-        (team) =>
-          Array.isArray(team.players) && team.players.length < playersPerTeam
+      const hitTeamLimit  = teamCount === maxTeams;
+      const allAtCapacity = teams.every(
+        (team) => Array.isArray(team.players) 
+              && team.players.length >= playersPerTeam
       );
       // only truly “full” when neither creating nor joining is possible:
-      t.isFull = !canCreate && !hasOpenSlot;
+      t.isFull = hitTeamLimit && allAtCapacity && !isParticipant && !t.isOngoing;
+      t.canJoin = !t.isFull && !t.isCreator;
+      t.isParticipant = isParticipant;
 
-      if (hasEnded) {
+      if (t.hasEnded) {
         pastTournaments.push(t);
       } else {
         upcomingTournaments.push(t);
@@ -316,6 +326,11 @@ router.get(
 
       // original “canCreate” logic (only if slots remain)
       const canCreate = teams.length < maxTeams;
+      const hasOpenSlot = tournament.teams.some(
+        (team) =>
+          Array.isArray(team.players) &&
+          team.players.length < playersPerTeam
+      );
 
       // original “canJoin” logic (at least one team has room, and not already in one)
       const baseCanJoin =
@@ -370,6 +385,17 @@ router.get(
         ? "You’re already registered in a tournament that overlaps this time."
         : "";
 
+        for (const ot of occupied) {
+      if (new Date(ot.date).toDateString() !== tDate.toDateString()) continue;
+      const [oh1, om1] = ot.startTime.split(':').map(Number);
+      const [oh2, om2] = ot.endTime.split(':').map(Number);
+      const oStart = new Date(ot.date); oStart.setHours(oh1, om1);
+      const oEnd   = new Date(ot.date); oEnd  .setHours(oh2, om2);
+      if (thisStart < oEnd && oStart < thisEnd) {
+        hasTimeConflict = true;
+        break;
+      }
+    }
       res.render("egaming/registerTeam", {
         tournament,
         layout: "main",
@@ -377,6 +403,8 @@ router.get(
         playersPerTeam,
         userId,
         isCreator,
+        hasOpenSlot,
+        hasTimeConflict,
         isAlreadyInTeam,
         isTeamLeader,
         userTeam: teams.find((t) =>
@@ -421,8 +449,11 @@ router.post(
 
       // ─── 2) FETCH all other tournaments the user is in (exclude this one) ───
       const otherTourns = await Tournament.find({
-        "teams.players": userId,
-        _id: { $ne: tournament._id },
+          _id: { $ne: tournament._id },
+            $or: [
+              { creator: userId },
+              { "teams.players": userId }
+            ],
       }).lean();
 
       // ─── 3) CHECK for any time overlap on the SAME DATE ───
