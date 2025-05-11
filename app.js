@@ -62,6 +62,12 @@ const hbs = exphbs.create({
     array: (...args) => {
       return args.slice(0, -1);
     },
+    
+    playersCount: (format) => {
+      if (typeof format !== 'string') return '';
+      const parts = format.split('v');
+      return parts.length > 0 && !isNaN(parts[0]) ? parts[0] : '';
+    },
 
     formatBadgeName: function (badge) {
       if (!badge) return '';

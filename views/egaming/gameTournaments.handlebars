@@ -58,6 +58,8 @@
             <p class="mb-1"><strong>Created By:</strong>
               {{this.creator.username}}</p>
             <p class="mb-1"><strong>Team Size:</strong> {{this.format}}</p>
+            <p class="mb-1"><strong>Teams Registered:</strong> {{this.teams.length}} / {{this.maxTeams}}</p>
+            <p class="mb-1"><strong>Players per Team:</strong> {{playersCount this.format}}</p>
           </div>
 
           <div class="text-center mt-3 mt-md-0">

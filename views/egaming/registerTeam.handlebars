@@ -74,15 +74,50 @@
 
     {{!-- MEMBER VIEW --}}
     {{else if isAlreadyInTeam}}
-    <div class="text-center mb-4">
-      <h4>You’re in <strong>{{userTeam.teamName}}</strong></h4>
-      <p class="fst-italic text-muted">{{userTeam.description}}</p>
-      <form
-        action="/esports/{{tournament._id}}/leave-team"
-        method="POST"
-        class="mt-3">
-        <button type="submit" class="btn btn-warning">Leave Team</button>
-      </form>
+      <div class="card mb-4 p-3">
+        <h4>You’re in <strong>{{userTeam.teamName}}</strong></h4>
+        <p class="fst-italic text-muted">{{userTeam.description}}</p>
+
+        {{!-- Current slot usage --}}
+        <p class="fst-italic text-muted">
+          Members: {{userTeam.players.length}} / {{playersPerTeam}}
+        </p>
+
+        {{!-- List all teammates --}}
+        <ul class="list-group mb-3">
+          {{#each userTeam.players}}
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+              {{this.username}}
+            </li>
+          {{/each}}
+        </ul>
+
+        {{!-- Leave team button --}}
+        <form action="/esports/{{tournament._id}}/leave-team" method="POST">
+          <button type="submit" class="btn btn-warning">Leave Team</button>
+        </form>
+      </div>
+
+      {{!-- BELOW: SHOW ALL OTHER TEAMS --}}
+  <div class="card mb-4 p-3">
+    <h4>Other Teams in This Tournament : </h4>
+    {{#each tournament.teams}}
+      {{!-- skip your own team --}}
+      {{#ifCond this._id '!=' ../userTeam._id}}
+        <div class="mb-4">
+          <h5>{{this.teamName}}</h5>
+          <p class="fst-italic text-muted">{{this.description}}</p>
+          <p class="fst-italic text-muted">
+            Members: {{this.players.length}} / {{../playersPerTeam}}
+          </p>
+          <ul class="list-group">
+            {{#each this.players}}
+              <li class="list-group-item">{{this.username}}</li>
+            {{/each}}
+          </ul>
+        </div>
+      {{/ifCond}}
+    {{/each}}
     </div>
 
     {{!-- NEW USER VIEW --}}
