@@ -8,6 +8,7 @@ import { format } from "date-fns";
 import Gym from "../models/Gym.js";
 import { updateKarmaPoints } from "../utils/karmaHelper.js";
 import { evaluateAchievements } from "../utils/achievementHelper.js";
+import axios from "axios";
 
 
 // Home
@@ -160,6 +161,29 @@ router
         );
       }
 
+      const apiKey = process.env.GOOGLE_MAPS_API_KEY;
+      const encodedLoc = encodeURIComponent(gymlocation);
+      const geoRes = await axios.get(
+        `https://maps.googleapis.com/maps/api/geocode/json?address=${encodedLoc}&key=${apiKey}`
+      );
+
+      if (
+        !geoRes.data ||
+        !geoRes.data.results ||
+        !geoRes.data.results[0]?.geometry?.location
+      ) {
+        return res.status(400).json({
+          error: "Invalid gym address — unable to fetch coordinates.",
+        });
+      }
+
+      const { lat, lng } = geoRes.data.results[0].geometry.location;
+      const geoLocation = {
+        type: "Point",
+        coordinates: [lng, lat],
+      };
+
+
       // Log inputs for debugging
       console.log("Creating session with:", {
         title,
@@ -186,7 +210,8 @@ router
         experience,
         workoutType,
         hostedBy,
-        Number(maxMembers)
+        Number(maxMembers),
+        geoLocation
       );
 
       return res.json({
