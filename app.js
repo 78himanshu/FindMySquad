@@ -5,6 +5,7 @@ dotenv.config();
 
 import express from "express";
 import path from "path";
+import sanitizeRequest from './utils/sanitize.js';
 import { fileURLToPath } from "url";
 import connectDB from "./config/mongoConnections.js";
 import { scheduleAllPendingReminders } from "./emailScheduler.js";
@@ -160,6 +161,9 @@ app.set("views", path.join(__dirname, "views"));
 // Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+// Sanitize *all* incoming data (body, query, params)
+app.use(sanitizeRequest);
 
 // for statis files
 app.use(express.static(path.join(__dirname, "public")));
