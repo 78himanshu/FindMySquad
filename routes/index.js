@@ -14,7 +14,7 @@ import {
   gymBuddyData,
   userProfileData,
   joinGameData,
-  authUserData
+  authUserData,
 } from "../data/index.js";
 
 const configRoutesFunction = (app) => {
@@ -37,7 +37,7 @@ const configRoutesFunction = (app) => {
     const upcomingGames = await hostGameData.getUpcomingGames();
     // console.log("upcomingGames", upcomingGames);
     const upcomingGymSessions = await gymBuddyData.getUpcomingSessions();
-    console.log("upcomingGymSessions", upcomingGymSessions)
+    // console.log("upcomingGymSessions", upcomingGymSessions)
 
     res.render("index", {
       title: "FindMySquad",
@@ -47,7 +47,6 @@ const configRoutesFunction = (app) => {
       topUsers: topUsers,
       upcomingGymSessions,
       profileCompleted,
-
     });
   });
 

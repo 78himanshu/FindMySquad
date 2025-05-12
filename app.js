@@ -5,7 +5,7 @@ dotenv.config();
 
 import express from "express";
 import path from "path";
-import sanitizeRequest from './utils/sanitize.js';
+import sanitizeRequest from "./utils/sanitize.js";
 import { fileURLToPath } from "url";
 import connectDB from "./config/mongoConnections.js";
 import { scheduleAllPendingReminders } from "./emailScheduler.js";
@@ -35,7 +35,7 @@ import http from "http";
 import { Server } from "socket.io";
 import Game from "./models/hostGame.js";
 import ChatMessage from "./models/ChatMessage.js";
-import { attachProfileStatus } from './middleware/profileStatus.js';
+import { attachProfileStatus } from "./middleware/profileStatus.js";
 
 const app = express();
 
@@ -63,31 +63,31 @@ const hbs = exphbs.create({
     array: (...args) => {
       return args.slice(0, -1);
     },
-    
+
     playersCount: (format) => {
-      if (typeof format !== 'string') return '';
-      const parts = format.split('v');
-      return parts.length > 0 && !isNaN(parts[0]) ? parts[0] : '';
+      if (typeof format !== "string") return "";
+      const parts = format.split("v");
+      return parts.length > 0 && !isNaN(parts[0]) ? parts[0] : "";
     },
 
     formatBadgeName: function (badge) {
-      if (!badge) return '';
+      if (!badge) return "";
       return badge
-        .replace(/([a-z])([A-Z])/g, '$1 $2')   // split camelCase
-        .replace(/_/g, ' ')                    // replace underscores
-        .replace(/\b\w/g, c => c.toUpperCase()); // capitalize first letter
+        .replace(/([a-z])([A-Z])/g, "$1 $2") // split camelCase
+        .replace(/_/g, " ") // replace underscores
+        .replace(/\b\w/g, (c) => c.toUpperCase()); // capitalize first letter
     },
-    
+
     badgeImageName: function (badge) {
-      if (!badge) return 'default.png';
+      if (!badge) return "default.png";
       const map = {
         "Pro Host": "prohost.png",
-        "Host": "host.png",
-        "Rookie": "rookie.png",
-        "Advanced": "advanced.png",
-        "Leader": "leader.png"
+        Host: "host.png",
+        Rookie: "rookie.png",
+        Advanced: "advanced.png",
+        Leader: "leader.png",
       };
-      return map[badge] || 'default.png';
+      return map[badge] || "default.png";
     },
 
     formatDate: (datetime) => {
@@ -195,7 +195,6 @@ app.use((req, res, next) => {
   if (token) {
     try {
       const decoded = jwt.verify(token, process.env.JWT_SECRET);
-      console.log("🧪 Decoded JWT Payload:", decoded);
       if (!decoded.userId) {
         console.log("❌ JWT token missing userId:", decoded);
         res.clearCookie("token");
@@ -216,7 +215,7 @@ app.use((req, res, next) => {
         userId: decoded.userId,
         username: decoded.username,
         profilePic: decoded.profilePic || "/images/default-avatar.png",
-        profileCompleted: decoded.profileCompleted || false
+        profileCompleted: decoded.profileCompleted || false,
       };
 
       res.locals.isLoggedIn = true;
@@ -242,8 +241,8 @@ app.use((req, res, next) => {
 
 app.use((req, res, next) => {
   // pick up any ?success= or ?error= query params
-  res.locals.success     = req.query.success    || "";
-  res.locals.error       = req.query.error      || "";
+  res.locals.success = req.query.success || "";
+  res.locals.error = req.query.error || "";
   // tournament toasts
   res.locals.justCreated = req.query.tournamentCreated === "1";
   res.locals.justDeleted = req.query.tournamentDeleted === "1";

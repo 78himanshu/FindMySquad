@@ -275,7 +275,6 @@ export const getTopKarmaUsers = async () => {
       .sort({ karmaPoints: -1 })
       .limit(5);
 
-    console.log("Top users are here:", topUsers);
     return topUsers;
   } catch (err) {
     console.error("Error fetching top karma users:", err);
