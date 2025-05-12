@@ -18,7 +18,7 @@
             <div class="col-md-4">
                 <label for="gender" class="form-label">Gender *</label>
                 <select class="form-select" name="gender" id="gender">
-                    <option value>Select Gender</option>
+                    <option value="" disabled selected>Select Gender</option>
                     <option value="Male">Male</option>
                     <option value="Female">Female</option>
                     <option value="Other">Other</option>
@@ -147,6 +147,10 @@
 
 <script src="/js/main.js"></script>
 <script>
+    const allowedSports = new Set(["Soccer", "Basketball", "Baseball", "Tennis", "Swimming", "Running", "Cycling", "Hiking", "Golf", "Volleyball"]);
+    const allowedWorkouts = new Set(["Cardio", "Weight Training", "CrossFit", "Yoga", "HIIT", "Pilates", "Zumba", "Bodyweight"]);
+    const allowedGames = new Set(["FPS (e.g., Call of Duty)", "Battle Royale (e.g., Fortnite)", "MOBA (e.g., Dota 2)", "Sports (e.g., FIFA)", "Racing (e.g., Forza)", "Simulation (e.g., Sims)", "RPG (e.g., Elden Ring)", "MMORPG", "Strategy", "Puzzle"]);
+
     document.addEventListener('DOMContentLoaded', () => {
         const profilePics = document.querySelectorAll('input[name="profilePic"]');
         const profileImages = document.querySelectorAll('.profile-option');
@@ -228,11 +232,22 @@
 
         // Validate required fields
         if (!firstName || !lastName) return showToast('First and Last name are required.');
-        if (!gender) return showToast('Please select a gender.');
         if (!profilePic) return showToast('Please select a profile picture.');
         if (sports.length === 0) return showToast('Please select at least one sport.');
-        //if (workouts.length === 0) return showToast('Please select at least one workout type.');
-        //if (games.length === 0) return showToast('Please select at least one gaming interest.');
+        const nameRegex = /^[A-Za-z]{1,50}$/;
+        if (!nameRegex.test(firstName)) return showToast('First name must be 1-50 letters only.');
+        if (!nameRegex.test(lastName)) return showToast('Last name must be 1-50 letters only.');
+        if (bio.length > 300) return showToast('Bio must be under 300 characters.');
+        const allowedGenders = new Set(["Male", "Female", "Other"]);
+        if (!allowedGenders.has(gender)) return showToast('Please select a valid gender.');
+        if (sports.length === 0 || !sports.every(s => allowedSports.has(s)))
+        return showToast("Please select valid sports from the list.");
+
+        if (workouts.length > 0 && !workouts.every(w => allowedWorkouts.has(w)))
+        return showToast("Please select valid workout types from the list.");
+
+        if (games.length > 0 && !games.every(g => allowedGames.has(g)))
+        return showToast("Please select valid gaming interests from the list.");
 
 const city = form.city.value.trim();
 const phoneNumber = form.phoneNumber.value.trim();
