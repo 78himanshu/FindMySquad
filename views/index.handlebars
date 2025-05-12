@@ -1,22 +1,18 @@
 <style>
-  /* Card container */
   .game-card {
     border-radius: 1rem;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
     overflow: hidden;
   }
 
-  /* Skill-level badge */
   .skill-badge {
     background-color: #28a745;
-    /* your green */
     font-size: 0.85rem;
     padding: 0.5em 1em;
     border-radius: 0.5rem;
     color: white;
   }
 
-  /* Feature badges */
   .feature-badge {
     font-size: 0.85rem;
     padding: 0.5em 0.75em;
@@ -26,19 +22,14 @@
 
   .feature-badge.equipment {
     background-color: #ffdd57;
-    /* yellow */
     color: #212529;
-    /* dark text */
   }
 
   .feature-badge.shared {
     background-color: #cfe2ff;
-    /* light blue */
     color: #084298;
-    /* dark text */
   }
 
-  /* Host avatar */
   .host-avatar {
     width: 48px;
     height: 48px;
@@ -47,19 +38,16 @@
     border: 2px solid white;
   }
 
-  /* Card title */
   .card-title {
     font-size: 1.25rem;
     font-weight: 600;
   }
 
-  /* “More Info” link */
   .more-info .link-primary {
     font-size: 0.9rem;
     font-weight: 500;
   }
 
-  /* Hide collapse chevron on open */
   .more-info .collapse.show+a .bi-chevron-down {
     transform: rotate(-180deg);
   }
@@ -67,22 +55,18 @@
   .section-header .border-top {
     border-top-width: 3px !important;
     border-color: #6f42c1 !important;
-    /* purple, for example */
   }
 
-  /* 1. Make each cell square and hide overflow */
   .about-grid .grid-item {
     aspect-ratio: 1/1;
     overflow: hidden;
   }
 
-  /* 2. Control span: you can tweak these or add more sizes */
   .grid-item.span-2 {
     grid-column: span 2;
     grid-row: span 2;
   }
 
-  /* 3. Style the shape-block placeholders */
   .shape-block {
     width: 100%;
     height: 100%;
@@ -107,17 +91,28 @@
     display: block;
   }
 
-  /* Remove underline & inherit text color */
   .card-link.text-decoration-none {
     text-decoration: none !important;
     color: inherit !important;
   }
 
-  /* Optional: add a hover lift effect */
   .card-link:hover .game-card {
     transform: translateY(-4px);
     transition: transform 0.2s;
     cursor: pointer;
+  }
+
+  .session-card .card-body {
+    padding-bottom: 3rem !important;
+  }
+
+  .session-card .host-avatar {
+    bottom: 1rem;
+    right: 1rem;
+  }
+
+  .session-card .more-info .btn-primary {
+    z-index: 1;
   }
 </style>
 
@@ -158,18 +153,15 @@
 
 <section class="container my-5">
   <div class="card shadow-sm">
-    <!-- Gradient Header -->
     <div class="card-header text-white text-center py-3 bg-primary">
       <h4 class="mb-0">🏆 Top Karma Users</h4>
     </div>
 
-    <!-- User List -->
     <ul class="list-group list-group-flush">
       {{#if topUsers.length}}
       {{#each topUsers}}
       <li class="list-group-item d-flex align-items-center justify-content-between">
         <div class="d-flex align-items-center">
-          <!-- Avatar with block helper fallback -->
           <img src="{{#if profile.avatar}}{{profile.avatar}}{{else}}/images/default-avatar.png{{/if}}"
             alt="Avatar of {{profile.firstName}} {{profile.lastName}}" class="rounded-circle me-3" width="40"
             height="40">
@@ -203,16 +195,13 @@
   {{#each upcomingGames}}
   {{!-- <a href="/join/{{_id}}" class="game-card-link text-decoration-none text-reset"> --}}
     <div class="card game-card h-100 position-relative">
-      <div class="card-body pb-4">
-        <!-- Skill-level badge -->
+      <div class="card-body pb-4 p-0">
         <span class="badge skill-badge position-absolute top-0 end-0 m-3">
           {{skillLevel}}
         </span>
 
-        <!-- Title -->
         <h5 class="card-title mb-3">{{title}}</h5>
 
-        <!-- Details -->
         <ul class="list-unstyled mb-3 small text-secondary">
           <li><strong>Sport:</strong> {{sport}}</li>
           <li class="location"><strong>Location:</strong> {{location}}</li>
@@ -226,7 +215,6 @@
           <li><strong>Players:</strong> {{players.length}} / {{playersRequired}}</li>
         </ul>
 
-        <!-- Feature badges -->
         <div class="d-flex flex-wrap gap-2 mb-3">
           {{#if equipmentRequired}}
           <span class="badge feature-badge equipment">
@@ -242,7 +230,6 @@
 
         <hr class="my-3">
 
-        <!-- More Info + View inline -->
         <div class="more-info d-flex align-items-center">
           <button type="button" class="btn btn-link link-primary p-0 me-3 d-flex align-items-center"
             data-bs-toggle="collapse" data-bs-target="#info-{{_id}}" aria-expanded="false" aria-controls="info-{{_id}}">
@@ -257,13 +244,11 @@
           </a>
         </div>
 
-        <!-- Collapsible description -->
         <div class="collapse mt-2" id="info-{{_id}}">
           <p class="text-secondary mb-0">{{description}}</p>
         </div>
       </div>
 
-      <!-- Host avatar -->
       <img src="{{#if hostAvatarUrl}}{{hostAvatarUrl}}{{else}}/images/avatar-placeholder.png{{/if}}" alt="Host avatar"
         class="host-avatar position-absolute bottom-0 end-0 m-3">
     </div>
@@ -287,36 +272,51 @@
 
 
 {{#if upcomingGymSessions.length}}
-<div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+<div id="sessionCarousel" class="game-scroll-wrapper container">
   {{#each upcomingGymSessions}}
-  <div class="col">
-    <div class="card h-100 shadow-sm position-relative">
-      <div class="card-body d-flex flex-column">
-        <h5 class="card-title">{{title}}</h5>
-        <p class="mb-1 text-muted">
-          <i class="bi bi-calendar-event me-1"></i>
-          {{formatDate dateTime}} at {{formatTime dateTime}}
-        </p>
-        <p class="mb-2">
-          <i class="bi bi-clock me-1"></i>
-          Ends at: {{formatTime endTime}}
-        </p>
-        <div class="mt-auto">
-          <a href="/gym/{{_id}}" class="btn btn-outline-success w-100">
-            View Details
-          </a>
+  {{#ifCond @index '<' 15}} <a href="/gymBuddy/find/{{_id}}"
+    class="card-link text-decoration-none text-reset mb-4 d-block">
+    <div class="card game-card session-card h-100 position-relative">
+      <div class="card-body pb-4 p-0">
+        <h5 class="card-title mb-3">{{title}}</h5>
+
+        <ul class="list-unstyled mb-3 small text-secondary flex-grow-1">
+          <li><strong>Date:</strong> {{date}}</li>
+          <li><strong>Time:</strong> {{startTime}} – {{endTime}}</li>
+          <li><strong>Gym:</strong> {{gym}}</li>
+          <li><strong>Members:</strong> {{members.length}} / {{maxMembers}}</li>
+        </ul>
+
+        <hr class="my-3">
+
+        <div class="d-flex align-items-center mt-auto">
+          <button type="button" class="btn btn-link link-primary p-0 me-3 d-flex align-items-center"
+            data-bs-toggle="collapse" data-bs-target="#sess-info-{{_id}}" aria-expanded="false"
+            aria-controls="sess-info-{{_id}}">
+            More Info <i class="bi bi-chevron-down ms-1"></i>
+          </button>
+
+          <button type="button" class="btn btn-primary btn-sm ms-auto" onclick="location.href='/gymBuddy/find/{{_id}}'">
+            View
+          </button>
+        </div>
+
+        <div class="collapse mt-2" id="sess-info-{{_id}}">
+          <p class="text-secondary mb-0">{{description}}</p>
         </div>
       </div>
 
-      <!-- Host avatar (bottom-right) -->
-      <img src="{{hostAvatarUrl}}" alt="Host avatar" class="host-avatar position-absolute bottom-0 end-0 m-3">
+      <img src="{{#if host.avatarUrl}}{{host.avatarUrl}}{{else}}/images/avatar-placeholder.png{{/if}}" alt="Host avatar"
+        class="host-avatar position-absolute bottom-0 end-0 m-3">
     </div>
-  </div>
-  {{/each}}
+    </a>
+    {{/ifCond}}
+    {{/each}}
 </div>
 {{else}}
 <p class="text-center text-muted">No gym sessions coming up.</p>
 {{/if}}
+
 </section>
 
   <!-- ===== Gamification Section ===== -->
@@ -354,31 +354,26 @@
 
       <div class="col-lg-6">
         <div class="about-grid d-grid gap-3" style="grid-template-columns: repeat(4, 1fr); grid-auto-rows: 1fr;">
-          <!-- Top-left small -->
           <div class="grid-item position-relative"
             style="grid-column: 1; grid-row: 1; aspect-ratio:1/1; overflow:hidden;">
             <img src="/images/team1.avif" alt="Team photo 1" class="img-fluid rounded">
           </div>
 
-          <!-- Center large spanning 2×2 -->
           <div class="grid-item position-relative"
             style="grid-column: 2 / span 2; grid-row: 1 / span 2; aspect-ratio:1/1; overflow:hidden;">
             <img src="/images/team2.avif" alt="Team photo 2" class="img-fluid rounded">
           </div>
 
-          <!-- Top-right small -->
           <div class="grid-item position-relative"
             style="grid-column: 4; grid-row: 1; aspect-ratio:1/1; overflow:hidden;">
             <img src="/images/team3.avif" alt="Team photo 3" class="img-fluid rounded">
           </div>
 
-          <!-- Bottom-left small -->
           <div class="grid-item position-relative"
             style="grid-column: 1; grid-row: 2; aspect-ratio:1/1; overflow:hidden;">
             <img src="/images/team4.avif" alt="Team photo 4" class="img-fluid rounded">
           </div>
 
-          <!-- Bottom-right small -->
           <div class="grid-item position-relative"
             style="grid-column: 4; grid-row: 2; aspect-ratio:1/1; overflow:hidden;">
             <img src="/images/team5.avif" alt="Team photo 5" class="img-fluid rounded">

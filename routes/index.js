@@ -24,7 +24,9 @@ const configRoutesFunction = (app) => {
 
     const topUsers = await userProfileData.getTopKarmaUsers();
     const upcomingGames = await hostGameData.getUpcomingGames();
+    // console.log("upcomingGames", upcomingGames);
     const upcomingGymSessions = await gymBuddyData.getUpcomingSessions();
+    // console.log("upcomingGymSessions", upcomingGymSessions)
 
     res.render("index", {
       title: "FindMySquad",
@@ -34,6 +36,7 @@ const configRoutesFunction = (app) => {
       topUsers: topUsers,
       upcomingGymSessions,
       profileCompleted,
+
     });
   });
 
