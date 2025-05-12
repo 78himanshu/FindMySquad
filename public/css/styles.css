@@ -863,3 +863,8 @@ a.disabled {
 .list-group-item .fw-medium {
   font-weight: 500;
 }
+
+.card-title-strong {
+  font-weight: 900 !important;   /* super-bold */
+  color: #000000 !important;     /* pure black */
+}

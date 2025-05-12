@@ -119,7 +119,37 @@
           </div>
 
 
+  <section class="my-5">
+    <h4 class="fw-semibold mb-3">User Reviews</h4>
 
+    {{#if ratings.length}}
+      <div class="row">
+        {{#each ratings}}
+          <div class="col-md-4 mb-4">
+            <div class="card h-100">
+              <div class="card-body">
+                <h5 class="card-title card-title-strong">
+                  {{this.rater.profile.firstName}} {{this.rater.profile.lastName}}
+                </h5>
+                <h6 class="card-subtitle mb-2 text-muted">
+                  {{this.bookingId.title}}
+                </h6>
+                <p class="card-text">{{this.review}}</p>
+              </div>
+              <div class="card-footer d-flex justify-content-between">
+                <small class="text-muted">Score: {{this.score}}/5</small>
+                <small class="text-muted">
+                  Date: {{formatDate this.bookingId.startTime}}
+                </small>
+              </div>
+            </div>
+          </div>
+        {{/each}}
+      </div>
+    {{else}}
+      <p class="text-muted">No reviews yet.</p>
+    {{/if}}
+  </section>
 
 
           <!-- Section: Edit Profile -->

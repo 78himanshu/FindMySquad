@@ -5,6 +5,7 @@ import UserProfile from "../models/userProfile.js";
 import { checkString } from "../utils/helper.js";
 import Userlist from "../models/User.js";
 import mongoose from "mongoose";
+import HostGame    from "../models/hostGame.js";
 
 
 export const createProfile = async (userId, data) => {
@@ -33,14 +34,40 @@ export const createProfile = async (userId, data) => {
   return newProfile;
 };
 
+// export const getProfile = async (userId) => {
+//   const profile = await UserProfile.findOne({ userId }).populate(
+//     "userId",
+//     "username email"
+//   );
+//   if (!profile) throw "Profile not found";
+//   return profile;
+// };
+
 export const getProfile = async (userId) => {
-  const profile = await UserProfile.findOne({ userId }).populate(
-    "userId",
-    "username email"
-  );
+  const profile = await UserProfile.findOne({ userId })
+    // still pull in the user’s own account data
+    .populate("userId", "username email")
+    // pull in each rating’s rater → firstName, lastName
+    .populate({
+      path: "ratings.rater",        // the path in YOUR doc
+      model: "UserProfile",         // which model to pull from
+      localField: "ratings.rater",  // the ObjectId stored
+      foreignField: "userId",       // match against this field in UserProfile
+      select: "profile.firstName profile.lastName"
+    })
+    // pull in each rating’s bookingId → the HostGame’s title
+    .populate({
+      path: "ratings.bookingId",
+      model: "Game",
+      select: "title startTime"
+    });
+
   if (!profile) throw "Profile not found";
+
+  console.log("profile>>>>",profile.ratings)
   return profile;
 };
+
 
 export const updateProfile = async (userId, data) => {
   const update = {};

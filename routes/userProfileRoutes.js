@@ -192,6 +192,8 @@ router.route("/view").get(verifyToken, async (req, res) => {
     const isOwn = true; // Important: mark as your own
     const isFollowing = false; // You can't follow yourself
 
+    console.log("profile from routes ", profile)
+
     res.render("userProfile/view", {
       title: "Your Profile",
       layout: "main",
