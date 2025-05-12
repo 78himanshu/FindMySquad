@@ -8,7 +8,6 @@ import { userProfileData } from "../data/index.js";
 import { sendGameEmail } from "../utils/emailHelper.js";
 import Reminder from "../models/Reminder.js";
 import { scheduleJobFromReminder } from "../emailScheduler.js";
-import requireAuth from "../middleware/auth.js";
 
 router
   .get("/", async (req, res) => {
@@ -231,7 +230,8 @@ router
       await sendGameEmail(
         user.email,
         `🎮 Game Confirmation: ${targetGame.title}`,
-        `<p>Hi ${user.username},</p><p>You have successfully joined <strong>${targetGame.title
+        `<p>Hi ${user.username},</p><p>You have successfully joined <strong>${
+          targetGame.title
         }</strong> on ${new Date(targetGame.startTime).toLocaleString()}.</p>`
       );
 
@@ -259,20 +259,29 @@ router
 
 router.get("/filter", async (req, res) => {
   try {
-    const { sport, date, playersLeft, friendsOnly, skillLevel, minPlayers, maxCost, city } = req.query;
+    const {
+      sport,
+      date,
+      playersLeft,
+      friendsOnly,
+      skillLevel,
+      minPlayers,
+      maxCost,
+      city,
+    } = req.query;
     const userId = req.user?.userId;
     const filters = {};
 
     const now = new Date();
-    if (date === 'today') {
+    if (date === "today") {
       const endOfToday = new Date();
       endOfToday.setHours(23, 59, 59, 999);
       filters.startTime = { $gte: now, $lte: endOfToday };
-    } else if (date === '1+') {
+    } else if (date === "1+") {
       const tomorrow = new Date(now);
       tomorrow.setDate(tomorrow.getDate() + 1);
       filters.startTime = { $gte: tomorrow };
-    } else if (date === '2+') {
+    } else if (date === "2+") {
       const dayAfter = new Date(now);
       dayAfter.setDate(dayAfter.getDate() + 2);
       filters.startTime = { $gte: dayAfter };
@@ -284,7 +293,10 @@ router.get("/filter", async (req, res) => {
 
     if (playersLeft) {
       filters.$expr = {
-        $gt: [{ $subtract: ["$playersRequired", { $size: "$players" }] }, Number(playersLeft) - 1]
+        $gt: [
+          { $subtract: ["$playersRequired", { $size: "$players" }] },
+          Number(playersLeft) - 1,
+        ],
       };
     }
 
@@ -297,12 +309,18 @@ router.get("/filter", async (req, res) => {
       }
     }
 
-    if (skillLevel && ["Beginner", "Intermediate", "Advanced"].includes(skillLevel)) {
+    if (
+      skillLevel &&
+      ["Beginner", "Intermediate", "Advanced"].includes(skillLevel)
+    ) {
       filters.skillLevel = skillLevel;
     }
 
     if (minPlayers) {
-      filters.playersRequired = { ...(filters.playersRequired || {}), $gte: Number(minPlayers) };
+      filters.playersRequired = {
+        ...(filters.playersRequired || {}),
+        $gte: Number(minPlayers),
+      };
     }
 
     if (maxCost) {
@@ -315,9 +333,9 @@ router.get("/filter", async (req, res) => {
 
     const games = await hostGameData.getAllGames(filters);
     const plainGames = games
-      .filter(g => new Date(g.endTime) > now)
+      .filter((g) => new Date(g.endTime) > now)
       .sort((a, b) => new Date(a.startTime) - new Date(b.startTime))
-      .map(g => g.toObject());
+      .map((g) => g.toObject());
 
     // res.render("joinGame/joinGameForm", {
     //   recommendedGames: [],
@@ -351,7 +369,7 @@ router.get("/success", (req, res) => {
   });
 });
 
-router.get("/:id", requireAuth, async (req, res) => {
+router.get("/:id", async (req, res) => {
   //http://localhost:8080/join/67f970e5d5c97b58736c31be
   try {
     const gameId = req.params.id;
