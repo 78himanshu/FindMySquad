@@ -16,6 +16,25 @@
         </div>
         <div class="col-md-6">
           <p><strong>📝 Description:</strong> {{game.description}}</p>
+        {{#if game.costPerHead}}
+          <p>💰 <strong>Cost per Head:</strong> ${{game.costPerHead}}</p>
+        {{/if}}
+
+        {{#if game.bringEquipment}}
+          <p>🎒 <strong>Bring Equipment:</strong> Yes</p>
+        {{else}}
+          <p>🎒 <strong>Bring Equipment:</strong> No</p>
+        {{/if}}
+
+        {{#if game.costShared}}
+          <p>🤝 <strong>Cost Shared:</strong> Yes</p>
+        {{else}}
+          <p>🤝 <strong>Cost Shared:</strong> No</p>
+        {{/if}}
+
+        {{#if game.extraInfo}}
+          <p>📝 <strong>Additional Info:</strong> {{game.extraInfo}}</p>
+        {{/if}}
           <p><strong>🏠 Hosted By:</strong>
             <a href="/profile/view/{{game.host._id}}" class="text-decoration-none fw-semibold text-dark">
               {{game.host.username}}
