@@ -11,29 +11,37 @@ document.addEventListener("DOMContentLoaded", () => {
       fieldsWrap.innerHTML = "";
 
       players.forEach((player) => {
-        if (String(player._id) === String(hostId)) return; // ⛔ Skip logged-in user
+        if (String(player._id) === String(hostId)) return; //  Skip logged-in user
 
         const group = document.createElement("div");
         group.className = "mb-4";
 
-        // Stars: disabled if already rated
-        let starsHtml = `<div class="stars mb-2 ${player.hasBeenRated ? "disabled" : ""}" data-user-id="${player._id}">`;
+        const score = player.ratedScore || 0;
+        let starsHtml = `<div class="stars mb-2" data-user-id="${player._id}">`;
+
         for (let i = 1; i <= 5; i++) {
-          const selected = i <= player.ratedScore ? "selected" : "";
-          const dataAttr = player.hasBeenRated ? "" : `data-score="${i}"`;
-          starsHtml += `<i class="bi bi-star-fill star me-1 ${selected}" ${dataAttr}></i>`;
+          // if i ≤ score → filled, otherwise empty
+          const iconClass = i <= score ? "bi-star-fill selected" : "bi-star";
+          starsHtml += `<i class="star me-1 ${iconClass}" data-score="${i}"></i>`;
         }
+
         starsHtml += `</div>`;
 
-        const disabledAttr = player.hasBeenRated ? "disabled" : "";
-
         group.innerHTML = `
-          <label class="form-label fw-bold">${player.username}</label>
-          ${starsHtml}
-          <input type="hidden" name="rating_${player._id}" value="${player.hasBeenRated ? player.ratedScore : ""}">
-          <textarea name="review_${player._id}" class="form-control" rows="2" placeholder="Write a review..." ${disabledAttr}>${player.hasBeenRated ? player.review : ""}</textarea>
-          ${player.hasBeenRated ? '<p class="text-muted small fst-italic">You have already rated this player.</p>' : ""}
-        `;
+  <label class="form-label fw-bold">${player.username}</label>
+  ${starsHtml}
+  <input 
+    type="hidden" 
+    name="rating_${player._id}" 
+    value="${player.ratedScore || ""}"
+  >
+  <textarea 
+    name="review_${player._id}" 
+    class="form-control" 
+    rows="2" 
+    placeholder="Write a review..."
+  >${player.review || ""}</textarea>
+`;
 
         fieldsWrap.appendChild(group);
       });
@@ -45,7 +53,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Interactive Stars Logic
   fieldsWrap.addEventListener("click", (e) => {
-    if (e.target.classList.contains("star") && !e.target.closest(".stars").classList.contains("disabled")) {
+    if (e.target.classList.contains("star")) {
       const clickedStar = e.target;
       const selectedScore = parseInt(clickedStar.dataset.score);
       const starsContainer = clickedStar.closest(".stars");
@@ -56,7 +64,9 @@ document.addEventListener("DOMContentLoaded", () => {
         star.classList.toggle("selected", score <= selectedScore);
       });
 
-      const hiddenInput = document.querySelector(`input[name="rating_${userId}"]`);
+      const hiddenInput = document.querySelector(
+        `input[name="rating_${userId}"]`
+      );
       if (hiddenInput) hiddenInput.value = selectedScore;
     }
   });
@@ -92,6 +102,7 @@ document.addEventListener("DOMContentLoaded", () => {
         alert("Ratings submitted successfully!");
         rateModal.hide();
         form.reset();
+        window.location.reload();
       } else {
         alert(result.message || "Something went wrong!");
       }

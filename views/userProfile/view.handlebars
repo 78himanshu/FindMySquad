@@ -4,7 +4,8 @@
     <div class="col-md-3">
       <div class="card border rounded shadow-sm">
         <div class="card-body text-center">
-          <img src="{{avatar}}" alt="avatar" class="rounded-circle mb-3" width="90" height="90">
+          <img src="{{avatar}}" alt="avatar" class="rounded-circle mb-3"
+            width="90" height="90">
           <h5 class="fw-semibold mb-1">{{firstName}} {{ lastName}}</h5>
           <small class="text-muted d-block">{{ email}}</small>
           <small class="text-muted">{{ gender}}</small>
@@ -19,7 +20,8 @@
         {{/if}}
 
         <ul class="list-group list-group-flush">
-          <li class="list-group-item bg-success text-white fw-semibold nav-btn" data-target="overview">
+          <li class="list-group-item bg-success text-white fw-semibold nav-btn"
+            data-target="overview">
             <i class="bi bi-bookmark-fill me-2"></i> Overview
           </li>
           {{#if isOwn}}
@@ -38,7 +40,16 @@
     <div class="col-md-9">
       <div class="card border rounded shadow-sm">
         <div class="card-body">
-
+          {{#if query.msg}}
+          {{#if (eq query.msg "already_logged_in")}}
+          <div class="alert alert-warning alert-dismissible fade show"
+            role="alert">
+            You are already logged in.
+            <button type="button" class="btn-close" data-bs-dismiss="alert"
+              aria-label="Close"></button>
+          </div>
+          {{/if}}
+          {{/if}}
           <!-- Section: Profile Overview -->
           <div id="section-overview">
             <h4 class="fw-semibold mb-3">Your Profile Overview</h4>
@@ -46,17 +57,20 @@
 
             <div class="mb-3">
               <strong>Sports Interests:</strong>
-              {{#each sportsInterests}}<span class="badge bg-primary me-1">{{this}}</span>{{/each}}
+              {{#each sportsInterests}}<span
+                class="badge bg-primary me-1">{{this}}</span>{{/each}}
             </div>
 
             <div class="mb-3">
               <strong>Gym Preferences:</strong>
-              {{#each gymPreferences}}<span class="badge bg-success me-1">{{this}}</span>{{/each}}
+              {{#each gymPreferences}}<span
+                class="badge bg-success me-1">{{this}}</span>{{/each}}
             </div>
 
             <div class="mb-3">
               <strong>Gaming Interests:</strong>
-              {{#each gamingInterests}}<span class="badge bg-warning text-dark me-1">{{this}}</span>{{/each}}
+              {{#each gamingInterests}}<span
+                class="badge bg-warning text-dark me-1">{{this}}</span>{{/each}}
             </div>
 
             <div class="mb-3">
@@ -65,13 +79,42 @@
               location.state}} {{ location.zipCode}}
             </div>
 
-            <div class="align-items-center d-flex justify-content-center mt-4 row text-center">
+            {{#if showContactInfo}}
+            <div class="mb-3">
+              <strong>Contact Information:</strong>
+              <div class="ms-3">
+                <div><strong>Email ID:</strong> {{email}}</div>
+                <div><strong>Phone Number:</strong> {{phoneNumber}}</div>
+              </div>
+            </div>
+            {{/if}}
+
+            {{#if achievements.length}}
+            <div class="mt-4 achievement-section">
+              <h5 class="fw-semibold mb-2">🏆 Achievements</h5>
+              <div class="d-flex flex-wrap gap-4 justify-content-start">
+                {{#each achievements}}
+                <div class="text-center">
+                  <img
+                    src="/images/badges/{{badgeImageName this}}"
+                    alt="{{formatBadgeName this}} badge"
+                    class="achievement-badge" />
+                  <div class="badge-label">{{formatBadgeName this}}</div>
+                </div>
+                {{/each}}
+              </div>
+            </div>
+            {{/if}}
+
+            <div
+              class="align-items-center d-flex justify-content-center mt-4 row text-center">
               <div class="col-md-3">
                 <h5>{{ karmaPoints}}</h5>
                 <p class="text-muted">Karma Points</p>
               </div>
               <div class="col-md-3">
-                <h5>{{ followers.length}}</h5>
+                {{!-- <h5>{{ followers.length}}</h5> --}}
+                <h5 id="followerCount">{{ followers.length }}</h5>
                 <p class="text-muted">Followers</p>
               </div>
               <div class="col-md-3">
@@ -93,114 +136,139 @@
             </div>
           </div>
 
-          {{#if achievements.length}}
-          <div class="mt-4">
-            <strong>Achievements:</strong>
-            <ul>{{#each achievements}}<li>{{this}}</li>{{/each}}</ul>
+          <section class="my-5">
+            <h4 class="fw-semibold mb-3">User Reviews</h4>
+
+            {{#if ratings.length}}
+            <div class="row">
+              {{#each ratings}}
+              <div class="col-md-4 mb-4">
+                <div class="card h-100">
+                  <div class="card-body">
+                    <h5 class="card-title card-title-strong">
+                      {{this.rater.profile.firstName}}
+                      {{this.rater.profile.lastName}}
+                    </h5>
+                    <h6 class="card-subtitle mb-2 text-muted">
+                      {{this.bookingId.title}}
+                    </h6>
+                    <p class="card-text">{{this.review}}</p>
+                  </div>
+                  <div class="card-footer d-flex justify-content-between">
+                    <small class="text-muted">Score: {{this.score}}/5</small>
+                    <small class="text-muted">
+                      Date: {{formatDate this.bookingId.startTime}}
+                    </small>
+                  </div>
+                </div>
+              </div>
+              {{/each}}
+            </div>
+            {{else}}
+            <p class="text-muted">No reviews yet.</p>
+            {{/if}}
+          </section>
+
+          <!-- Section: Edit Profile -->
+          <div id="section-edit" class="d-none">
+            {{> editProfileForm }}
           </div>
-          {{/if}}
-        </div>
 
-        <!-- Section: Edit Profile -->
-        <div id="section-edit" class="d-none">
-          {{> editProfileForm }}
-        </div>
+          <!-- Section: Bookings -->
+          <div id="section-bookings" class="d-none">
+            <h4 class="fw-semibold m-3">Your Bookings</h4>
 
-        <!-- Section: Bookings -->
-        <div id="section-bookings" class="d-none">
-          <h4 class="fw-semibold m-3">Your Bookings</h4>
+            <p>🎾 <strong>Game Bookings</strong></p>
+            <p><strong>Future Games:</strong> No upcoming games.</p>
+            <p><strong>Past Games:</strong> No past games.</p>
 
-          <p>🎾 <strong>Game Bookings</strong></p>
-          <p><strong>Future Games:</strong> No upcoming games.</p>
-          <p><strong>Past Games:</strong> No past games.</p>
+            <p>🐕‍🦺 <strong>Gym Bookings</strong></p>
+            <p><strong>Future Sessions:</strong> No upcoming sessions.</p>
+            <p><strong>Past Sessions:</strong> No past sessions.</p>
 
-          <p>🐕‍🦺 <strong>Gym Bookings</strong></p>
-          <p><strong>Future Sessions:</strong> No upcoming sessions.</p>
-          <p><strong>Past Sessions:</strong> No past sessions.</p>
-
-          <p>🎮 <strong>Esports Bookings:</strong> Coming soon!</p>
+            <p>🎮 <strong>Esports Bookings:</strong> Coming soon!</p>
+          </div>
         </div>
       </div>
     </div>
   </div>
-</div>
 
-<script>
-  document.addEventListener('DOMContentLoaded', () => {
-    const navButtons = document.querySelectorAll('.nav-btn');
-    const sections = ['overview', 'edit'];
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const navButtons = document.querySelectorAll('.nav-btn');
+      const sections = ['overview', 'edit'];
 
-    navButtons.forEach(btn => {
-      btn.addEventListener('click', function () {
-        const target = this.getAttribute('data-target');
+      navButtons.forEach(btn => {
+        btn.addEventListener('click', function () {
+          const target = this.getAttribute('data-target');
 
-        if (target === 'bookings') {
-          window.location.href = '/profile/bookings';
-          return;
-        }
+          if (target === 'bookings') {
+            window.location.href = '/profile/bookings';
+            return;
+          }
 
-        sections.forEach(id => {
-          const el = document.getElementById(`section-${id}`);
-          if (el) el.classList.add('d-none');
+          sections.forEach(id => {
+            const el = document.getElementById(`section-${id}`);
+            if (el) el.classList.add('d-none');
+          });
+          const sectionEl = document.getElementById(`section-${target}`);
+          if (sectionEl) sectionEl.classList.remove('d-none');
+
+          navButtons.forEach(b => b.classList.remove('bg-success', 'text-white'));
+          this.classList.add('bg-success', 'text-white');
         });
-        const sectionEl = document.getElementById(`section-${target}`);
-        if (sectionEl) sectionEl.classList.remove('d-none');
-
-        navButtons.forEach(b => b.classList.remove('bg-success', 'text-white'));
-        this.classList.add('bg-success', 'text-white');
       });
+
+      const followButton = document.getElementById('followButton');
+      if (followButton) {
+        followButton.addEventListener('click', async () => {
+          const targetUserId = followButton.dataset.userId;
+          const isFollowing = followButton.innerText.trim() === 'Following';
+          const action = isFollowing ? 'unfollow' : 'follow';
+
+          try {
+            const res = await fetch(`/profile/${action}/${targetUserId}`, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json'
+              },
+              credentials: 'include'
+            });
+
+            const result = await res.json();
+
+            if (res.ok) {
+              followButton.innerText = isFollowing ? 'Follow' : 'Following';
+              showToast(`${isFollowing ? 'Unfollowed' : 'Followed'} successfully! 🎉`, true);
+            } else {
+              showToast(result.error || 'Something went wrong.', false);
+            }
+          } catch (err) {
+            showToast('Server error. Please try again.', false);
+          }
+        });
+      }
     });
 
-    const followButton = document.getElementById('followButton');
-    if (followButton) {
-      followButton.addEventListener('click', async () => {
-        const targetUserId = followButton.dataset.userId;
-        const isFollowing = followButton.innerText.trim() === 'Following';
-        const action = isFollowing ? 'unfollow' : 'follow';
+    function showToast(message, isSuccess) {
+      const color = isSuccess ? 'green' : 'red';
+      const toast = document.createElement('div');
+      toast.textContent = message;
+      toast.style.position = 'fixed';
+      toast.style.top = '20px';
+      toast.style.right = '20px';
+      toast.style.background = color;
+      toast.style.color = 'white';
+      toast.style.padding = '10px 15px';
+      toast.style.borderRadius = '8px';
+      toast.style.zIndex = 9999;
+      toast.style.fontSize = '14px';
+      document.body.appendChild(toast);
 
-        try {
-          const res = await fetch(`/profile/${action}/${targetUserId}`, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json'
-            },
-            credentials: 'include'
-          });
-
-          const result = await res.json();
-
-          if (res.ok) {
-            followButton.innerText = isFollowing ? 'Follow' : 'Following';
-            showToast(`${isFollowing ? 'Unfollowed' : 'Followed'} successfully! 🎉`, true);
-          } else {
-            showToast(result.error || 'Something went wrong.', false);
-          }
-        } catch (err) {
-          showToast('Server error. Please try again.', false);
-        }
-      });
+      setTimeout(() => {
+        toast.remove();
+      }, 2000);
     }
-  });
+  </script>
 
-  function showToast(message, isSuccess) {
-    const color = isSuccess ? 'green' : 'red';
-    const toast = document.createElement('div');
-    toast.textContent = message;
-    toast.style.position = 'fixed';
-    toast.style.top = '20px';
-    toast.style.right = '20px';
-    toast.style.background = color;
-    toast.style.color = 'white';
-    toast.style.padding = '10px 15px';
-    toast.style.borderRadius = '8px';
-    toast.style.zIndex = 9999;
-    toast.style.fontSize = '14px';
-    document.body.appendChild(toast);
-
-    setTimeout(() => {
-      toast.remove();
-    }, 2000);
-  }
-</script>
-
-<script src="/js/userProfile.js"></script>
+  <script src="/js/userProfile.js"></script>

@@ -44,24 +44,26 @@
         <label for="autocomplete" class="form-label">Location <span
             class="text-danger">*</span></label>
         <input type="text" id="autocomplete" name="city" class="form-control"
-          placeholder="Enter your location" value="{{location.city}}">
+          placeholder="Enter your location" data-initial="{{location.city}}">
         <div id="cityError" class="form-text text-danger"></div>
       </div>
       <div class="col-md-6">
         <label for="phoneNumber" class="form-label">Phone Number <span
             class="text-danger">*</span></label>
-        <input
-          type="tel"
-          id="phoneNumber"
-          name="phoneNumber"
-          class="form-control"
-          placeholder="Enter a valid phone number"
-          value="{{phoneNumber}}"
-          required />
+        <input type="tel" id="phoneNumber" name="phoneNumber"
+          class="form-control" placeholder="Enter a valid phone number"
+          value="{{phoneNumber}}">
         <div id="phoneError" class="form-text text-danger"></div>
         <small class="form-text text-muted">Format: 123-456-7890</small>
-        <div id="phoneError" class="form-text text-danger"></div>
       </div>
+    </div>
+
+    <div class="form-check mb-4">
+      <input class="form-check-input" type="checkbox" id="showContactInfo"
+        name="showContactInfo" {{#if showContactInfo}}checked{{/if}}>
+      <label class="form-check-label" for="showContactInfo">
+        Show contact information on your profile
+      </label>
     </div>
 
     <div class="d-grid">
@@ -76,6 +78,10 @@
 <script>
   document.addEventListener('DOMContentLoaded', () => {
     const input = document.getElementById('autocomplete');
+    const initialLocation = input?.getAttribute('data-initial');
+    if (input && initialLocation) {
+      input.value = initialLocation;
+    }
     if (input) {
       const autocomplete = new google.maps.places.Autocomplete(input, {
         types: ['geocode'],
@@ -83,7 +89,7 @@
       });
       autocomplete.addListener('place_changed', function () {
         const place = autocomplete.getPlace();
-        if (place && place.formatted_address) {
+        if (place?.formatted_address) {
           input.value = place.formatted_address;
         }
       });

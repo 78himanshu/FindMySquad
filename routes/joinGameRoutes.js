@@ -8,11 +8,9 @@ import { userProfileData } from "../data/index.js";
 import { sendGameEmail } from "../utils/emailHelper.js";
 import Reminder from "../models/Reminder.js";
 import { scheduleJobFromReminder } from "../emailScheduler.js";
-import requireAuth from "../middleware/auth.js";
 
 router
   .get("/", async (req, res) => {
-    // get http://localhost:8080/join  get all games
     try {
       let userId = null;
       let recommendation = [];
@@ -37,13 +35,11 @@ router
                   $maxDistance: 10000,
                 },
               },
-              //sport: { $in: userProfile.sportsInterests.map((a) => a.sport)},
               sport: { $in: userProfile.sportsInterests || [] },
             };
           } else {
             filters = {
               location: userProfile.city, //need to check this
-              //sport: { $in: userProfile.sportsInterests.map((a) => a.sport)},
               sport: { $in: userProfile.sportsInterests || [] },
               skillLevel: userProfile.gymPreferences?.skillLevel || "Beginner",
             };
@@ -51,12 +47,6 @@ router
         }
         await Promise.all(allGames.map((game) => game.populate("host")));
         const now = new Date();
-
-        //Filter out games that are already over
-        // const upcomingGames = allGames.filter((game) => {
-        //   return new Date(game.endTime) > now;
-        // });
-
         const upcomingGames = [];
 
         for (const game of allGames) {
@@ -79,9 +69,6 @@ router
                   "../helpers/karmaHelper.js"
                 );
                 await updateKarmaPoints(hostId, -15);
-                console.log(
-                  `Applied -15 karma to host ${hostId} for unplayed game: ${game._id}`
-                );
               } catch (err) {
                 console.error(
                   "Failed to apply karma penalty for unplayed game:",
@@ -180,28 +167,23 @@ router
     const game = await hostGameData.getGameById(gameId);
     try {
       const targetGame = await hostGameData.getGameById(gameId);
+      // const now = new Date();
+      // const gameStart = new Date(targetGame.startTime);
 
-      // Check if the game is in the past
-      // if (new Date(targetGame.startTime) < new Date()) {
-      //   return res.redirect(`/join/${gameId}?error=This game has already started and cannot be joined.`);
-      // }
-      const now = new Date();
-      const gameStart = new Date(targetGame.startTime);
-
-      const nowRounded = new Date(
-        now.getFullYear(),
-        now.getMonth(),
-        now.getDate(),
-        now.getHours(),
-        now.getMinutes()
-      );
-      const gameStartRounded = new Date(
-        gameStart.getFullYear(),
-        gameStart.getMonth(),
-        gameStart.getDate(),
-        gameStart.getHours(),
-        gameStart.getMinutes()
-      );
+      // const nowRounded = new Date(
+      //   now.getFullYear(),
+      //   now.getMonth(),
+      //   now.getDate(),
+      //   now.getHours(),
+      //   now.getMinutes()
+      // );
+      // const gameStartRounded = new Date(
+      //   gameStart.getFullYear(),
+      //   gameStart.getMonth(),
+      //   gameStart.getDate(),
+      //   gameStart.getHours(),
+      //   gameStart.getMinutes()
+      // );
 
       if (new Date(targetGame.startTime).getTime() <= Date.now()) {
         return res.redirect(
@@ -231,7 +213,8 @@ router
       await sendGameEmail(
         user.email,
         `🎮 Game Confirmation: ${targetGame.title}`,
-        `<p>Hi ${user.username},</p><p>You have successfully joined <strong>${targetGame.title
+        `<p>Hi ${user.username},</p><p>You have successfully joined <strong>${
+          targetGame.title
         }</strong> on ${new Date(targetGame.startTime).toLocaleString()}.</p>`
       );
 
@@ -259,20 +242,29 @@ router
 
 router.get("/filter", async (req, res) => {
   try {
-    const { sport, date, playersLeft, friendsOnly, skillLevel, minPlayers, maxCost, city } = req.query;
+    const {
+      sport,
+      date,
+      playersLeft,
+      friendsOnly,
+      skillLevel,
+      minPlayers,
+      maxCost,
+      city,
+    } = req.query;
     const userId = req.user?.userId;
     const filters = {};
 
     const now = new Date();
-    if (date === 'today') {
+    if (date === "today") {
       const endOfToday = new Date();
       endOfToday.setHours(23, 59, 59, 999);
       filters.startTime = { $gte: now, $lte: endOfToday };
-    } else if (date === '1+') {
+    } else if (date === "1+") {
       const tomorrow = new Date(now);
       tomorrow.setDate(tomorrow.getDate() + 1);
       filters.startTime = { $gte: tomorrow };
-    } else if (date === '2+') {
+    } else if (date === "2+") {
       const dayAfter = new Date(now);
       dayAfter.setDate(dayAfter.getDate() + 2);
       filters.startTime = { $gte: dayAfter };
@@ -284,7 +276,10 @@ router.get("/filter", async (req, res) => {
 
     if (playersLeft) {
       filters.$expr = {
-        $gt: [{ $subtract: ["$playersRequired", { $size: "$players" }] }, Number(playersLeft) - 1]
+        $gt: [
+          { $subtract: ["$playersRequired", { $size: "$players" }] },
+          Number(playersLeft) - 1,
+        ],
       };
     }
 
@@ -297,12 +292,18 @@ router.get("/filter", async (req, res) => {
       }
     }
 
-    if (skillLevel && ["Beginner", "Intermediate", "Advanced"].includes(skillLevel)) {
+    if (
+      skillLevel &&
+      ["Beginner", "Intermediate", "Advanced"].includes(skillLevel)
+    ) {
       filters.skillLevel = skillLevel;
     }
 
     if (minPlayers) {
-      filters.playersRequired = { ...(filters.playersRequired || {}), $gte: Number(minPlayers) };
+      filters.playersRequired = {
+        ...(filters.playersRequired || {}),
+        $gte: Number(minPlayers),
+      };
     }
 
     if (maxCost) {
@@ -315,23 +316,10 @@ router.get("/filter", async (req, res) => {
 
     const games = await hostGameData.getAllGames(filters);
     const plainGames = games
-      .filter(g => new Date(g.endTime) > now)
+      .filter((g) => new Date(g.endTime) > now)
       .sort((a, b) => new Date(a.startTime) - new Date(b.startTime))
-      .map(g => g.toObject());
+      .map((g) => g.toObject());
 
-    // res.render("joinGame/joinGameForm", {
-    //   recommendedGames: [],
-    //   allGames: plainAll,
-    //   userId: req.user.userId,
-    //   title: "Join Games",
-    //   layout: "main",
-    //   profileCompleted: req.user?.profileCompleted || false,
-    //   head: `
-    //               <link rel="stylesheet" href="/css/joinGame.css">
-    //               <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
-    //               <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-    //             `,
-    // });
     res.json({ games: plainGames });
   } catch (error) {
     console.error("🔥 Filter route error:", error);
@@ -351,7 +339,7 @@ router.get("/success", (req, res) => {
   });
 });
 
-router.get("/:id", requireAuth, async (req, res) => {
+router.get("/:id", async (req, res) => {
   //http://localhost:8080/join/67f970e5d5c97b58736c31be
   try {
     const gameId = req.params.id;
@@ -437,12 +425,6 @@ router.post("/leave/:id", auth, async (req, res) => {
     await joinGameData.leaveGame(gameId, userId);
     res.redirect("/join");
   } catch (e) {
-    //Removing them since logivc added in data layer
-    // if (game.host.toString() === userId) {
-    //   const isLoggedIn = true;
-    //   const joinedGames = await joinGameData.getJoinedGamesByUser(userId);
-    //   const joinedGameIdStrings = joinedGames.map((g) => g._id.toString());
-
     return res.render("joinGame/gameDetails", {
       game: game.toObject(),
       isLoggedIn,

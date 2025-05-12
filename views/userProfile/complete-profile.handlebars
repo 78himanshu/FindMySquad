@@ -18,7 +18,7 @@
             <div class="col-md-4">
                 <label for="gender" class="form-label">Gender *</label>
                 <select class="form-select" name="gender" id="gender">
-                    <option value>Select Gender</option>
+                    <option value disabled selected>Select Gender</option>
                     <option value="Male">Male</option>
                     <option value="Female">Female</option>
                     <option value="Other">Other</option>
@@ -63,10 +63,15 @@
                     placeholder="Enter your city">
             </div>
             <div class="col-md-6">
-                <label for="phoneNumber" class="form-label">Phone Number
-                    *</label>
-                <input type="text" id="phoneNumber" name="phoneNumber"
-                    class="form-control" placeholder="123-456-7890">
+                <label for="phoneNumber" class="form-label">Phone Number <span
+                        class="text-danger">*</span></label>
+                <input type="tel" id="phoneNumber" name="phoneNumber"
+                    class="form-control"
+                    placeholder="Enter a valid phone number"
+                    value="{{phoneNumber}}" />
+                <div id="phoneError" class="form-text text-danger"></div>
+                <small class="form-text text-muted">Format: 123-456-7890</small>
+                <div id="phoneError" class="form-text text-danger"></div>
             </div>
         </div>
 
@@ -115,7 +120,13 @@
                 {{/each}}
             </div>
         </div>
-
+        <div class="form-check mt-3">
+            <input class="form-check-input" type="checkbox" id="showContactInfo"
+                name="showContactInfo">
+            <label class="form-check-label" for="showContactInfo">
+                Show contact information on your profile
+            </label>
+        </div>
         <button type="submit" class="btn btn-primary mt-4">Save Profile</button>
     </form>
 </main>
@@ -135,8 +146,12 @@
     </div>
 </div>
 
-<script src="/js/main"></script>
+<script src="/js/main.js"></script>
 <script>
+    const allowedSports = new Set(["Soccer", "Basketball", "Baseball", "Tennis", "Swimming", "Running", "Cycling", "Hiking", "Golf", "Volleyball"]);
+    const allowedWorkouts = new Set(["Cardio", "Weight Training", "CrossFit", "Yoga", "HIIT", "Pilates", "Zumba", "Bodyweight"]);
+    const allowedGames = new Set(["FPS (e.g., Call of Duty)", "Battle Royale (e.g., Fortnite)", "MOBA (e.g., Dota 2)", "Sports (e.g., FIFA)", "Racing (e.g., Forza)", "Simulation (e.g., Sims)", "RPG (e.g., Elden Ring)", "MMORPG", "Strategy", "Puzzle"]);
+
     document.addEventListener('DOMContentLoaded', () => {
         const profilePics = document.querySelectorAll('input[name="profilePic"]');
         const profileImages = document.querySelectorAll('.profile-option');
@@ -218,17 +233,33 @@
 
         // Validate required fields
         if (!firstName || !lastName) return showToast('First and Last name are required.');
-        if (!gender) return showToast('Please select a gender.');
         if (!profilePic) return showToast('Please select a profile picture.');
         if (sports.length === 0) return showToast('Please select at least one sport.');
-        //if (workouts.length === 0) return showToast('Please select at least one workout type.');
-        //if (games.length === 0) return showToast('Please select at least one gaming interest.');
+        const nameRegex = /^[A-Za-z]{1,50}$/;
+        if (!nameRegex.test(firstName)) return showToast('First name must be 1-50 letters only.');
+        if (!nameRegex.test(lastName)) return showToast('Last name must be 1-50 letters only.');
+        if (bio.length > 300) return showToast('Bio must be under 300 characters.');
+        const allowedGenders = new Set(["Male", "Female", "Other"]);
+        if (!allowedGenders.has(gender)) return showToast('Please select a valid gender.');
+        if (sports.length === 0 || !sports.every(s => allowedSports.has(s)))
+        return showToast("Please select valid sports from the list.");
 
-        const city = form.city.value.trim();
-        const phoneNumber = form.phoneNumber.value.trim();
+        if (workouts.length > 0 && !workouts.every(w => allowedWorkouts.has(w)))
+        return showToast("Please select valid workout types from the list.");
 
-        if (!city) return showToast('Please enter your city.');
-        if (!phoneNumber) return showToast('Phone number is required.');
+        if (games.length > 0 && !games.every(g => allowedGames.has(g)))
+        return showToast("Please select valid gaming interests from the list.");
+
+const city = form.city.value.trim();
+const phoneNumber = form.phoneNumber.value.trim();
+
+if (!city) return showToast('Please enter your city.');
+if (!phoneNumber) return showToast('Phone number is required.');
+
+const phonePattern = /^(\+?1\s?)?(\(\d{3}\)|\d{3})[\s.-]?\d{3}[\s.-]?\d{4}$/;
+if (!phonePattern.test(phoneNumber)) {
+  return showToast('Please enter a valid phone number (e.g., 123-456-7890)');
+}
 
         // Prepare and send the data
         const profileData = {
@@ -242,6 +273,7 @@
             gamingInterests: games,
             city,
             phoneNumber,
+            showContactInfo: form.showContactInfo?.checked || false,
             //geoLocation
         };
 
@@ -253,6 +285,7 @@
             });
 
             const result = await res.json();
+            console.log("result hbd",result);
             if (res.ok) {
                 showToast('Profile saved successfully!', true);
                 setTimeout(() => window.location.href = '/', 1500);

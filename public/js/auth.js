@@ -99,7 +99,6 @@ document.addEventListener("DOMContentLoaded", () => {
       document
         .querySelectorAll(".form__error")
         .forEach((el) => (el.textContent = ""));
-
       // Client-side validation
       let isValid = true;
 
@@ -128,7 +127,6 @@ document.addEventListener("DOMContentLoaded", () => {
         });
 
         const data = await response.json();
-        console.log("data", data);
 
         if (!response.ok) {
           if (data.errors) {
@@ -166,15 +164,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // ------------------ VALIDATION ------------------ //
   function validateSignupForm() {
-    console.log("entered");
     let isValid = true;
 
     const username = document.getElementById("username").value.trim();
     const email = document.getElementById("email").value.trim();
     const password = passwordInput.value;
     const confirmPassword = confirmInput.value;
-
-    console.log("username", username);
 
     // Username
     if (!/^[a-zA-Z0-9]{3,20}$/.test(username)) {
@@ -218,8 +213,6 @@ document.addEventListener("DOMContentLoaded", () => {
         "error"
       );
 
-      // document.getElementById("passwordError").textContent =
-      //   "Password must be 8+ characters, including uppercase, lowercase, number, and special character";
       isValid = false;
 
       return false;
@@ -229,7 +222,6 @@ document.addEventListener("DOMContentLoaded", () => {
     if (password !== confirmPassword) {
       showToast("Passwords do not match", "error");
 
-      // document.getElementById("confirmError").textContent = "Passwords do not match";
       isValid = false;
       return false;
     }
@@ -248,7 +240,6 @@ function showToast(message, type = "info", duration = 10000) {
   // Create toast element
   const toast = document.createElement("div");
   toast.className = `toast toast--${type} show`;
-  // toast.className = `toast toast--${type}`;
   toast.innerHTML = `
     <span>${message}</span>
     <button class="toast__close" aria-label="Close">&times;</button>
@@ -256,11 +247,6 @@ function showToast(message, type = "info", duration = 10000) {
 
   // Add toast to DOM
   container.appendChild(toast);
-
-  // Force a repaint to trigger animation
-  // requestAnimationFrame(() => {
-  //   toast.style.opacity = "1";
-  // });
 
   // Auto remove after duration
   const timeoutId = setTimeout(() => {

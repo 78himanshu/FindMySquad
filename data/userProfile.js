@@ -5,7 +5,7 @@ import UserProfile from "../models/userProfile.js";
 import { checkString } from "../utils/helper.js";
 import Userlist from "../models/User.js";
 import mongoose from "mongoose";
-
+import HostGame from "../models/hostGame.js";
 
 export const createProfile = async (userId, data) => {
   console.log(">>>", userId);
@@ -16,7 +16,15 @@ export const createProfile = async (userId, data) => {
   if (data.city) {
     const geoLocation = await geocodeCity(data.city);
     if (geoLocation) {
-      data.geoLocation = geoLocation;
+      data.location = {
+        city: data.city.trim(),
+        latitude: geoLocation.coordinates[1], // lat
+        longitude: geoLocation.coordinates[0], // lng
+      };
+      data.geoLocation = {
+        type: "Point",
+        coordinates: geoLocation.coordinates, // [lng, lat]
+      };
     }
   }
 
@@ -33,12 +41,36 @@ export const createProfile = async (userId, data) => {
   return newProfile;
 };
 
+// export const getProfile = async (userId) => {
+//   const profile = await UserProfile.findOne({ userId }).populate(
+//     "userId",
+//     "username email"
+//   );
+//   if (!profile) throw "Profile not found";
+//   return profile;
+// };
+
 export const getProfile = async (userId) => {
-  const profile = await UserProfile.findOne({ userId }).populate(
-    "userId",
-    "username email"
-  );
+  const profile = await UserProfile.findOne({ userId })
+    // still pull in the user’s own account data
+    .populate("userId", "username email")
+    // pull in each rating’s rater → firstName, lastName
+    .populate({
+      path: "ratings.rater", // the path in YOUR doc
+      model: "UserProfile", // which model to pull from
+      localField: "ratings.rater", // the ObjectId stored
+      foreignField: "userId", // match against this field in UserProfile
+      select: "profile.firstName profile.lastName",
+    })
+    // pull in each rating’s bookingId → the HostGame’s title
+    .populate({
+      path: "ratings.bookingId",
+      model: "Game",
+      select: "title startTime",
+    });
+
   if (!profile) throw "Profile not found";
+
   return profile;
 };
 
@@ -63,6 +95,10 @@ export const updateProfile = async (userId, data) => {
     update["phoneNumber"] = data.phoneNumber.trim();
   }
 
+  if (typeof data.showContactInfo === "boolean") {
+    update["showContactInfo"] = data.showContactInfo;
+  }
+
   if (Object.keys(update).length === 0) {
     throw new Error("No valid fields provided for update.");
   }
@@ -83,7 +119,6 @@ export const deleteProfile = async (userId) => {
   if (!deleted) throw "Profile not found";
   return true;
 };
-
 
 export const ratePlayers = async (raterId, ratingsArray, bookingId) => {
   if (!ObjectId.isValid(raterId)) throw "Invalid rater ID";
@@ -126,7 +161,8 @@ export const ratePlayers = async (raterId, ratingsArray, bookingId) => {
     // Update counts
     profile.ratingCount = profile.ratings.length;
     profile.averageRating =
-      profile.ratings.reduce((sum, r) => sum + r.score, 0) / profile.ratingCount;
+      profile.ratings.reduce((sum, r) => sum + r.score, 0) /
+      profile.ratingCount;
 
     await profile.save();
 
@@ -135,7 +171,6 @@ export const ratePlayers = async (raterId, ratingsArray, bookingId) => {
 
   return results;
 };
-
 
 /**
  * Have userId follow targetUserId.
@@ -227,6 +262,7 @@ export const getTopKarmaUsers = async () => {
       {
         "profile.firstName": 1,
         "profile.lastName": 1,
+        "profile.avatar": 1,
         userId: 1,
         karmaPoints: 1,
         _id: 0,
@@ -235,7 +271,6 @@ export const getTopKarmaUsers = async () => {
       .sort({ karmaPoints: -1 })
       .limit(5);
 
-    console.log("Top users are here:", topUsers);
     return topUsers;
   } catch (err) {
     console.error("Error fetching top karma users:", err);

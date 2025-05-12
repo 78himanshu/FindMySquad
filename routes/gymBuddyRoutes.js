@@ -7,6 +7,8 @@ import { ObjectId } from "mongodb";
 import { format } from "date-fns";
 import Gym from "../models/Gym.js";
 import { updateKarmaPoints } from "../utils/karmaHelper.js";
+import { evaluateAchievements } from "../utils/achievementHelper.js";
+import axios from "axios";
 
 // Home
 router.get("/", (req, res) => {
@@ -23,8 +25,9 @@ router.get("/", (req, res) => {
 router
   .get("/create", requireAuth, (req, res) => {
     res.render("Gym/createSession", {
-      title: "Create Gym Session",
+      title: "",
       layout: "main",
+      today: new Date().toISOString().split("T")[0],
       head: `<link rel="stylesheet" href="/css/gym.css">`,
       user: {
         username: req.user.username,
@@ -40,7 +43,7 @@ router
       return res.status(400).json({ error: "Request body cannot be empty" });
     }
 
-    console.log("data", data);
+    // console.log("data", data);
     const {
       title,
       gymName,
@@ -81,7 +84,7 @@ router
 
     try {
       // Log date & time inputs
-      console.log("Raw inputs:", { date, startTime, endTime });
+      // console.log("Raw inputs:", { date, startTime, endTime });
 
       checkString(title, "Title");
       checkString(gymName, "Gym Name");
@@ -90,14 +93,22 @@ router
       checkString(workoutType, "Workout Type");
       if (description) checkString(description, "Description");
 
-      const now = new Date();
-      const parsedSessionDate = new Date(date);
+      // build a true local‐midnight for the session date
+      const [Y, M, D] = date.split("-").map(Number);
+      const parsedSessionDate = new Date(Y, M - 1, D);
 
-      const paddedStartTime = startTime.length === 5 ? `${startTime}:00` : startTime;
+      // ── keep your padded strings for DB storage ──
+      const paddedStartTime =
+        startTime.length === 5 ? `${startTime}:00` : startTime;
       const paddedEndTime = endTime.length === 5 ? `${endTime}:00` : endTime;
 
-      const startDateTime = new Date(`${date}T${paddedStartTime}`);
-      const endDateTime = new Date(`${date}T${paddedEndTime}`);
+      // parse hours/mins into local‐time Date objects
+      const [sh, sm] = startTime.split(":").map(Number);
+      const [eh, em] = endTime.split(":").map(Number);
+      const startDateTime = new Date(Y, M - 1, D, sh, sm, 0);
+      const endDateTime = new Date(Y, M - 1, D, eh, em, 0);
+
+      const now = new Date();
 
       if (
         isNaN(parsedSessionDate.getTime()) ||
@@ -107,7 +118,10 @@ router
         throw new Error("Invalid Date or Time format.");
       }
 
-      if (parsedSessionDate < now) {
+      if (
+        parsedSessionDate <
+        new Date(now.getFullYear(), now.getMonth(), now.getDate())
+      ) {
         return res
           .status(400)
           .json({ error: "Session date must be in the future." });
@@ -131,8 +145,10 @@ router
       });
 
       const hasClash = existingSessions.some((s) => {
-        const sPaddedStart = s.startTime.length === 5 ? `${s.startTime}:00` : s.startTime;
-        const sPaddedEnd = s.endTime.length === 5 ? `${s.endTime}:00` : s.endTime;
+        const sPaddedStart =
+          s.startTime.length === 5 ? `${s.startTime}:00` : s.startTime;
+        const sPaddedEnd =
+          s.endTime.length === 5 ? `${s.endTime}:00` : s.endTime;
         const existingStart = new Date(`${s.date}T${sPaddedStart}`);
         const existingEnd = new Date(`${s.date}T${sPaddedEnd}`);
         return (
@@ -150,20 +166,27 @@ router
         );
       }
 
-      // Log inputs for debugging
-      console.log("Creating session with:", {
-        title,
-        gymName,
-        description,
-        parsedSessionDate,
-        startTime,
-        endTime,
-        gymlocation,
-        experience,
-        workoutType,
-        hostedBy,
-        maxMembers,
-      });
+      const apiKey = process.env.GOOGLE_MAPS_API_KEY;
+      const encodedLoc = encodeURIComponent(gymlocation);
+      const geoRes = await axios.get(
+        `https://maps.googleapis.com/maps/api/geocode/json?address=${encodedLoc}&key=${apiKey}`
+      );
+
+      if (
+        !geoRes.data ||
+        !geoRes.data.results ||
+        !geoRes.data.results[0]?.geometry?.location
+      ) {
+        return res.status(400).json({
+          error: "Invalid gym address — unable to fetch coordinates.",
+        });
+      }
+
+      const { lat, lng } = geoRes.data.results[0].geometry.location;
+      const geoLocation = {
+        type: "Point",
+        coordinates: [lng, lat],
+      };
 
       await gymBuddyData.createGymSession(
         title,
@@ -176,7 +199,8 @@ router
         experience,
         workoutType,
         hostedBy,
-        Number(maxMembers)
+        Number(maxMembers),
+        geoLocation
       );
 
       return res.json({
@@ -184,8 +208,6 @@ router
         message: "Session created successfully",
         redirectUrl: "/gymBuddy/mySessions",
       });
-
-      // return res.redirect("/gymBuddy?success=Session created successfully");
     } catch (e) {
       console.error("🔥 Error creating session:", e);
       return res
@@ -193,7 +215,6 @@ router
         .json({ error: e?.message || "Failed to create session" });
     }
   });
-
 
 // find session
 router.get("/find", async (req, res) => {
@@ -258,7 +279,7 @@ router.get("/find", async (req, res) => {
     isLoggedIn: res.locals.isLoggedIn,
     error,
     profileCompleted: req.user?.profileCompleted || false,
-    success
+    success,
   });
 });
 
@@ -313,6 +334,7 @@ router.post("/join/:id", requireAuth, async (req, res) => {
     sessionToJoin.currentMembers = sessionToJoin.members.length;
 
     await updateKarmaPoints(userId, 10);
+    await evaluateAchievements(userId);
 
     await sessionToJoin.save();
 
@@ -339,6 +361,7 @@ router.post("/leave/:id", requireAuth, async (req, res) => {
     session.currentMembers = session.members.length;
 
     await updateKarmaPoints(userId, -10);
+    await evaluateAchievements(userId);
 
     await session.save();
 
@@ -439,6 +462,7 @@ router.get("/edit/:id", requireAuth, async (req, res) => {
       .populate("hostedBy", "username")
       .lean();
 
+    console.log("session", session);
     if (!session) {
       return res.status(404).render("error", { error: "Session not found" });
     }
@@ -468,6 +492,7 @@ router.get("/edit/:id", requireAuth, async (req, res) => {
         userId: session.hostedBy._id.toString(),
         username: session.hostedBy.username,
       },
+      gym_title: session.title,
     });
   } catch (e) {
     console.error("Error loading edit page:", e);
@@ -553,6 +578,9 @@ router.post("/delete/:id", requireAuth, async (req, res) => {
         .status(403)
         .render("error", { message: "Unauthorized to delete this session" });
     }
+
+    await updateKarmaPoints(session.hostedBy.toString(), -15);
+    await evaluateAchievements(session.hostedBy.toString());
 
     await Gym.deleteOne({ _id: id });
     res.redirect("/gymBuddy/mySessions");

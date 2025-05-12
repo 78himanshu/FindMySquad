@@ -1,101 +1,389 @@
-<section class="section_home-faqs">
-  <div
-    class="w-layout-blockcontainer container-small padding-section-small w-container">
-    <!-- ✅ Added heading for semantic structure -->
-    <h2 class="visually-hidden">Home Banner</h2>
-    <div class="image-container">
-      <img src="/images/pexels-ashleyrae-685382.jpg"
-        alt="Sports enthusiasts playing"
-        class="responsive-home-image">
+<style>
+  .game-card {
+    border-radius: 1rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    overflow: hidden;
+  }
+
+  .skill-badge {
+    background-color: #28a745;
+    font-size: 0.85rem;
+    padding: 0.5em 1em;
+    border-radius: 0.5rem;
+    color: white;
+  }
+
+  .feature-badge {
+    font-size: 0.85rem;
+    padding: 0.5em 0.75em;
+    border-radius: 0.5rem;
+    white-space: nowrap;
+  }
+
+  .feature-badge.equipment {
+    background-color: #ffdd57;
+    color: #212529;
+  }
+
+  .feature-badge.shared {
+    background-color: #cfe2ff;
+    color: #084298;
+  }
+
+  .host-avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid white;
+  }
+
+  .card-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+  }
+
+  .more-info .link-primary {
+    font-size: 0.9rem;
+    font-weight: 500;
+  }
+
+  .more-info .collapse.show+a .bi-chevron-down {
+    transform: rotate(-180deg);
+  }
+
+  .section-header .border-top {
+    border-top-width: 3px !important;
+    border-color: #6f42c1 !important;
+  }
+
+  .about-grid .grid-item {
+    aspect-ratio: 1/1;
+    overflow: hidden;
+  }
+
+  .grid-item.span-2 {
+    grid-column: span 2;
+    grid-row: span 2;
+  }
+
+  .shape-block {
+    width: 100%;
+    height: 100%;
+  }
+
+  .about-grid .grid-item:hover img,
+  .about-grid .grid-item:hover .shape-block {
+    transform: scale(1.03);
+    transition: transform 0.3s;
+  }
+
+  /* Gamification card tweaks */
+.gamification-section .card-body {
+  background: #f8f9fa;
+  border-radius: 1rem;
+}
+.gamification-section h2 {
+  color: #343a40;
+}
+
+  .card-link {
+    display: block;
+  }
+
+  .card-link.text-decoration-none {
+    text-decoration: none !important;
+    color: inherit !important;
+  }
+
+  .card-link:hover .game-card {
+    transform: translateY(-4px);
+    transition: transform 0.2s;
+    cursor: pointer;
+  }
+
+  .session-card .card-body {
+    padding-bottom: 3rem !important;
+  }
+
+  .session-card .host-avatar {
+    bottom: 1rem;
+    right: 1rem;
+  }
+
+  .session-card .more-info .btn-primary {
+    z-index: 1;
+  }
+</style>
+
+<section class="hero d-flex align-items-center text-white bg-dark" style="
+    min-height: 80vh;
+  ">
+  <div class="container text-center">
+
+    <h1 class="display-3 fw-bold mb-3">
+      FindMySquad
+    </h1>
+    <p class="lead mb-4">
+      Connect with fellow players.
+      Host or join games & gym sessions in your area.
+    </p>
+    <div>
+      <a href="/signup" class="btn btn-primary btn-lg me-2">
+        Get Started
+      </a>
+    </div>
+    <div class="row justify-content-center mt-5">
+      <div class="col-6 col-md-3 mb-3">
+        <i class="bi bi-people-fill fs-1 mb-2"></i>
+        <p>Build Your Team</p>
+      </div>
+      <div class="col-6 col-md-3 mb-3">
+        <i class="bi bi-calendar-check-fill fs-1 mb-2"></i>
+        <p>Schedule & Join</p>
+      </div>
+      <div class="col-6 col-md-3 mb-3">
+        <i class="bi bi-star-fill fs-1 mb-2"></i>
+        <p>Rate & Review</p>
+      </div>
     </div>
   </div>
 </section>
 
-<section class="karma-leaderboard p-3 mb-4 bg-light rounded shadow-sm">
-  <h4 class="text-center mb-3">🏆 Top Karma Users</h4>
-  {{#if topUsers.length}}
-  <ol class="list-group list-group-numbered">
-    {{#each topUsers}}
-    <li
-      class="list-group-item d-flex justify-content-between align-items-center">
-      {{this.profile.firstName}} {{this.profile.lastName}}
-      <span class="badge bg-primary rounded-pill">{{this.karmaPoints}}
-        karma</span>
-    </li>
-    {{/each}}
-  </ol>
-  {{else}}
-  <p class="text-center text-muted">No users found.</p>
-  {{/if}}
+
+<section class="container my-5">
+  <div class="card shadow-sm">
+    <div class="card-header text-white text-center py-3 bg-primary">
+      <h4 class="mb-0">🏆 Top Karma Users</h4>
+    </div>
+
+    <ul class="list-group list-group-flush">
+      {{#if topUsers.length}}
+      {{#each topUsers}}
+      <li class="list-group-item d-flex align-items-center justify-content-between">
+        <div class="d-flex align-items-center">
+          <img src="{{#if profile.avatar}}{{profile.avatar}}{{else}}/images/default-avatar.png{{/if}}"
+            alt="Avatar of {{profile.firstName}} {{profile.lastName}}" class="rounded-circle me-3" width="40"
+            height="40">
+          <span class="fw-medium">
+            {{profile.firstName}} {{profile.lastName}}
+          </span>
+        </div>
+        <span class="badge bg-success rounded-pill">
+          {{karmaPoints}} karma
+        </span>
+      </li>
+      {{/each}}
+      {{else}}
+      <li class="list-group-item text-center text-muted">
+        No users found.
+      </li>
+      {{/if}}
+    </ul>
+  </div>
 </section>
 
-    <section class="discover-games-section">
+<div class="container p-0">
+  <div class="d-flex align-items-center my-4 section-header">
+    <div class="flex-grow-1 border-top"></div>
+    <h2 class="mx-3 fw-bold mb-0">Discover Games</h2>
+    <div class="flex-grow-1 border-top"></div>
+  </div>
+</div>
 
-      <div class="container ">
-        <div class="d-flex justify-content-between align-items-center mb-4">
-          <h2 class="fw-bold">Discover Games</h2>
-          <a href="/join" class="btn btn-outline-primary btn-sm require-profile">See All
-            Games</a>
+<div id="gameCarousel" class="game-scroll-wrapper container">
+  {{#each upcomingGames}}
+  {{!-- <a href="/join/{{_id}}" class="game-card-link text-decoration-none text-reset"> --}}
+    <div class="card game-card h-100 position-relative">
+      <div class="card-body pb-4 p-0">
+        <span class="badge skill-badge position-absolute top-0 end-0 m-3">
+          {{skillLevel}}
+        </span>
+
+        <h5 class="card-title mb-3">{{title}}</h5>
+
+        <ul class="list-unstyled mb-3 small text-secondary">
+          <li><strong>Sport:</strong> {{sport}}</li>
+          <li class="location"><strong>Location:</strong> {{location}}</li>
+          <li>
+            <strong>Time:</strong> {{formatTime startTime}} – {{formatTime endTime}}
+          </li>
+          <li>
+            <strong>Cost:</strong>
+            {{#if (eq costPerHead 0)}}$0{{else}}${{costPerHead}}{{/if}}
+          </li>
+          <li><strong>Players:</strong> {{players.length}} / {{playersRequired}}</li>
+        </ul>
+
+        <div class="d-flex flex-wrap gap-2 mb-3">
+          {{#if equipmentRequired}}
+          <span class="badge feature-badge equipment">
+            <i class="bi bi-backpack-fill me-1"></i> BYO Equipment
+          </span>
+          {{/if}}
+          {{#if costShared}}
+          <span class="badge feature-badge shared">
+            <i class="bi bi-handshake-fill me-1"></i> Cost Shared
+          </span>
+          {{/if}}
         </div>
-        <p class="text-muted mb-4">Join a game or host your own. Find players
-          nearby and enjoy the game!</p>
 
-    <div class="position-relative">
-      <button class="scroll-btn left" onclick="scrollGames(-1)">
-        <i class="fas fa-chevron-left"></i>
-      </button>
+        <hr class="my-3">
 
-      <div id="gameCarousel" class="game-scroll-wrapper d-flex gap-3">
-        {{#each upcomingGames}}
-        <div class="game-card shadow-sm p-3 bg-white rounded">
-          <div class="h-100 p-3">
-            <div class="d-flex justify-content-between align-items-center mb-2">
-              <h5 class="mb-0 fw-semibold">{{title}}</h5>
-              <span class="badge bg-success">{{sport}}</span>
-            </div>
+        <div class="more-info d-flex align-items-center">
+          <button type="button" class="btn btn-link link-primary p-0 me-3 d-flex align-items-center"
+            data-bs-toggle="collapse" data-bs-target="#info-{{_id}}" aria-expanded="false" aria-controls="info-{{_id}}">
+            <span>More Info</span>
+            <i class="bi bi-chevron-down ms-1"></i>
+          </button>
+          <a href="/join/{{_id}}" class="game-card-link text-decoration-none text-reset">
 
-            {{#if (eq players.length playersRequired)}}
-            <span class="badge bg-success mb-2">BOOKED</span>
-            {{else if (eq (subtract playersRequired players.length) 1)}}
-            <span class="badge bg-warning text-dark mb-2">🚀 Only 1 Slot</span>
-            {{/if}}
-
-            <p class="mb-1 text-muted location"><i
-                class="bi bi-geo-alt me-1"></i> {{location}}</p>
-            <p class="mb-1"><i
-                class="bi bi-calendar-event me-1"></i><strong>Date:</strong>
-              {{formatDate startTime}}</p>
-            <p class="mb-1"><i
-                class="bi bi-clock me-1"></i><strong>Time:</strong> {{formatTime
-              startTime}} - {{formatTime endTime}}</p>
-            <p class="mb-1"><i
-                class="bi bi-people-fill me-1"></i><strong>Players:</strong>
-              {{players.length}} / {{playersRequired}}</p>
-            <p class="mb-1"><i
-                class="bi bi-stars me-1"></i><strong>Skills:</strong>
-              {{skillLevel}}</p>
-            <p class="mb-2">
-              <i class="bi bi-cash me-1"></i><strong>Cost:</strong>
-              {{#if (eq costPerHead 0)}}
-              <span class="badge bg-primary">Free</span>
-              {{else}}
-              <span class="badge bg-warning text-dark">${{costPerHead}}</span>
-              {{/if}}
-            </p>
-            <a href="/join/{{_id}}" class="btn btn-outline-success w-100">View
-              Details</a>
-          </div>
+            <button type="button" class="btn btn-primary btn-sm ms-auto" onclick="window.location.href='/join/{{_id}}'">
+              View
+            </button>
+          </a>
         </div>
-        {{/each}}
+
+        <div class="collapse mt-2" id="info-{{_id}}">
+          <p class="text-secondary mb-0">{{description}}</p>
+        </div>
       </div>
 
-      <button class="scroll-btn right" onclick="scrollGames(1)">
-        <i class="fas fa-chevron-right"></i>
-      </button>
+      <img src="{{#if hostAvatarUrl}}{{hostAvatarUrl}}{{else}}/images/avatar-placeholder.png{{/if}}" alt="Host avatar"
+        class="host-avatar position-absolute bottom-0 end-0 m-3">
+    </div>
+    {{!--
+  </a> --}}
+  {{/each}}
+</div>
+
+
+
+
+
+
+<div class="container p-0">
+  <div class="d-flex align-items-center my-4 section-header">
+    <div class="flex-grow-1 border-top"></div>
+    <h2 class="mx-3 fw-bold mb-0">Discover Gym Sessions</h2>
+    <div class="flex-grow-1 border-top"></div>
+  </div>
+</div>
+
+
+{{#if upcomingGymSessions.length}}
+<div id="sessionCarousel" class="game-scroll-wrapper container">
+  {{#each upcomingGymSessions}}
+  {{#ifCond @index '<' 15}} <a href="/gymBuddy/find/{{_id}}"
+    class="card-link text-decoration-none text-reset mb-4 d-block">
+    <div class="card game-card session-card h-100 position-relative">
+      <div class="card-body pb-4 p-0">
+        <h5 class="card-title mb-3">{{title}}</h5>
+
+        <ul class="list-unstyled mb-3 small text-secondary flex-grow-1">
+          <li><strong>Date:</strong> {{date}}</li>
+          <li><strong>Time:</strong> {{startTime}} – {{endTime}}</li>
+          <li><strong>Gym:</strong> {{gym}}</li>
+          <li><strong>Members:</strong> {{members.length}} / {{maxMembers}}</li>
+        </ul>
+
+        <hr class="my-3">
+
+        <div class="d-flex align-items-center mt-auto">
+          <button type="button" class="btn btn-link link-primary p-0 me-3 d-flex align-items-center"
+            data-bs-toggle="collapse" data-bs-target="#sess-info-{{_id}}" aria-expanded="false"
+            aria-controls="sess-info-{{_id}}">
+            More Info <i class="bi bi-chevron-down ms-1"></i>
+          </button>
+
+          <button type="button" class="btn btn-primary btn-sm ms-auto" onclick="location.href='/gymBuddy/find/{{_id}}'">
+            View
+          </button>
+        </div>
+
+        <div class="collapse mt-2" id="sess-info-{{_id}}">
+          <p class="text-secondary mb-0">{{description}}</p>
+        </div>
+      </div>
+
+      <img src="{{#if host.avatarUrl}}{{host.avatarUrl}}{{else}}/images/avatar-placeholder.png{{/if}}" alt="Host avatar"
+        class="host-avatar position-absolute bottom-0 end-0 m-3">
+    </div>
+    </a>
+    {{/ifCond}}
+    {{/each}}
+</div>
+{{else}}
+<p class="text-center text-muted">No gym sessions coming up.</p>
+{{/if}}
+
+</section>
+
+  <!-- ===== Gamification Section ===== -->
+  <section class="container my-5 gamification-section">
+    <div class="card shadow-sm border-0">
+      <div class="card-body text-center">
+        <h2 class="fw-bold mb-3">Level Up with Gamification</h2>
+        <p class="lead text-muted mb-4">
+          Earn karma points by hosting games, joining sessions, and sharing reviews.  
+          Climb the leaderboard, unlock achievement badges, and show off your squad-building skills!
+        </p>
+        <a href="/gamification" class="btn btn-primary btn-lg">Read More</a>
+      </div>
+    </div>
+  </section>
+  <!-- ===== End Gamification Section ===== -->
+
+
+<section class="about-team py-5 bg-white rounded shadow-sm">
+  <div class="container">
+    <div class="row align-items-center g-4">
+      <div class="col-lg-6">
+        <h2 class="fw-bold display-6 mb-3">About the Team</h2>
+        <p class="text-muted mb-4">
+          At FindMySquad, our team thrives on collaboration and shared passion for sports.
+          We bring together diverse skills—from coding and design to community building—to craft
+          seamless, engaging experiences for every player.
+          With open communication, mutual respect, and a relentless drive to innovate,
+          we tackle challenges as one united squad and celebrate every victory together.
+        </p>
+        <div class="d-flex gap-3">
+          <a href="#" class="btn btn-success btn-lg">READ OUR STORY</a>
+        </div>
+      </div>
+
+      <div class="col-lg-6">
+        <div class="about-grid d-grid gap-3" style="grid-template-columns: repeat(4, 1fr); grid-auto-rows: 1fr;">
+          <div class="grid-item position-relative"
+            style="grid-column: 1; grid-row: 1; aspect-ratio:1/1; overflow:hidden;">
+            <img src="/images/team1.avif" alt="Team photo 1" class="img-fluid rounded">
+          </div>
+
+          <div class="grid-item position-relative"
+            style="grid-column: 2 / span 2; grid-row: 1 / span 2; aspect-ratio:1/1; overflow:hidden;">
+            <img src="/images/team2.avif" alt="Team photo 2" class="img-fluid rounded">
+          </div>
+
+          <div class="grid-item position-relative"
+            style="grid-column: 4; grid-row: 1; aspect-ratio:1/1; overflow:hidden;">
+            <img src="/images/team3.avif" alt="Team photo 3" class="img-fluid rounded">
+          </div>
+
+          <div class="grid-item position-relative"
+            style="grid-column: 1; grid-row: 2; aspect-ratio:1/1; overflow:hidden;">
+            <img src="/images/team4.avif" alt="Team photo 4" class="img-fluid rounded">
+          </div>
+
+          <div class="grid-item position-relative"
+            style="grid-column: 4; grid-row: 2; aspect-ratio:1/1; overflow:hidden;">
+            <img src="/images/team5.avif" alt="Team photo 5" class="img-fluid rounded">
+          </div>
+        </div>
+      </div>
+
     </div>
   </div>
 </section>
-
 <script>
   function scrollGames(direction) {
     const container = document.getElementById("gameCarousel");

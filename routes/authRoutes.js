@@ -2,12 +2,12 @@ import { Router } from "express";
 const router = Router();
 import { authUserData } from "../data/index.js";
 import { checkString } from "../utils/helper.js";
-import jwt from 'jsonwebtoken';
-import xss from 'xss';
+import xss from "xss";
+import redirectIfLoggedIn from "../middleware/redirectIfLoggedIn.js";
 
 router
   .route("/signup")
-  .get((req, res) => {
+  .get(redirectIfLoggedIn, (req, res) => {
     res.render("auth/signup", {
       title: "Sign Up",
       layout: "main",
@@ -32,8 +32,6 @@ router
         return res.status(400).json({ error: "All fields are required" });
       }
 
-      console.log("==>>>>", username, email, password, confirmPassword);
-
       if (password !== confirmPassword) {
         return res.status(400).json({ error: "Passwords do not match" });
       }
@@ -42,8 +40,6 @@ router
       checkString(password, "password");
 
       const newUser = await authUserData.signup(username, email, password);
-
-      console.log("newUser", newUser);
 
       // Redirect to add profile page
       return res.status(200).json({
@@ -56,7 +52,7 @@ router
   });
 router
   .route("/login")
-  .get((req, res) => {
+  .get(redirectIfLoggedIn, (req, res) => {
     res.render("auth/login", {
       title: "Login",
       layout: "main",
@@ -85,15 +81,10 @@ router
       checkString(email, "email");
       checkString(password, "password");
 
-      const {token, user, profilePic } = await authUserData.login(
+      const { token, user, profilePic } = await authUserData.login(
         email,
         password
       );
-
-      console.log("✅ Setting token cookie:", token);
-      console.log("✅ Token payload:", jwt.decode(token));
-
-      console.log(token, user, profilePic);
 
       res.cookie("token", token, {
         httpOnly: true,
@@ -117,7 +108,6 @@ router
       if (!user.profileCompleted) {
         redirectTo = "/profile/addprofile";
       }
-      console.log(redirectTo, "test redirectTo:");
       return res.status(200).json({
         message: "Login successful",
         redirect: redirectTo,
@@ -128,7 +118,6 @@ router
           profileCompleted: user.profileCompleted,
           profilepic: user.profilePic || "/images/default-avatar.png",
         },
-        redirect: redirect || "/", // Included redirect in the response
       });
     } catch (error) {
       return res.status(400).json({

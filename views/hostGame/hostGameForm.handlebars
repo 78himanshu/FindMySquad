@@ -4,55 +4,79 @@
       <h2 class="mb-0">{{#if game}}Edit Game{{else}}Host a Game{{/if}}</h2>
     </div>
     <div class="card-body">
-      <form class="host-game-form" data-edit="{{#if game}}true{{else}}false{{/if}}" data-game-id="{{game._id}}">
+      <form class="host-game-form"
+        data-edit="{{#if game}}true{{else}}false{{/if}}"
+        data-game-id="{{game._id}}">
 
         <div class="mb-3">
-          <label for="title" class="form-label">Title <span class="text-danger">*</span></label>
-          <input type="text" id="title" name="title" class="form-control" placeholder="Title" value="{{game.title}}">
+          <label for="title" class="form-label">Title <span
+              class="text-danger">*</span></label>
+          <input type="text" id="title" name="title" class="form-control"
+            placeholder="Title" value="{{game.title}}">
         </div>
 
         <div class="row g-3">
           <div class="col-md-4">
-            <label for="sportSelect" class="form-label">Select Sport <span class="text-danger">*</span></label>
+            <label for="sportSelect" class="form-label">Select Sport <span
+                class="text-danger">*</span></label>
             <select name="sport" id="sportSelect" class="form-select">
               <option value>Select Sport</option>
-              <option value="Soccer" {{#if (eq game.sport "Soccer" )}}selected{{/if}}>Soccer</option>
-              <option value="Basketball" {{#if (eq game.sport "Basketball" )}}selected{{/if}}>Basketball</option>
-              <option value="Baseball" {{#if (eq game.sport "Baseball" )}}selected{{/if}}>Baseball</option>
-              <option value="Tennis" {{#if (eq game.sport "Tennis" )}}selected{{/if}}>Tennis</option>
-              <option value="Swimming" {{#if (eq game.sport "Swimming" )}}selected{{/if}}>Swimming</option>
-              <option value="Running" {{#if (eq game.sport "Running" )}}selected{{/if}}>Running</option>
-              <option value="Cycling" {{#if (eq game.sport "Cycling" )}}selected{{/if}}>Cycling</option>
-              <option value="Hiking" {{#if (eq game.sport "Hiking" )}}selected{{/if}}>Hiking</option>
-              <option value="Golf" {{#if (eq game.sport "Golf" )}}selected{{/if}}>Golf</option>
-              <option value="Volleyball" {{#if (eq game.sport "Volleyball" )}}selected{{/if}}>Volleyball</option>
+              <option value="Soccer" {{#if (eq game.sport "Soccer"
+                )}}selected{{/if}}>Soccer</option>
+              <option value="Basketball" {{#if (eq game.sport "Basketball"
+                )}}selected{{/if}}>Basketball</option>
+              <option value="Baseball" {{#if (eq game.sport "Baseball"
+                )}}selected{{/if}}>Baseball</option>
+              <option value="Tennis" {{#if (eq game.sport "Tennis"
+                )}}selected{{/if}}>Tennis</option>
+              <option value="Swimming" {{#if (eq game.sport "Swimming"
+                )}}selected{{/if}}>Swimming</option>
+              <option value="Running" {{#if (eq game.sport "Running"
+                )}}selected{{/if}}>Running</option>
+              <option value="Cycling" {{#if (eq game.sport "Cycling"
+                )}}selected{{/if}}>Cycling</option>
+              <option value="Hiking" {{#if (eq game.sport "Hiking"
+                )}}selected{{/if}}>Hiking</option>
+              <option value="Golf" {{#if (eq game.sport "Golf"
+                )}}selected{{/if}}>Golf</option>
+              <option value="Volleyball" {{#if (eq game.sport "Volleyball"
+                )}}selected{{/if}}>Volleyball</option>
             </select>
           </div>
           <div class="col-md-4">
-            <label for="playersRequired" class="form-label">Players <span class="text-danger">*</span></label>
-            <input type="number" id="playersRequired" name="playersRequired" class="form-control" placeholder="Players"
+            <label for="playersRequired" class="form-label">Players <span
+                class="text-danger">*</span></label>
+            <input type="number" id="playersRequired" name="playersRequired"
+              class="form-control" placeholder="Players"
               value="{{game.playersRequired}}" min="0" step="1" required>
           </div>
           <div class="col-md-4">
-            <label for="costPerHead" class="form-label">Cost per Head <span class="text-danger">*</span></label>
-            <input type="number" id="costPerHead" name="costPerHead" class="form-control" placeholder="Cost per Head"
+            <label for="costPerHead" class="form-label">Cost per Head <span
+                class="text-danger">*</span></label>
+            <input type="number" id="costPerHead" name="costPerHead"
+              class="form-control" placeholder="Cost per Head"
               min="0" value="{{game.costPerHead}}">
           </div>
         </div>
 
         <div class="row g-3">
           <div class="col-md-4">
-            <label for="gameDate" class="form-label">Date <span class="text-danger">*</span></label>
-            <input type="date" id="gameDate" name="gameDate" class="form-control"
+            <label for="gameDate" class="form-label">Date <span
+                class="text-danger">*</span></label>
+            <input type="date" id="gameDate" name="gameDate"
+              class="form-control" min="{{today}}"
               value="{{formatDateInput game.startTime}}">
           </div>
           <div class="col-md-4">
-            <label for="startTime" class="form-label">Start Time <span class="text-danger">*</span></label>
-            <input type="time" id="startTime" name="startTime" class="form-control"
+            <label for="startTime" class="form-label">Start Time <span
+                class="text-danger">*</span></label>
+            <input type="time" id="startTime" name="startTime"
+              class="form-control"
               value="{{formatTimeInput game.startTime}}">
           </div>
           <div class="col-md-4">
-            <label for="endTime" class="form-label">End Time <span class="text-danger">*</span></label>
+            <label for="endTime" class="form-label">End Time <span
+                class="text-danger">*</span></label>
             <input type="time" id="endTime" name="endTime" class="form-control"
               value="{{formatTimeInput game.endTime}}">
           </div>
@@ -60,25 +84,33 @@
 
         <div class="row g-3">
           <div class="col-md-6">
-            <label for="skillLevel" class="form-label">Skill Level <span class="text-danger">*</span></label>
+            <label for="skillLevel" class="form-label">Skill Level <span
+                class="text-danger">*</span></label>
             <select name="skillLevel" id="skillLevel" class="form-select">
               <option value>Select Skill Level</option>
-              <option value="Beginner" {{#if (eq game.skillLevel "Beginner" )}}selected{{/if}}>Beginner</option>
-              <option value="Intermediate" {{#if (eq game.skillLevel "Intermediate" )}}selected{{/if}}>Intermediate
+              <option value="Beginner" {{#if (eq game.skillLevel "Beginner"
+                )}}selected{{/if}}>Beginner</option>
+              <option value="Intermediate" {{#if (eq game.skillLevel
+                "Intermediate" )}}selected{{/if}}>Intermediate
               </option>
-              <option value="Advanced" {{#if (eq game.skillLevel "Advanced" )}}selected{{/if}}>Advanced</option>
+              <option value="Advanced" {{#if (eq game.skillLevel "Advanced"
+                )}}selected{{/if}}>Advanced</option>
             </select>
           </div>
           <div class="col-md-6">
-            <label for="game-location" class="form-label">Location <span class="text-danger">*</span></label>
-            <input type="text" id="game-location" name="location" class="form-control" placeholder="Enter a Location"
+            <label for="game-location" class="form-label">Location <span
+                class="text-danger">*</span></label>
+            <input type="text" id="game-location" name="location"
+              class="form-control" placeholder="Enter a Location"
               value="{{game.location}}">
           </div>
         </div>
 
         <div class="mb-3">
-          <label for="description" class="form-label">Description <span class="text-danger">*</span></label>
-          <input type="text" id="description" name="description" class="form-control" placeholder="Description"
+          <label for="description" class="form-label">Description <span
+              class="text-danger">*</span></label>
+          <input type="text" id="description" name="description"
+            class="form-control" placeholder="Description"
             value="{{game.description}}">
         </div>
 
@@ -93,7 +125,8 @@
         <div class="row mb-3">
           <div class="col-md-6 d-flex align-items-center">
             <div class="form-check">
-              <input class="form-check-input me-2" type="checkbox" value="1" name="bringEquipment" id="bringEquipment"
+              <input class="form-check-input me-2" type="checkbox" value="1"
+                name="bringEquipment" id="bringEquipment"
                 {{#if game.bringEquipment}}checked{{/if}}>
               <label class="form-check-label" for="bringEquipment">Bring your
                 own equipment</label>
@@ -101,7 +134,8 @@
           </div>
           <div class="col-md-6 d-flex align-items-center">
             <div class="form-check">
-              <input class="form-check-input me-2" type="checkbox" value="1" name="costShared" id="costShared" {{#if
+              <input class="form-check-input me-2" type="checkbox" value="1"
+                name="costShared" id="costShared" {{#if
                 game.costShared}}checked{{/if}}>
               <label class="form-check-label" for="costShared">Cost
                 shared</label>
@@ -136,6 +170,10 @@
         }
       });
     }
+    const today = new Date().toISOString().split("T")[0];
+    document.querySelectorAll('input[type="date"]').forEach(input => {
+      input.setAttribute("min", today);
+    });
 
     document.querySelector("input[name='userTimeZone']").value =
       Intl.DateTimeFormat().resolvedOptions().timeZone;

@@ -3,6 +3,9 @@ import { ObjectId } from "mongodb";
 import { checkString } from "../utils/helper.js";
 import UserProfile from "../models/userProfile.js";
 import { updateKarmaPoints } from "../utils/karmaHelper.js";
+import { evaluateAchievements } from "../utils/achievementHelper.js";
+// import GymSession from "../models/Gym.js";
+
 import "../models/User.js";
 import fetch from "node-fetch";
 
@@ -99,6 +102,7 @@ export const createGymSession = async (
   }
 
   await updateKarmaPoints(hostedBy, 15);
+  await evaluateAchievements(hostedBy);
 
   return saved;
 };
@@ -149,8 +153,15 @@ export const updateGymSession = async (sessionId, updates) => {
 export const deleteGymSession = async (sessionId) => {
   if (!ObjectId.isValid(sessionId)) throw "Invalid session ID";
 
-  const deleted = await Gym.findByIdAndDelete(sessionId);
+  const deleted = await Gym.findById(sessionId);
   if (!deleted) throw "Gym session not found or already deleted";
+
+  const hostedBy = deleted.hostedBy.toString();
+
+  await updateKarmaPoints(hostedBy, -15);
+  await Gym.findByIdAndDelete(sessionId);
+  await evaluateAchievements(hostedBy);
+
   return deleted;
 };
 
@@ -163,4 +174,57 @@ export const getJoinedSessionsByUser = async (userId) => {
   if (!ObjectId.isValid(userId)) throw "Invalid user ID";
   // Assumes your Gym schema has a `members: [ObjectId]` field
   return await Gym.find({ members: userId }).populate("hostedBy", "username");
+};
+
+export const getUpcomingSessions = async () => {
+  const now = new Date();
+
+  // 1) Load every session, populate hostedBy → { _id, username }
+  const sessions = await Gym.find({})
+    .populate("hostedBy", "username")
+    .lean();
+
+  // 2) Convert your string date+time into a real Date object
+  const withDates = sessions.map((s) => ({
+    ...s,
+    __startDate: new Date(`${s.date}T${s.startTime}`)
+  }));
+
+  // 3) Filter out past sessions, sort by start, and take the first 15
+  const upcoming = withDates
+    .filter((s) => s.__startDate > now)
+    .sort((a, b) => a.__startDate - b.__startDate)
+    .slice(0, 15);
+
+  // 4) Enrich each session with host profile info
+  const enriched = await Promise.all(
+    upcoming.map(async (session) => {
+      const profile = await UserProfile.findOne(
+        { userId: session.hostedBy._id },
+        { "profile.avatar": 1, "profile.firstName": 1, "profile.lastName": 1 }
+      )
+        .lean();
+
+      return {
+        ...session,
+        host: {
+          _id: session.hostedBy._id,
+          username: session.hostedBy.username,
+          avatarUrl:
+            profile?.profile?.avatar || "/images/default-avatar.png",
+          firstName: profile?.profile?.firstName || "",
+          lastName: profile?.profile?.lastName || ""
+        }
+      };
+    })
+  );
+
+  return enriched;
+}
+
+
+export const getHostedSessionsByUser = async (userId) => {
+  if (!ObjectId.isValid(userId)) throw "Invalid user ID";
+
+  return await Gym.find({ hostedBy: userId }).populate("hostedBy", "username");
 };

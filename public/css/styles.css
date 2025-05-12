@@ -549,16 +549,23 @@ label.btn.active {
 }
 
 .game-scroll-wrapper {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(260px, 1fr);
+  gap: 1rem;
   overflow-x: auto;
+  scroll-snap-type: x mandatory;
   -ms-overflow-style: none;
-  /* IE and Edge */
   scrollbar-width: none;
-  /* Firefox */
 }
 
 .game-scroll-wrapper::-webkit-scrollbar {
   display: none;
-  /* Chrome, Safari and Opera */
+}
+
+.game-scroll-wrapper .game-card {
+  scroll-snap-align: start;
+  min-height: 100%;
 }
 
 .game-card {
@@ -579,12 +586,12 @@ label.btn.active {
   margin-bottom: 2rem;
 }
 
-.game-scroll-wrapper {
+/* .game-scroll-wrapper {
   display: flex;
   overflow-x: auto;
   scroll-snap-type: x mandatory;
   padding: 1rem 0;
-}
+} */
 
 .game-card {
   flex: 0 0 25%;
@@ -679,14 +686,14 @@ label.btn.active {
 }
 
 
-.game-scroll-wrapper {
+/* .game-scroll-wrapper {
   display: flex;
   overflow-x: auto;
   scroll-snap-type: x mandatory;
   gap: 1rem;
   padding-bottom: 1rem;
   scroll-behavior: smooth;
-}
+} */
 
 .game-card {
   flex: 0 0 calc(25% - 1rem);
@@ -833,4 +840,36 @@ a.disabled {
   pointer-events: none;
   opacity: 0.6;
   cursor: not-allowed;
+}
+
+
+/* Gradient for the card header */
+.bg-gradient-primary {
+  background: linear-gradient(90deg, #4e54c8, #8f94fb);
+}
+
+/* Slight hover effect on list items */
+.list-group-item:hover {
+  background-color: #f8f9fa;
+  cursor: default;
+}
+
+/* Ensure avatar images stay consistent */
+.list-group-item img {
+  object-fit: cover;
+}
+
+/* Stronger font weight for names */
+.list-group-item .fw-medium {
+  font-weight: 500;
+}
+
+.card-title-strong {
+  font-weight: 900 !important;   /* super-bold */
+  color: #000000 !important;     /* pure black */
+}
+
+.required-star {
+  color: red;
+  font-weight: bold;
 }

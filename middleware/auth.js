@@ -1,3 +1,4 @@
+import { ChannelLogStatusSummary } from "@elasticemail/elasticemail-client";
 import jwt from "jsonwebtoken";
 
 export default async function requireAuth(req, res, next) {
@@ -13,10 +14,6 @@ export default async function requireAuth(req, res, next) {
       token = req.headers.authorization.split(" ")[1];
     }
 
-    // If no token found at all, redirect to login
-    // if (!token) {
-    //   return res.redirect("/login?error=Please login first");
-    // }
     if (!token) {
       const redirectTo = encodeURIComponent(req.originalUrl || "/");
       return res.redirect(`/login?redirect=${redirectTo}`);
@@ -29,10 +26,10 @@ export default async function requireAuth(req, res, next) {
     req.user = {
       userID: decoded.userId, // Required by routes
       username: decoded.username, // Optional
-      profileCompleted: decoded.profileCompleted || false 
+      profileCompleted: decoded.profileCompleted || false,
     };
-    res.locals.profileCompleted = decoded.profileCompleted || false; 
-    // ✅ Pass user info to Handlebars
+    res.locals.profileCompleted = decoded.profileCompleted || false;
+    // Pass user info to Handlebars
     const userCookie = req.cookies.user;
 
     if (userCookie) {
@@ -51,7 +48,6 @@ export default async function requireAuth(req, res, next) {
   } catch (err) {
     console.error("Auth Middleware Error:", err.message);
     res.clearCookie("token");
-    // res.clearCookie("user");
 
     return res.redirect(
       `/login?redirect=${encodeURIComponent(req.originalUrl)}`

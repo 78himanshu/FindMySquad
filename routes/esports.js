@@ -1,8 +1,8 @@
 import { Router } from "express";
 import Tournament from "../models/tournament.js";
-import User from "../models/User.js";
 import { requireAuth } from "../middleware/authMiddleware.js";
 import { updateKarmaPoints } from "../utils/karmaHelper.js";
+import { evaluateAchievements } from "../utils/achievementHelper.js";
 
 const router = Router();
 
@@ -221,10 +221,7 @@ router.get("/game/:gameName", async (req, res, next) => {
     const userId = req.user?.userId;
 
     allTournaments.forEach((t) => {
-      // build full Date objects for start & end
-      //const dateStr       = t.date.toISOString().split('T')[0];
-      // const startDateTime = new Date(`${dateStr}T${t.startTime}`);
-      // const endDateTime   = new Date(`${dateStr}T${t.endTime}`);
+      const teams = Array.isArray(t.teams) ? t.teams : [];
       const [startHour, startMin] = t.startTime.split(":").map(Number);
       const [endHour, endMin] = t.endTime.split(":").map(Number);
       // build Date() off of t.date (local) rather than toISOString()
@@ -237,30 +234,41 @@ router.get("/game/:gameName", async (req, res, next) => {
       const hasStarted = now >= startDateTime;
       const hasEnded = now > endDateTime;
       const isOngoing = hasStarted && !hasEnded;
-      const teamCount = Array.isArray(t.teams) ? t.teams.length : 0;
+      const teamCount = teams.length;
       t.teamCount = teamCount;
       const maxSlots = t.maxTeams || 0;
+
+      const isParticipant =
+        userId &&
+        teams.some(
+          (team) =>
+            Array.isArray(team.players) &&
+            team.players.some((p) => p.toString() === userId)
+        );
 
       // attach flags for template
       t.hasStarted = hasStarted;
       t.hasEnded = hasEnded;
       t.isOngoing = isOngoing;
       t.isCreator = userId && t.creator._id.toString() === userId;
-      t.teamCount = (t.teams || []).length;
       // only mark full when you've hit maxTeams AND every team is itself at capacity
       const maxTeams = t.maxTeams || 0;
-      const playersPerTeam = parseInt(t.format[0], 10);
+      const playersPerTeam = parseInt(t.format.split("v")[0], 10);
       // can still create brand-new teams?
       const canCreate = teamCount < maxTeams;
       // is there at least one team that still has room?
-      const hasOpenSlot = (t.teams || []).some(
+      const hitTeamLimit = teamCount === maxTeams;
+      const allAtCapacity = teams.every(
         (team) =>
-          Array.isArray(team.players) && team.players.length < playersPerTeam
+          Array.isArray(team.players) && team.players.length >= playersPerTeam
       );
       // only truly “full” when neither creating nor joining is possible:
-      t.isFull = !canCreate && !hasOpenSlot;
+      t.isFull =
+        hitTeamLimit && allAtCapacity && !isParticipant && !t.isOngoing;
+      t.canJoin = !t.isFull && !t.isCreator;
+      t.isParticipant = isParticipant;
 
-      if (hasEnded) {
+      if (t.hasEnded) {
         pastTournaments.push(t);
       } else {
         upcomingTournaments.push(t);
@@ -315,6 +323,10 @@ router.get(
 
       // original “canCreate” logic (only if slots remain)
       const canCreate = teams.length < maxTeams;
+      const hasOpenSlot = tournament.teams.some(
+        (team) =>
+          Array.isArray(team.players) && team.players.length < playersPerTeam
+      );
 
       // original “canJoin” logic (at least one team has room, and not already in one)
       const baseCanJoin =
@@ -325,7 +337,7 @@ router.get(
         !isAlreadyInTeam &&
         !isCreator;
 
-      // ── NEW: time-conflict check ──────────────────────────────────────
+      // time-conflict check
       // parse this tournament’s start/end into Date objects
       const [h1, m1] = tournament.startTime.split(":").map(Number);
       const [h2, m2] = tournament.endTime.split(":").map(Number);
@@ -369,6 +381,25 @@ router.get(
         ? "You’re already registered in a tournament that overlaps this time."
         : "";
 
+      for (const ot of occupied) {
+        if (new Date(ot.date).toDateString() !== tDate.toDateString()) continue;
+        const [oh1, om1] = ot.startTime.split(":").map(Number);
+        const [oh2, om2] = ot.endTime.split(":").map(Number);
+        const oStart = new Date(ot.date);
+        oStart.setHours(oh1, om1);
+        const oEnd = new Date(ot.date);
+        oEnd.setHours(oh2, om2);
+        if (thisStart < oEnd && oStart < thisEnd) {
+          hasTimeConflict = true;
+          break;
+        }
+      }
+      const userTeam = teams.find((t) =>
+        t.players.some((p) => p._id.toString() === userId)
+      );
+      const otherTeams = teams.filter(
+        (t) => !userTeam || t._id.toString() !== userTeam._id.toString()
+      );
       res.render("egaming/registerTeam", {
         tournament,
         layout: "main",
@@ -376,11 +407,15 @@ router.get(
         playersPerTeam,
         userId,
         isCreator,
+        hasOpenSlot,
+        hasTimeConflict,
         isAlreadyInTeam,
         isTeamLeader,
         userTeam: teams.find((t) =>
           t.players.some((p) => p._id.toString() === userId)
         ),
+        userTeam,
+        otherTeams,
         canCreate,
         canJoin,
         error,
@@ -409,7 +444,7 @@ router.post(
       const playersPerTeam = parseInt(tournament.format[0], 10);
       const maxTeams = tournament.maxTeams;
 
-      // ─── 1) PREP: build Date objects for this tournament’s start/end ───
+      // 1) PREP: build Date objects for this tournament’s start/end
       const [h1, m1] = tournament.startTime.split(":").map(Number);
       const [h2, m2] = tournament.endTime.split(":").map(Number);
       const tDate = new Date(tournament.date);
@@ -418,13 +453,13 @@ router.post(
       const thisEnd = new Date(tDate);
       thisEnd.setHours(h2, m2, 0, 0);
 
-      // ─── 2) FETCH all other tournaments the user is in (exclude this one) ───
+      //2) FETCH all other tournaments the user is in (exclude this one)
       const otherTourns = await Tournament.find({
-        "teams.players": userId,
         _id: { $ne: tournament._id },
+        $or: [{ creator: userId }, { "teams.players": userId }],
       }).lean();
 
-      // ─── 3) CHECK for any time overlap on the SAME DATE ───
+      // 3) CHECK for any time overlap on the SAME DATE
       for (const ot of otherTourns) {
         if (new Date(ot.date).toDateString() !== tDate.toDateString()) continue;
         const [oh1, om1] = ot.startTime.split(":").map(Number);
@@ -442,7 +477,7 @@ router.post(
         }
       }
 
-      // ─── 4) FOR “create” (team) ACTION: check if creator already hosts a team at this slot ───
+      //  4) FOR “create” (team) ACTION: check if creator already hosts a team at this slot
       if (action === "create") {
         // disallow the tournament’s own creator from double-booking themself
         if (tournament.creator._id.toString() === userId) {
@@ -521,6 +556,7 @@ router.post(
           players: [userId],
         });
         await updateKarmaPoints(userId, 10);
+        await evaluateAchievements(userId);
       } else if (action === "join") {
         const team = tournament.teams.id(joinTeamId);
         if (!team) return res.status(404).send("Team not found.");
@@ -529,6 +565,7 @@ router.post(
         }
         team.players.push(userId);
         await updateKarmaPoints(userId, 10);
+        await evaluateAchievements(userId);
       }
 
       await tournament.save();
@@ -568,6 +605,7 @@ router.post(
         for (const member of team.players) {
           if (member.toString() !== userId) {
             await updateKarmaPoints(member.toString(), -10);
+            await evaluateAchievements(member.toString());
           }
         }
       } else {
@@ -582,6 +620,7 @@ router.post(
       }
 
       await updateKarmaPoints(userId, -10);
+      await evaluateAchievements(userId);
 
       await tournament.save();
       res.redirect(`/esports/${req.params.tournamentId}/register-team`);
@@ -624,11 +663,13 @@ router.post(
         // deduct karma from everyone who was on that team
         for (const mId of allMemberIds) {
           await updateKarmaPoints(mId, -10);
+          await evaluateAchievements(mId);
         }
       } else {
         // Otherwise just remove that one member
         team.players = team.players.filter((p) => p.toString() !== memberId);
         await updateKarmaPoints(memberId, -10);
+        await evaluateAchievements(memberId);
 
         // If that was the last member, clean up the empty team
         if (team.players.length === 0) {
@@ -666,6 +707,7 @@ router.post(
 
       for (const member of team.players) {
         if (member) await updateKarmaPoints(member.toString(), -10);
+        await evaluateAchievements(member.toString());
       }
 
       tournament.teams = tournament.teams.filter(
@@ -692,12 +734,14 @@ router.post("/:tournamentId/delete", requireAuth, async (req, res, next) => {
     }
 
     await updateKarmaPoints(t.creator.toString(), -15); // Host loses 15
+    await evaluateAchievements(t.creator.toString());
 
     // All other players lose 10 (skip host)
     for (const team of t.teams) {
       for (const playerId of team.players) {
         if (playerId && playerId.toString() !== t.creator.toString()) {
           await updateKarmaPoints(playerId.toString(), -10);
+          await evaluateAchievements(playerId.toString());
         }
       }
     }

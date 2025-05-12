@@ -4,13 +4,9 @@ import hostGamesRoutes from "./hostGamesRoutes.js";
 import joinGameRoutes from "./joinGameRoutes.js";
 import authRoutes from "./authRoutes.js";
 import userProfileRoutes from "./userProfileRoutes.js";
-import esportsRoutes from "./esports.js";
-import jwt from "jsonwebtoken";
-import User from "../models/User.js";
 import gymBuddyRoutes from "./gymBuddyRoutes.js";
 import tournamentRoutes from "./tournamentRoutes.js";
-import { hostGameData } from "../data/index.js";
-import { userProfileData } from "../data/index.js";
+import { hostGameData, gymBuddyData, userProfileData } from "../data/index.js";
 
 const configRoutesFunction = (app) => {
   // Base route - simplified since we're using middleware
@@ -26,22 +22,31 @@ const configRoutesFunction = (app) => {
       }
     }
 
-    console.log("req,", req.user);
     const topUsers = await userProfileData.getTopKarmaUsers();
-    console.log("TOP USERS FOR HOMEPAGE:", topUsers);
-    const upcomingGames = await hostGameData.upcomingGames();
-    console.log("upcomingGames", upcomingGames);
-      
+    const upcomingGames = await hostGameData.getUpcomingGames();
+    // console.log("upcomingGames", upcomingGames);
+    const upcomingGymSessions = await gymBuddyData.getUpcomingSessions();
+    // console.log("upcomingGymSessions", upcomingGymSessions)
+
     res.render("index", {
       title: "FindMySquad",
       user: req.user || null,
       layout: "main",
       upcomingGames: upcomingGames,
       topUsers: topUsers,
-      profileCompleted
+      upcomingGymSessions,
+      profileCompleted,
+
     });
   });
 
+  app.get("/gamification", (req, res) => {
+    res.render("gamification", {
+      title: "How Gamification Works",
+      layout: "main",
+      currentYear: new Date().getFullYear()
+    });
+  });
   // Auth routes
   app.use("/", authRoutes);
 

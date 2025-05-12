@@ -31,8 +31,8 @@
 
     {{!-- <input type="text" name="venue" placeholder="Venue"
       value="{{game.venue}}" /> --}}
-    <input type="date" name="gameDate"
-      value="{{formatDateInput game.startTime}}" />
+    <input type="date" name="gameDate" min="{{today}}"
+      value="{{formatDateInput game.startTime}}">
 
     <div class="form-row">
       <input type="time" name="startTime" placeholder="Start Time"
@@ -71,7 +71,7 @@
 
 <script>
   document.addEventListener('DOMContentLoaded', () => {
-    const input = document.getElementById('autocomplete'); // ✅ Use correct ID
+    const input = document.getElementById('autocomplete');
     if (input) {
       const autocomplete = new google.maps.places.Autocomplete(input, {
         types: ['geocode'],
@@ -79,7 +79,6 @@
       });
       autocomplete.addListener('place_changed', function () {
         const place = autocomplete.getPlace();
-        console.log("Selected Place:", place);
         if (place && place.formatted_address) {
           input.value = place.formatted_address;
         }

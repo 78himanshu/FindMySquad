@@ -19,8 +19,6 @@ document.addEventListener("DOMContentLoaded", () => {
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
 
-    console.log("form.sport.value", form.sport.value);
-
     // Form field extraction and validation
     const title = form.title.value.trim();
     if (!title) {
@@ -33,7 +31,18 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
-    const allowedSports = ["Soccer", "Basketball", "Baseball", "Tennis", "Swimming", "Running", "Cycling", "Hiking", "Golf", "Volleyball"];
+    const allowedSports = [
+      "Soccer",
+      "Basketball",
+      "Baseball",
+      "Tennis",
+      "Swimming",
+      "Running",
+      "Cycling",
+      "Hiking",
+      "Golf",
+      "Volleyball",
+    ];
     const allowedSkills = ["Beginner", "Intermediate", "Advanced"];
     if (!allowedSports.includes(sport)) {
       showToastError("Invalid sport selected");
@@ -105,8 +114,6 @@ document.addEventListener("DOMContentLoaded", () => {
       "w#ore",
       "r@pe",
     ];
-
-    console.log("--->", sport, "=-->", allowedSports.includes(sport));
 
     // Validation...
     if (!title) return showToastError("Title is required.");
