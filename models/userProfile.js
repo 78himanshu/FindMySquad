@@ -110,6 +110,7 @@ const userProfileSchema = new mongoose.Schema({
   createdAt: { type: Date, default: Date.now },
   city: { type: String, required: true },
   phoneNumber: { type: String, required: true },
+  showContactInfo: { type: Boolean, default: false },
   geoLocation: {
     type: {
       type: String,

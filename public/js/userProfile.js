@@ -60,7 +60,7 @@ document.addEventListener("DOMContentLoaded", () => {
         headers: { "Content-Type": "application/json" },
         credentials: "include",
         body: JSON.stringify({
-          profile: { firstName, lastName, gender, bio, phoneNumber },
+          profile: { firstName, lastName, gender, bio, phoneNumber, showContactInfo: document.getElementById("showContactInfo").checked },
           location: { city },
         }),
       });

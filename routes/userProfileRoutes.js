@@ -95,6 +95,7 @@ router
         gamingInterests,
         city,
         phoneNumber,
+        showContactInfo: req.body.showContactInfo === true || req.body.showContactInfo === "true",
         //geoLocation
       };
 
@@ -157,12 +158,13 @@ router
           gender: profile.gender || "",
         },
         phoneNumber: profile.phoneNumber || "",
+        showContactInfo: profile.showContactInfo === true || profile.showContactInfo === "true",
         location: {
           city: location?.city?.trim() || "",
           // You can extend this to include state, zipCode, etc.
         },
       };
-
+      console.log("showContactInfo received:", profile.showContactInfo);
       const encodedLoc = encodeURIComponent(updateData.location.city);
       const apiKey = process.env.GOOGLE_MAPS_API_KEY;
 
@@ -247,6 +249,7 @@ router.route("/view").get(verifyToken, async (req, res) => {
       isFollowing, // 👈 pass false
       head: `<link rel="stylesheet" href="/css/userProfile.css">`,
       query: req.query,
+      showContactInfo: profile.showContactInfo,
     });
   } catch (e) {
     res.status(404).render("error", { error: e.toString() });
@@ -267,11 +270,16 @@ router
         lastName: profile.profile.lastName,
         bio: profile.profile.bio,
         avatar: profile.profile.avatar,
-        city: profile.location?.city || "",
-        state: profile.location?.state || "",
-        zipCode: profile.location?.zipCode || "",
+        // city: profile.location?.city || "",
+        // state: profile.location?.state || "",
+        // zipCode: profile.location?.zipCode || "",
+        location: {
+          city: profile.location?.city || ""
+        },
+        phoneNumber: profile.phoneNumber || "",
         head: `<link rel="stylesheet" href="/css/editProfile.css">`,
         googleMapsApiKey: process.env.GOOGLE_MAPS_API_KEY,
+        showContactInfo: profile.showContactInfo,
       });
     } catch (e) {
       res.status(404).render("error", { error: e.toString() });

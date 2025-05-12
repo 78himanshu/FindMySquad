@@ -72,6 +72,15 @@
               location.state}} {{ location.zipCode}}
             </div>
 
+            {{#if showContactInfo}}
+            <div class="mb-3">
+              <strong>Contact Information:</strong>
+              <div class="ms-3">
+                <div><strong>Email ID:</strong> {{email}}</div>
+                <div><strong>Phone Number:</strong> {{phoneNumber}}</div>
+              </div>
+            </div>
+            {{/if}}
 
             {{#if achievements.length}}
             <div class="mt-4 achievement-section">
