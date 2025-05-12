@@ -11,7 +11,11 @@ const ObjectId = mongoose.Types.ObjectId;
 //import { geocodeCity } from '../utils/geocode.js';
 import { format } from "date-fns";
 import axios from "axios";
-import xss from 'xss';
+import xss from "xss";
+import {
+  getJoinedGamesByUser,
+  getHostedGamesByUser,
+} from "../data/joinGame.js";
 import jwt from "jsonwebtoken";
 
 const router = Router();
@@ -40,9 +44,13 @@ router
       const city = xss(req.body.city || "").trim();
       const phoneNumber = xss(req.body.phoneNumber || "").trim();
 
-      const sportsInterests = req.body.sportsInterests.map(i => xss(i.trim()));
-      const gymPreferences = req.body.gymPreferences.map(i => xss(i.trim()));
-      const gamingInterests = req.body.gamingInterests.map(i => xss(i.trim()));
+      const sportsInterests = req.body.sportsInterests.map((i) =>
+        xss(i.trim())
+      );
+      const gymPreferences = req.body.gymPreferences.map((i) => xss(i.trim()));
+      const gamingInterests = req.body.gamingInterests.map((i) =>
+        xss(i.trim())
+      );
 
       console.log(">>>", req.body);
 
@@ -167,11 +175,9 @@ router
         !geoRes.data.results ||
         !geoRes.data.results[0]?.geometry?.location
       ) {
-        return res
-          .status(400)
-          .json({
-            error: "Invalid city address, could not get location coordinates.",
-          });
+        return res.status(400).json({
+          error: "Invalid city address, could not get location coordinates.",
+        });
       }
       const { lat, lng } = geoRes.data.results[0].geometry.location;
       updateData.location.geoLocation = {
@@ -341,8 +347,21 @@ router.get("/bookings", verifyToken, async (req, res) => {
   const userId = req.user.userID;
 
   try {
-    const allGameBookings = await joinGameData.getJoinedGamesByUser(userId);
-    const allGymBookings = await gymBuddyData.getJoinedSessionsByUser(userId);
+    const joinedGames = await getJoinedGamesByUser(userId);
+    const hostedGames = await getHostedGamesByUser(userId);
+
+    const seen = new Set();
+    const allGameBookings = [...joinedGames, ...hostedGames].filter((g) => {
+      const id = g._id.toString();
+      if (seen.has(id)) return false;
+      seen.add(id);
+      return true;
+    });
+
+    const joined = await gymBuddyData.getJoinedSessionsByUser(userId);
+    const hosted = await gymBuddyData.getHostedSessionsByUser(userId);
+
+    const allGymBookings = [...joined, ...hosted];
     const now = new Date();
 
     const allGameBookingsEnriched = await Promise.all(
@@ -363,11 +382,10 @@ router.get("/bookings", verifyToken, async (req, res) => {
               username: user ? user.username : "Unknown",
               hasBeenRated: !!existingRating,
               ratedScore: existingRating?.score || 0,
-              review: existingRating?.review || ""
+              review: existingRating?.review || "",
             };
           })
         );
-
 
         const formattedDateTime = game.startTime
           ? format(new Date(game.startTime), "eee MMM dd, yyyy h:mm a")
@@ -389,8 +407,6 @@ router.get("/bookings", verifyToken, async (req, res) => {
     const futureGameBookings = allGameBookingsEnriched.filter(
       (game) => new Date(game.endTime) >= now
     );
-
-    console.log("pastGameBookings", pastGameBookings)
 
     const allGymBookingsEnriched = await Promise.all(
       allGymBookings.map(async (session) => {
@@ -414,25 +430,42 @@ router.get("/bookings", verifyToken, async (req, res) => {
           })
         );
 
-        const formattedDateTime = session.dateTime
-          ? format(new Date(session.dateTime), "eee MMM dd, yyyy h:mm a")
-          : "Invalid Date";
+        const padded =
+          session.startTime.length === 5
+            ? `${session.startTime}:00`
+            : session.startTime;
+
+        let formattedDateTime = "Invalid Date";
+        try {
+          formattedDateTime = format(
+            new Date(`${session.date}T${padded}`),
+            "eee MMM dd, yyyy h:mm a"
+          );
+        } catch (e) {
+          console.warn("Failed to format gym session date:", session._id);
+        }
 
         return {
           ...session.toObject(),
           players: enrichedPlayers,
           host: session.hostedBy.toString(),
+          gymName: session.gymName || session.gym || "Unknown Gym",
           formattedDateTime,
         };
       })
     );
 
-    const pastGymBookings = allGymBookingsEnriched.filter(
-      (s) => new Date(s.dateTime) < now
-    );
-    const futureGymBookings = allGymBookingsEnriched.filter(
-      (s) => new Date(s.dateTime) >= now
-    );
+    const pastGymBookings = allGymBookingsEnriched.filter((s) => {
+      const padded =
+        s.startTime.length === 5 ? `${s.startTime}:00` : s.startTime;
+      return new Date(`${s.date}T${padded}`) < now;
+    });
+
+    const futureGymBookings = allGymBookingsEnriched.filter((s) => {
+      const padded =
+        s.startTime.length === 5 ? `${s.startTime}:00` : s.startTime;
+      return new Date(`${s.date}T${padded}`) >= now;
+    });
 
     res.render("userProfile/bookings", {
       title: "Your Bookings",
@@ -517,8 +550,8 @@ router.post("/bookings/rate", verifyToken, async (req, res) => {
         {
           $set: {
             "ratings.$.score": rating,
-            "ratings.$.review": review
-          }
+            "ratings.$.review": review,
+          },
         }
       );
 
@@ -528,8 +561,8 @@ router.post("/bookings/rate", verifyToken, async (req, res) => {
           { userId },
           {
             $push: {
-              ratings: { bookingId, rater: raterId, score: rating, review }
-            }
+              ratings: { bookingId, rater: raterId, score: rating, review },
+            },
           }
         );
       }
@@ -540,7 +573,6 @@ router.post("/bookings/rate", verifyToken, async (req, res) => {
     res.status(500).json({ error: "Internal Server Error" });
   }
 });
-
 
 // ————— Show Rate Players Form ——————
 router.get("/bookings/rate/:bookingId", verifyToken, async (req, res) => {
@@ -597,8 +629,6 @@ router.get("/view/:targetUserId", verifyToken, async (req, res) => {
       })
     );
 
-
-
     res.render("userProfile/view", {
       title: `${profile.profile.firstName} ${profile.profile.lastName}`,
       layout: "main",
@@ -630,7 +660,6 @@ router.get("/view/:targetUserId", verifyToken, async (req, res) => {
 });
 router.get("/userview/:targetUserId", verifyToken, async (req, res) => {
   try {
-
     if (req.params.targetUserId === req.user.userID) {
       return res.redirect(`/profile/view?msg=already_logged_in`);
     }
@@ -652,7 +681,6 @@ router.get("/userview/:targetUserId", verifyToken, async (req, res) => {
         };
       })
     );
-
 
     res.render("userProfile/userview", {
       title: `${profile.profile.firstName} ${profile.profile.lastName}`,
