@@ -25,7 +25,7 @@ export const login = async (email, password) => {
   const trimmedpassword = checkString(password, "password", 1);
 
   const user = await Userlist.findOne({ email: trimmedemail });
-  console.log("user", user);
+  // console.log("user", user);
 
   if (!user) throw new Error("Invalid email or password. Please try again.");
 
@@ -33,7 +33,7 @@ export const login = async (email, password) => {
   if (!isMatch) throw new Error("Invalid email or password. Please try again.");
 
   const userProfile = await UserProfile.findOne({ userId: user._id });
-  console.log("userProfile", userProfile);
+  // console.log("userProfile", userProfile);
 
   const profilePic =
     userProfile?.profile?.avatar || "/images/default-avatar.png";
@@ -43,17 +43,17 @@ export const login = async (email, password) => {
       userId: user._id.toString(),
       username: user.username,
       profilePic,
-      profileCompleted: user.profileCompleted || false
+      profileCompleted: user.profileCompleted || false,
     },
     process.env.JWT_SECRET,
     { expiresIn: "2h" }
   );
-  console.log("🪪 Payload in token:", {
-    userId: user._id.toString(),
-    username: user.username,
-    profilePic,
-    profileCompleted: user.profileCompleted || false
-  });
+  // console.log("🪪 Payload in token:", {
+  //   userId: user._id.toString(),
+  //   username: user.username,
+  //   profilePic,
+  //   profileCompleted: user.profileCompleted || false
+  // });
   return {
     token,
     user: {

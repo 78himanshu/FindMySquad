@@ -207,8 +207,6 @@ export const getUpcomingGames = async () => {
     .sort({ startTime: 1 })
     .lean();
 
-
-  console.log("games", games);
   const enriched = await Promise.all(
     games.map(async (game) => {
       // look up the host’s profile
@@ -219,9 +217,7 @@ export const getUpcomingGames = async () => {
 
       return {
         ...game,
-        hostAvatarUrl:
-          profile?.profile?.avatar ||
-          "/images/default-avatar.png",
+        hostAvatarUrl: profile?.profile?.avatar || "/images/default-avatar.png",
       };
     })
   );
