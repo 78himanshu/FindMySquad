@@ -38,7 +38,14 @@
     <div class="col-md-9">
       <div class="card border rounded shadow-sm">
         <div class="card-body">
-
+          {{#if query.msg}}
+            {{#if (eq query.msg "already_logged_in")}}
+              <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                You are already logged in.
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+              </div>
+            {{/if}}
+          {{/if}}
           <!-- Section: Profile Overview -->
           <div id="section-overview">
             <h4 class="fw-semibold mb-3">Your Profile Overview</h4>

@@ -207,6 +207,7 @@ router.route("/view").get(verifyToken, async (req, res) => {
       isOwn, // 👈 pass true
       isFollowing, // 👈 pass false
       head: `<link rel="stylesheet" href="/css/userProfile.css">`,
+      query: req.query,
     });
   } catch (e) {
     res.status(404).render("error", { error: e.toString() });
@@ -588,6 +589,7 @@ router.get("/view/:targetUserId", verifyToken, async (req, res) => {
       isOwn,
       isFollowing,
       head: `<link rel="stylesheet" href="/css/userProfile.css">`,
+      query: req.query,
     });
   } catch (e) {
     res.status(404).render("error", { error: e.toString() });
@@ -595,6 +597,11 @@ router.get("/view/:targetUserId", verifyToken, async (req, res) => {
 });
 router.get("/userview/:targetUserId", verifyToken, async (req, res) => {
   try {
+
+    if (req.params.targetUserId === req.user.userID) {
+      return res.redirect(`/profile/view?msg=already_logged_in`);
+    }
+
     const profile = await userProfileData.getProfile(req.params.targetUserId);
 
     const isOwn = req.params.targetUserId === req.user.userID;
@@ -639,6 +646,7 @@ router.get("/userview/:targetUserId", verifyToken, async (req, res) => {
         isFollowing,
       },
       head: `<link rel="stylesheet" href="/css/userProfile.css">`,
+      query: req.query,
     });
   } catch (e) {
     res.status(404).render("error", { error: e.toString() });

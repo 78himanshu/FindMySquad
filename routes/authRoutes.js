@@ -4,10 +4,11 @@ import { authUserData } from "../data/index.js";
 import { checkString } from "../utils/helper.js";
 import jwt from "jsonwebtoken";
 import xss from "xss";
+import redirectIfLoggedIn from "../middleware/redirectIfLoggedIn.js";
 
 router
   .route("/signup")
-  .get((req, res) => {
+  .get(redirectIfLoggedIn,(req, res) => {
     res.render("auth/signup", {
       title: "Sign Up",
       layout: "main",
@@ -56,7 +57,7 @@ router
   });
 router
   .route("/login")
-  .get((req, res) => {
+  .get(redirectIfLoggedIn,(req, res) => {
     res.render("auth/login", {
       title: "Login",
       layout: "main",
