@@ -60,14 +60,14 @@ document.addEventListener("DOMContentLoaded", () => {
         headers: { "Content-Type": "application/json" },
         credentials: "include",
         body: JSON.stringify({
-          profile: { firstName, lastName, gender, bio, phoneNumber },
+          profile: { firstName, lastName, gender, bio, phoneNumber, showContactInfo: document.getElementById("showContactInfo").checked },
           location: { city },
         }),
       });
 
       const data = await res.json();
 
-      console.log("data", data);
+      // console.log("data", data);
       if (!res.ok) {
         showToast(data.error || "Update failed", "error");
       } else {

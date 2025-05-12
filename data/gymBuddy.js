@@ -150,7 +150,6 @@ export const updateGymSession = async (sessionId, updates) => {
   return updated;
 };
 
-
 export const deleteGymSession = async (sessionId) => {
   if (!ObjectId.isValid(sessionId)) throw "Invalid session ID";
 
@@ -189,14 +188,12 @@ export const getUpcomingSessions = async () => {
         const profile = await UserProfile.findOne(
           { userId: session.hostedBy },
           { "profile.avatar": 1, _id: 0 }
-        )
-          .lean();
+        ).lean();
 
         return {
           ...session,
           hostAvatarUrl:
-            profile?.profile?.avatar ||
-            "/images/default-avatar.png",
+            profile?.profile?.avatar || "/images/default-avatar.png",
         };
       })
     );
@@ -206,4 +203,10 @@ export const getUpcomingSessions = async () => {
     console.error("Error fetching upcoming gym sessions:", err);
     return [];
   }
+};
+
+export const getHostedSessionsByUser = async (userId) => {
+  if (!ObjectId.isValid(userId)) throw "Invalid user ID";
+
+  return await Gym.find({ hostedBy: userId }).populate("hostedBy", "username");
 };

@@ -63,10 +63,15 @@
                     placeholder="Enter your city">
             </div>
             <div class="col-md-6">
-                <label for="phoneNumber" class="form-label">Phone Number
-                    *</label>
-                <input type="text" id="phoneNumber" name="phoneNumber"
-                    class="form-control" placeholder="123-456-7890">
+                <label for="phoneNumber" class="form-label">Phone Number <span
+                        class="text-danger">*</span></label>
+                <input type="tel" id="phoneNumber" name="phoneNumber"
+                    class="form-control"
+                    placeholder="Enter a valid phone number"
+                    value="{{phoneNumber}}" />
+                <div id="phoneError" class="form-text text-danger"></div>
+                <small class="form-text text-muted">Format: 123-456-7890</small>
+                <div id="phoneError" class="form-text text-danger"></div>
             </div>
         </div>
 
@@ -115,7 +120,12 @@
                 {{/each}}
             </div>
         </div>
-
+        <div class="form-check mt-3">
+            <input class="form-check-input" type="checkbox" id="showContactInfo" name="showContactInfo">
+            <label class="form-check-label" for="showContactInfo">
+                Show contact information on your profile
+            </label>
+        </div>
         <button type="submit" class="btn btn-primary mt-4">Save Profile</button>
     </form>
 </main>
@@ -224,11 +234,16 @@
         //if (workouts.length === 0) return showToast('Please select at least one workout type.');
         //if (games.length === 0) return showToast('Please select at least one gaming interest.');
 
-        const city = form.city.value.trim();
-        const phoneNumber = form.phoneNumber.value.trim();
+const city = form.city.value.trim();
+const phoneNumber = form.phoneNumber.value.trim();
 
-        if (!city) return showToast('Please enter your city.');
-        if (!phoneNumber) return showToast('Phone number is required.');
+if (!city) return showToast('Please enter your city.');
+if (!phoneNumber) return showToast('Phone number is required.');
+
+const phonePattern = /^(\+?1\s?)?(\(\d{3}\)|\d{3})[\s.-]?\d{3}[\s.-]?\d{4}$/;
+if (!phonePattern.test(phoneNumber)) {
+  return showToast('Please enter a valid phone number (e.g., 123-456-7890)');
+}
 
         // Prepare and send the data
         const profileData = {
@@ -242,6 +257,7 @@
             gamingInterests: games,
             city,
             phoneNumber,
+            showContactInfo: form.showContactInfo?.checked || false,
             //geoLocation
         };
 

@@ -31,18 +31,18 @@ document.addEventListener("DOMContentLoaded", () => {
     const workoutType = form.workoutType.value;
     const maxMembers = form.maxMembers.value;
 
-    console.log("form data", {
-      gym_title,
-      gymName,
-      description,
-      date,
-      startTime,
-      endTime,
-      gymLocation,
-      experience,
-      workoutType,
-      maxMembers,
-    });
+    // console.log("form data", {
+    //   gym_title,
+    //   gymName,
+    //   description,
+    //   date,
+    //   startTime,
+    //   endTime,
+    //   gymLocation,
+    //   experience,
+    //   workoutType,
+    //   maxMembers,
+    // });
 
 
     // 🛡️ Validations
@@ -88,7 +88,7 @@ document.addEventListener("DOMContentLoaded", () => {
       });
 
       const data = await response.json();
-      console.log(">>>>>", data);
+      // console.log(">>>>>", data);
 
       if (!response.ok) throw new Error(data.error || "Failed to save gym session.");
 

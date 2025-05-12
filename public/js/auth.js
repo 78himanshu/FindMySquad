@@ -128,7 +128,7 @@ document.addEventListener("DOMContentLoaded", () => {
         });
 
         const data = await response.json();
-        console.log("data", data);
+        // console.log("data", data);
 
         if (!response.ok) {
           if (data.errors) {
@@ -166,7 +166,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // ------------------ VALIDATION ------------------ //
   function validateSignupForm() {
-    console.log("entered");
+    // console.log("entered");
     let isValid = true;
 
     const username = document.getElementById("username").value.trim();
@@ -174,7 +174,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const password = passwordInput.value;
     const confirmPassword = confirmInput.value;
 
-    console.log("username", username);
+    // console.log("username", username);
 
     // Username
     if (!/^[a-zA-Z0-9]{3,20}$/.test(username)) {

@@ -17,7 +17,15 @@ export const createProfile = async (userId, data) => {
   if (data.city) {
     const geoLocation = await geocodeCity(data.city);
     if (geoLocation) {
-      data.geoLocation = geoLocation;
+      data.location = {
+        city: data.city.trim(),
+        latitude: geoLocation.coordinates[1], // lat
+        longitude: geoLocation.coordinates[0], // lng
+      };
+      data.geoLocation = {
+        type: "Point",
+        coordinates: geoLocation.coordinates, // [lng, lat]
+      };
     }
   }
 
@@ -88,6 +96,10 @@ export const updateProfile = async (userId, data) => {
 
   if (data.phoneNumber) {
     update["phoneNumber"] = data.phoneNumber.trim();
+  }
+
+  if (typeof data.showContactInfo === "boolean") {
+    update["showContactInfo"] = data.showContactInfo;
   }
 
   if (Object.keys(update).length === 0) {

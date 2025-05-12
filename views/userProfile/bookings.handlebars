@@ -14,12 +14,13 @@
           <p class="card-text"><strong>Location:</strong> {{location}}</p>
 
           {{#ifCond players.length '>' 1}}
-          <button class="btn btn-primary btn-sm mb-2 btn-rate" data-bs-toggle="modal" data-bs-target="#rateModal"
-            data-booking-id="{{_id}}" data-players='{{json players}}' data-host='{{host}}'>
+          <button class="btn btn-primary btn-sm mb-2 btn-rate"
+            data-bs-toggle="modal" data-bs-target="#rateModal"
+            data-booking-id="{{_id}}" data-players='{{json players}}'
+            data-host='{{host}}'>
             Rate Players
           </button>
           {{/ifCond}}
-
 
         </div>
       </div>
@@ -42,11 +43,13 @@
         <div class="card-body">
           <h5 class="card-title">{{title}}</h5>
           <p class="card-text"><strong>Date:</strong> {{formattedDateTime}}</p>
-          <p class="card-text"><strong>Gym:</strong> {{gym}}</p>
+          <p class="card-text"><strong>Gym:</strong> {{gymName}}</p>
 
           {{#ifCond players.length '>' 1}}
-          <button class="btn btn-primary btn-sm mb-2 btn-rate" data-bs-toggle="modal" data-bs-target="#rateModal"
-            data-booking-id="{{_id}}" data-players='{{json players}}' data-host='{{host}}'>
+          <button class="btn btn-primary btn-sm mb-2 btn-rate"
+            data-bs-toggle="modal" data-bs-target="#rateModal"
+            data-booking-id="{{_id}}" data-players='{{json players}}'
+            data-host='{{host}}'>
             Rate Players
           </button>
           {{/ifCond}}
@@ -74,6 +77,9 @@
           <h5 class="card-title">{{title}}</h5>
           <p class="card-text"><strong>Date:</strong> {{formattedDateTime}}</p>
           <p class="card-text"><strong>Location:</strong> {{location}}</p>
+          <a href="/join/{{_id}}"
+            class="btn btn-outline-primary btn-sm mt-2">View Details</a>
+
         </div>
       </div>
     </div>
@@ -83,7 +89,6 @@
   <h4 class="mt-5 mb-3">Upcoming Games</h4>
   <p class="text-muted text-center">No upcoming games booked.</p>
   {{/if}}
-
 
   <hr>
 
@@ -96,7 +101,9 @@
         <div class="card-body">
           <h5 class="card-title">{{title}}</h5>
           <p class="card-text"><strong>Date:</strong> {{formattedDateTime}}</p>
-          <p class="card-text"><strong>Gym:</strong> {{gym}}</p>
+          <p class="card-text"><strong>Gym:</strong> {{gymName}}</p>
+          <a href="/gymBuddy/find/{{_id}}"
+            class="btn btn-outline-primary btn-sm mt-2">View Details</a>
         </div>
       </div>
     </div>
@@ -106,33 +113,35 @@
   <h4 class="mt-5 mb-3">Upcoming Gym Sessions</h4>
   <p class="text-muted text-center">No upcoming gym sessions booked.</p>
   {{/if}}
-</div>
 
-<!-- Rating & Review Modal -->
-<div class="modal fade" id="rateModal" tabindex="-1" aria-labelledby="rateModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-scrollable">
-    <div class="modal-content">
-      <form id="rateForm">
-        <div class="modal-header bg-success text-white">
-          <h5 class="modal-title" id="rateModalLabel">Rate and Review Players</h5>
-          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
+  <!-- Rating & Review Modal -->
+  <div class="modal fade" id="rateModal" tabindex="-1"
+    aria-labelledby="rateModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-scrollable">
+      <div class="modal-content">
+        <form id="rateForm">
+          <div class="modal-header bg-success text-white">
+            <h5 class="modal-title" id="rateModalLabel">Rate and Review
+              Players</h5>
+            <button type="button" class="btn-close btn-close-white"
+              data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
 
-        <div class="modal-body" id="rateFields">
-          <!-- Rating fields will be injected here -->
-        </div>
+          <div class="modal-body" id="rateFields">
+            <!-- Rating fields will be injected here -->
+          </div>
 
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" id="rateCancel">Cancel</button>
-          <button type="submit" class="btn btn-success">Submit</button>
-        </div>
-      </form>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary"
+              data-bs-dismiss="modal" id="rateCancel">Cancel</button>
+            <button type="submit" class="btn btn-success">Submit</button>
+          </div>
+        </form>
+      </div>
     </div>
   </div>
-</div>
 
-
-
-<script src="/js/bookings.js"></script>
-<!-- Bootstrap Bundle with Popper (for modal functionality) -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="/js/bookings.js"></script>
+  <!-- Bootstrap Bundle with Popper (for modal functionality) -->
+  <script
+    src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>

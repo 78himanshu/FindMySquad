@@ -11,7 +11,12 @@ const ObjectId = mongoose.Types.ObjectId;
 //import { geocodeCity } from '../utils/geocode.js';
 import { format } from "date-fns";
 import axios from "axios";
-import xss from 'xss';
+import xss from "xss";
+import {
+  getJoinedGamesByUser,
+  getHostedGamesByUser,
+} from "../data/joinGame.js";
+import jwt from "jsonwebtoken";
 
 const router = Router();
 
@@ -21,7 +26,7 @@ const router = Router();
 router
   .route("/")
   .get(verifyToken, async (req, res) => {
-    console.log("Rendering edit view");
+    // console.log("Rendering edit view");
     try {
       const profile = await userProfileData.getProfile(req.user.userID);
       res.status(200).json(profile);
@@ -39,11 +44,15 @@ router
       const city = xss(req.body.city || "").trim();
       const phoneNumber = xss(req.body.phoneNumber || "").trim();
 
-      const sportsInterests = req.body.sportsInterests.map(i => xss(i.trim()));
-      const gymPreferences = req.body.gymPreferences.map(i => xss(i.trim()));
-      const gamingInterests = req.body.gamingInterests.map(i => xss(i.trim()));
+      const sportsInterests = req.body.sportsInterests.map((i) =>
+        xss(i.trim())
+      );
+      const gymPreferences = req.body.gymPreferences.map((i) => xss(i.trim()));
+      const gamingInterests = req.body.gamingInterests.map((i) =>
+        xss(i.trim())
+      );
 
-      console.log(">>>", req.body);
+      // console.log(">>>", req.body);
 
       if (
         !firstName ||
@@ -86,6 +95,7 @@ router
         gamingInterests,
         city,
         phoneNumber,
+        showContactInfo: req.body.showContactInfo === true || req.body.showContactInfo === "true",
         //geoLocation
       };
 
@@ -93,7 +103,27 @@ router
         req.user.userID,
         profileData
       );
+      // Build a brand-new JWT payload including the updated avatar:
+      const newPayload = {
+        userId: req.user.userID,
+        username: req.user.username,
+        profilePic: profileData.profile.avatar,   // <-- updated
+        profileCompleted: true,
+      };
 
+      // Sign a fresh token
+      const newToken = jwt.sign(newPayload, process.env.JWT_SECRET, {
+        expiresIn: "2h",
+      });
+
+      // Overwrite your existing auth cookie (name may differ in your app)
+      res.cookie("token", newToken, {
+        httpOnly: true,
+        sameSite: "lax",
+        maxAge: 2 * 60 * 60 * 1000, // 2 hours
+      });
+
+      // Optionally still set your "user" cookie for frontend usage if you like:
       res.cookie(
         "user",
         JSON.stringify({
@@ -102,7 +132,7 @@ router
         }),
         {
           httpOnly: false,
-          maxAge: 3600000,
+          maxAge: 2 * 60 * 60 * 1000,
         }
       );
 
@@ -128,12 +158,13 @@ router
           gender: profile.gender || "",
         },
         phoneNumber: profile.phoneNumber || "",
+        showContactInfo: profile.showContactInfo === true || profile.showContactInfo === "true",
         location: {
           city: location?.city?.trim() || "",
           // You can extend this to include state, zipCode, etc.
         },
       };
-
+      console.log("showContactInfo received:", profile.showContactInfo);
       const encodedLoc = encodeURIComponent(updateData.location.city);
       const apiKey = process.env.GOOGLE_MAPS_API_KEY;
 
@@ -146,11 +177,9 @@ router
         !geoRes.data.results ||
         !geoRes.data.results[0]?.geometry?.location
       ) {
-        return res
-          .status(400)
-          .json({
-            error: "Invalid city address, could not get location coordinates.",
-          });
+        return res.status(400).json({
+          error: "Invalid city address, could not get location coordinates.",
+        });
       }
       const { lat, lng } = geoRes.data.results[0].geometry.location;
       updateData.location.geoLocation = {
@@ -222,6 +251,7 @@ router.route("/view").get(verifyToken, async (req, res) => {
       isFollowing, // 👈 pass false
       head: `<link rel="stylesheet" href="/css/userProfile.css">`,
       query: req.query,
+      showContactInfo: profile.showContactInfo,
     });
   } catch (e) {
     res.status(404).render("error", { error: e.toString() });
@@ -242,11 +272,16 @@ router
         lastName: profile.profile.lastName,
         bio: profile.profile.bio,
         avatar: profile.profile.avatar,
-        city: profile.location?.city || "",
-        state: profile.location?.state || "",
-        zipCode: profile.location?.zipCode || "",
+        // city: profile.location?.city || "",
+        // state: profile.location?.state || "",
+        // zipCode: profile.location?.zipCode || "",
+        location: {
+          city: profile.location?.city || ""
+        },
+        phoneNumber: profile.phoneNumber || "",
         head: `<link rel="stylesheet" href="/css/editProfile.css">`,
         googleMapsApiKey: process.env.GOOGLE_MAPS_API_KEY,
+        showContactInfo: profile.showContactInfo,
       });
     } catch (e) {
       res.status(404).render("error", { error: e.toString() });
@@ -322,8 +357,21 @@ router.get("/bookings", verifyToken, async (req, res) => {
   const userId = req.user.userID;
 
   try {
-    const allGameBookings = await joinGameData.getJoinedGamesByUser(userId);
-    const allGymBookings = await gymBuddyData.getJoinedSessionsByUser(userId);
+    const joinedGames = await getJoinedGamesByUser(userId);
+    const hostedGames = await getHostedGamesByUser(userId);
+
+    const seen = new Set();
+    const allGameBookings = [...joinedGames, ...hostedGames].filter((g) => {
+      const id = g._id.toString();
+      if (seen.has(id)) return false;
+      seen.add(id);
+      return true;
+    });
+
+    const joined = await gymBuddyData.getJoinedSessionsByUser(userId);
+    const hosted = await gymBuddyData.getHostedSessionsByUser(userId);
+
+    const allGymBookings = [...joined, ...hosted];
     const now = new Date();
 
     const allGameBookingsEnriched = await Promise.all(
@@ -344,11 +392,10 @@ router.get("/bookings", verifyToken, async (req, res) => {
               username: user ? user.username : "Unknown",
               hasBeenRated: !!existingRating,
               ratedScore: existingRating?.score || 0,
-              review: existingRating?.review || ""
+              review: existingRating?.review || "",
             };
           })
         );
-
 
         const formattedDateTime = game.startTime
           ? format(new Date(game.startTime), "eee MMM dd, yyyy h:mm a")
@@ -370,8 +417,6 @@ router.get("/bookings", verifyToken, async (req, res) => {
     const futureGameBookings = allGameBookingsEnriched.filter(
       (game) => new Date(game.endTime) >= now
     );
-
-    console.log("pastGameBookings", pastGameBookings)
 
     const allGymBookingsEnriched = await Promise.all(
       allGymBookings.map(async (session) => {
@@ -395,25 +440,42 @@ router.get("/bookings", verifyToken, async (req, res) => {
           })
         );
 
-        const formattedDateTime = session.dateTime
-          ? format(new Date(session.dateTime), "eee MMM dd, yyyy h:mm a")
-          : "Invalid Date";
+        const padded =
+          session.startTime.length === 5
+            ? `${session.startTime}:00`
+            : session.startTime;
+
+        let formattedDateTime = "Invalid Date";
+        try {
+          formattedDateTime = format(
+            new Date(`${session.date}T${padded}`),
+            "eee MMM dd, yyyy h:mm a"
+          );
+        } catch (e) {
+          console.warn("Failed to format gym session date:", session._id);
+        }
 
         return {
           ...session.toObject(),
           players: enrichedPlayers,
           host: session.hostedBy.toString(),
+          gymName: session.gymName || session.gym || "Unknown Gym",
           formattedDateTime,
         };
       })
     );
 
-    const pastGymBookings = allGymBookingsEnriched.filter(
-      (s) => new Date(s.dateTime) < now
-    );
-    const futureGymBookings = allGymBookingsEnriched.filter(
-      (s) => new Date(s.dateTime) >= now
-    );
+    const pastGymBookings = allGymBookingsEnriched.filter((s) => {
+      const padded =
+        s.startTime.length === 5 ? `${s.startTime}:00` : s.startTime;
+      return new Date(`${s.date}T${padded}`) < now;
+    });
+
+    const futureGymBookings = allGymBookingsEnriched.filter((s) => {
+      const padded =
+        s.startTime.length === 5 ? `${s.startTime}:00` : s.startTime;
+      return new Date(`${s.date}T${padded}`) >= now;
+    });
 
     res.render("userProfile/bookings", {
       title: "Your Bookings",
@@ -498,8 +560,8 @@ router.post("/bookings/rate", verifyToken, async (req, res) => {
         {
           $set: {
             "ratings.$.score": rating,
-            "ratings.$.review": review
-          }
+            "ratings.$.review": review,
+          },
         }
       );
 
@@ -509,8 +571,8 @@ router.post("/bookings/rate", verifyToken, async (req, res) => {
           { userId },
           {
             $push: {
-              ratings: { bookingId, rater: raterId, score: rating, review }
-            }
+              ratings: { bookingId, rater: raterId, score: rating, review },
+            },
           }
         );
       }
@@ -521,7 +583,6 @@ router.post("/bookings/rate", verifyToken, async (req, res) => {
     res.status(500).json({ error: "Internal Server Error" });
   }
 });
-
 
 // ————— Show Rate Players Form ——————
 router.get("/bookings/rate/:bookingId", verifyToken, async (req, res) => {
@@ -578,8 +639,6 @@ router.get("/view/:targetUserId", verifyToken, async (req, res) => {
       })
     );
 
-
-
     res.render("userProfile/view", {
       title: `${profile.profile.firstName} ${profile.profile.lastName}`,
       layout: "main",
@@ -611,7 +670,6 @@ router.get("/view/:targetUserId", verifyToken, async (req, res) => {
 });
 router.get("/userview/:targetUserId", verifyToken, async (req, res) => {
   try {
-
     if (req.params.targetUserId === req.user.userID) {
       return res.redirect(`/profile/view?msg=already_logged_in`);
     }
@@ -633,7 +691,6 @@ router.get("/userview/:targetUserId", verifyToken, async (req, res) => {
         };
       })
     );
-
 
     res.render("userProfile/userview", {
       title: `${profile.profile.firstName} ${profile.profile.lastName}`,

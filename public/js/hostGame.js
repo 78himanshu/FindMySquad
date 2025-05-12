@@ -19,7 +19,7 @@ document.addEventListener("DOMContentLoaded", () => {
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
 
-    console.log("form.sport.value", form.sport.value);
+    // console.log("form.sport.value", form.sport.value);
 
     // Form field extraction and validation
     const title = form.title.value.trim();
@@ -106,7 +106,7 @@ document.addEventListener("DOMContentLoaded", () => {
       "r@pe",
     ];
 
-    console.log("--->", sport, "=-->", allowedSports.includes(sport));
+    // console.log("--->", sport, "=-->", allowedSports.includes(sport));
 
     // Validation...
     if (!title) return showToastError("Title is required.");

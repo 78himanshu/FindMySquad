@@ -75,3 +75,9 @@ export const leaveGame = async (gameId, userId) => {
   //adding return statement
   return game;
 };
+
+export const getHostedGamesByUser = async (userId) => {
+  if (!ObjectId.isValid(userId)) throw new Error("Invalid user ID");
+  const hostedGames = await Game.find({ host: userId });
+  return hostedGames;
+};
