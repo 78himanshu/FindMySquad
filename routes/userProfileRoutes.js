@@ -12,6 +12,7 @@ const ObjectId = mongoose.Types.ObjectId;
 import { format } from "date-fns";
 import axios from "axios";
 import xss from 'xss';
+import jwt from "jsonwebtoken";
 
 const router = Router();
 
@@ -93,7 +94,27 @@ router
         req.user.userID,
         profileData
       );
+      // Build a brand-new JWT payload including the updated avatar:
+      const newPayload = {
+        userId: req.user.userID,
+        username: req.user.username,
+        profilePic: profileData.profile.avatar,   // <-- updated
+        profileCompleted: true,
+      };
 
+      // Sign a fresh token
+      const newToken = jwt.sign(newPayload, process.env.JWT_SECRET, {
+        expiresIn: "2h",
+      });
+
+      // Overwrite your existing auth cookie (name may differ in your app)
+      res.cookie("token", newToken, {
+        httpOnly: true,
+        sameSite: "lax",
+        maxAge: 2 * 60 * 60 * 1000, // 2 hours
+      });
+
+      // Optionally still set your "user" cookie for frontend usage if you like:
       res.cookie(
         "user",
         JSON.stringify({
@@ -102,7 +123,7 @@ router
         }),
         {
           httpOnly: false,
-          maxAge: 3600000,
+          maxAge: 2 * 60 * 60 * 1000,
         }
       );
 
