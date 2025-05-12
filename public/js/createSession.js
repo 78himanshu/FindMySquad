@@ -21,11 +21,9 @@ document.addEventListener("DOMContentLoaded", () => {
     e.preventDefault();
 
     const gym_title = form.gym_title.value.trim();
-    const gymName = form.gymlocation.value.trim();
+    const gymName = form.gym.value.trim();
     const description = form.description.value.trim();
-    const date =
-      form.querySelector("input[name='sessionDate']")?.value ||
-      form.date?.value;
+    const date = form.date.value;
     const startTime = form.startTime.value;
     const endTime = form.endTime.value;
     const gymLocation = form.gymlocation.value.trim();

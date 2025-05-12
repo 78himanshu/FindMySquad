@@ -12,9 +12,10 @@
           <div class="col-md-6">
             <label for="gym_title">Title:<span
                 class="text-danger">*</span></label>
-            <input type="text" name="gym_title" class="form-control"
+            <input type="text" id="gym_title" name="gym_title" class="form-control"
               placeholder="Workout Title"
               value="{{#if isEditMode}}{{title}}{{/if}}" />
+
           </div>
           <div class="col-md-6">
             <label for="gym">Gym Name:<span class="text-danger">*</span></label>
@@ -62,21 +63,18 @@
           </div>
 
           <div class="col-md-6">
-            <label for="experience">Experience:<span
-                class="text-danger">*</span></label>
-            <select name="experience" class="form-select">
-              <option value>Select Experience</option>
-              <option value="newcomer" {{#if (eq experience "newcomer"
-                )}}selected{{/if}}>Newcomer</option>
-              <option value="1+ year" {{#if (eq experience "1+ year"
-                )}}selected{{/if}}>1+ Year</option>
-              <option value="3+ year" {{#if (eq experience "3+ year"
-                )}}selected{{/if}}>3+ Years</option>
-              <option value="5+ year" {{#if (eq experience "5+ year"
-                )}}selected{{/if}}>5+ Years</option>
-              <option value="10+ year" {{#if (eq experience "10+ year"
-                )}}selected{{/if}}>10+ Years</option>
-            </select>
+                <label for="maxMembers">How many members do you want?</label>
+        <select id="maxMembers" name="maxMembers" required {{#if isEditMode}}disabled{{/if}}>
+          <option value>--Select--</option>
+          <option value="1" {{#if (eq maxMembers "1" )}}selected{{/if}}>Buddy
+            (1)</option>
+          <option value="2" {{#if (eq maxMembers "2" )}}selected{{/if}}>Trio
+            (2)</option>
+          <option value="3" {{#if (eq maxMembers "3" )}}selected{{/if}}>Gang
+            (3)</option>
+          <option value="4" {{#if (eq maxMembers "4" )}}selected{{/if}}>Group
+            (4)</option>
+        </select>
           </div>
         </div>
 
@@ -120,11 +118,12 @@
           </div>
         </div>
 
+
         <div class="mt-3">
           <input type="text" class="form-control" value="{{user.username}}"
             readonly
             style="color: gray; background-color: #f0f0f0;">
-          <input type="hidden" name="hostedBy" value="{{user.userId}}">
+          <input type="hidden" id="hostedBy" name="hostedBy" value="{{user.userId}}">
         </div>
 
         <div class="d-grid mt-4">
