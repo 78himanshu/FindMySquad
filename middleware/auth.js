@@ -1,3 +1,4 @@
+import { ChannelLogStatusSummary } from "@elasticemail/elasticemail-client";
 import jwt from "jsonwebtoken";
 
 export default async function requireAuth(req, res, next) {
@@ -35,6 +36,7 @@ export default async function requireAuth(req, res, next) {
     // ✅ Pass user info to Handlebars
     const userCookie = req.cookies.user;
 
+     console.log("userCookie middleware",userCookie);
     if (userCookie) {
       const userData = JSON.parse(userCookie);
       res.locals.isLoggedIn = true;

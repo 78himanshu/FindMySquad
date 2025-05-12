@@ -253,6 +253,7 @@
             });
 
             const result = await res.json();
+            console.log("result hbd",result);
             if (res.ok) {
                 showToast('Profile saved successfully!', true);
                 setTimeout(() => window.location.href = '/', 1500);

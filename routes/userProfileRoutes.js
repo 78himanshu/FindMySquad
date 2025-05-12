@@ -94,6 +94,18 @@ router
         profileData
       );
 
+      res.cookie(
+        "user",
+        JSON.stringify({
+          username: req.user.username,
+          profilePic: profileData.profile.avatar,
+        }),
+        {
+          httpOnly: false,
+          maxAge: 3600000,
+        }
+      );
+
       res.status(201).json(profile);
     } catch (e) {
       res.status(400).json({ error: e.toString() });
