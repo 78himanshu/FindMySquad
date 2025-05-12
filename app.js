@@ -30,6 +30,7 @@ import Handlebars from "handlebars";
 import configRoutesFunction from "./routes/index.js";
 import "./utils/handlebarsHelper.js";
 import esportsRoutes from "./routes/esports.js";
+import userProfileRoutes from "./routes/userProfileRoutes.js";
 import http from "http";
 import { Server } from "socket.io";
 import Game from "./models/hostGame.js";
@@ -239,6 +240,18 @@ app.use((req, res, next) => {
   next();
 });
 
+app.use((req, res, next) => {
+  // pick up any ?success= or ?error= query params
+  res.locals.success     = req.query.success    || "";
+  res.locals.error       = req.query.error      || "";
+  // tournament toasts
+  res.locals.justCreated = req.query.tournamentCreated === "1";
+  res.locals.justDeleted = req.query.tournamentDeleted === "1";
+  // footer year
+  res.locals.currentYear = new Date().getFullYear();
+  next();
+});
+
 app.use(attachProfileStatus);
 
 // Routes
@@ -248,6 +261,7 @@ app.use("/gymBuddy", gymBuddyRoutes);
 app.use("/leaderboard", leaderboardRoutes);
 app.use("/esports", esportsRoutes);
 app.use("/join", esportsRoutes);
+app.use("/profile", userProfileRoutes);
 // 404 Handler (must come after routes but before error handler)
 app.use((req, res, next) => {
   console.log("404 Handler triggered for:", req.originalUrl);

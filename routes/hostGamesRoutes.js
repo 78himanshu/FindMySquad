@@ -15,6 +15,7 @@ router
       hostId,
       title: "Host a Game",
       layout: "main",
+      today: new Date().toISOString().split("T")[0],
       profileCompleted: req.user?.profileCompleted || false,
       head: `
           <link rel="stylesheet" href="/css/hostGame.css">

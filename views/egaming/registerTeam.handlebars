@@ -7,7 +7,9 @@
     {{#if isCreator}}
     <h1 class="text-center mb-4">Manage Teams</h1>
     {{else if isTeamLeader}}
-    <h1 class="text-center mb-4">Manage Teams</h1>
+    <h1 class="text-center mb-4">Manage Team</h1>
+    {{else if isAlreadyInTeam}}
+    <h1 class="text-center mb-4">Your Team</h1>
     {{else}}
     <h1 class="text-center mb-4">Register Team</h1>
     {{/if}}
@@ -103,14 +105,13 @@
       {{!-- BELOW: SHOW ALL OTHER TEAMS --}}
   <div class="card mb-4 p-3">
     <h4>Other Teams in This Tournament : </h4>
+    {{#if otherTeams.length}}
     {{#each tournament.teams}}
-      {{!-- skip your own team --}}
-      {{#ifCond this._id '!=' ../userTeam._id}}
         <div class="mb-4">
           <h5>{{this.teamName}}</h5>
           <p class="fst-italic text-muted">{{this.description}}</p>
           <p class="fst-italic text-muted">
-            Members: {{this.players.length}} / {{../playersPerTeam}}
+            Members: {{length this.players}} / {{../playersPerTeam}}
           </p>
           <ul class="list-group">
             {{#each this.players}}
@@ -118,8 +119,10 @@
             {{/each}}
           </ul>
         </div>
-      {{/ifCond}}
     {{/each}}
+    {{else}}
+      <p class="text-muted">No other teams have been created yet.</p>
+    {{/if}}
     </div>
 
     {{!-- NEW USER VIEW --}}
@@ -137,7 +140,8 @@
           id="teamName" name="teamName"
           class="form-control"
           placeholder="Enter Team Name"
-          required minlength="2"
+          minlength="2"
+          maxlength="20"
           value="{{formData.teamName}}">
       </div>
       <div class="mb-3">
@@ -147,7 +151,7 @@
           id="teamDescription" name="teamDescription"
           class="form-control"
           placeholder="Describe your team..."
-          required minlength="5"
+          minlength="5"
           maxlength="200">{{formData.description}}</textarea>
       </div>
       <button class="btn btn-success w-100">Create Team</button>
@@ -155,32 +159,33 @@
     {{/if}}
 
 
-    {{!-- c) Join-team grid (while any team has slots) --}}
-    {{#if hasOpenSlot}}
-    <h5 class="text-center mb-3">Or Join an Existing Team</h5>
+    {{!-- 2) Always list _all_ existing teams (even if full) --}}
+  {{#if tournament.teams.length}}
+    <h5 class="text-center mb-3">Existing Teams</h5>
     <div class="row g-3">
       {{#each tournament.teams}}
-      <div class="col-12 col-md-6">
-        <div class="card shadow-sm">
-          <div class="card-body">
-            <h6 class="card-title">{{this.teamName}}</h6>
-            <p class="fst-italic text-muted mb-2">{{this.description}}</p>
-            <p><strong>Players:</strong> {{this.players.length}} /
-              {{../playersPerTeam}}</p>
-            <form action="/esports/{{../tournament._id}}/register-team"
-              method="POST">
-              <input type="hidden" name="action" value="join">
-              <input type="hidden" name="joinTeamId" value="{{this._id}}">
-              <button class="btn btn-outline-success w-100" type="submit"
-                {{#if (gte this.players.length
-                ../playersPerTeam)}}disabled{{/if}}>
-                {{#if (lt this.players.length ../playersPerTeam)}}Join
-                Team{{else}}Full{{/if}}
-              </button>
-            </form>
+        <div class="col-12 col-md-6">
+          <div class="card shadow-sm">
+            <div class="card-body">
+              <h6 class="card-title">{{this.teamName}}</h6>
+              <p class="fst-italic text-muted mb-2">{{this.description}}</p>
+              <p>
+                <strong>Players:</strong> {{length this.players}} /
+                {{../playersPerTeam}}
+              </p>
+              <form action="/esports/{{../tournament._id}}/register-team"
+                    method="POST">
+                <input type="hidden" name="action" value="join">
+                <input type="hidden" name="joinTeamId" value="{{this._id}}">
+                <button class="btn btn-outline-success w-100"
+                        type="submit"
+                        {{#if (gte (length this.players) ../playersPerTeam)}}disabled{{/if}}>
+                  {{#if (lt (length this.players) ../playersPerTeam)}}Join Team{{else}}Full{{/if}}
+                </button>
+              </form>
+            </div>
           </div>
         </div>
-      </div>
       {{/each}}
     </div>
 

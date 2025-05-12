@@ -396,6 +396,12 @@ router.get(
         break;
       }
     }
+      const userTeam = teams.find(t =>
+          t.players.some(p => p._id.toString() === userId)
+        );
+        const otherTeams = teams.filter(t =>
+          !userTeam || t._id.toString() !== userTeam._id.toString()
+        );
       res.render("egaming/registerTeam", {
         tournament,
         layout: "main",
@@ -410,6 +416,8 @@ router.get(
         userTeam: teams.find((t) =>
           t.players.some((p) => p._id.toString() === userId)
         ),
+        userTeam,
+        otherTeams,
         canCreate,
         canJoin,
         error,

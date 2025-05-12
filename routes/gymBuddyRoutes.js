@@ -8,6 +8,7 @@ import { format } from "date-fns";
 import Gym from "../models/Gym.js";
 import { updateKarmaPoints } from "../utils/karmaHelper.js";
 import { evaluateAchievements } from "../utils/achievementHelper.js";
+import axios from "axios";
 
 
 // Home
@@ -27,6 +28,7 @@ router
     res.render("Gym/createSession", {
       title: "Create Gym Session",
       layout: "main",
+      today: new Date().toISOString().split("T")[0],
       head: `<link rel="stylesheet" href="/css/gym.css">`,
       user: {
         username: req.user.username,
@@ -92,14 +94,21 @@ router
       checkString(workoutType, "Workout Type");
       if (description) checkString(description, "Description");
 
-      const now = new Date();
-      const parsedSessionDate = new Date(date);
+      // build a true local‐midnight for the session date
+      const [Y, M, D] = date.split("-").map(Number);
+      const parsedSessionDate = new Date(Y, M - 1, D);
 
+      // ── keep your padded strings for DB storage ──
       const paddedStartTime = startTime.length === 5 ? `${startTime}:00` : startTime;
-      const paddedEndTime = endTime.length === 5 ? `${endTime}:00` : endTime;
-
-      const startDateTime = new Date(`${date}T${paddedStartTime}`);
-      const endDateTime = new Date(`${date}T${paddedEndTime}`);
+      const paddedEndTime   = endTime.length === 5   ? `${endTime}:00`   : endTime;
+  
+      // parse hours/mins into local‐time Date objects
+      const [sh, sm] = startTime.split(":").map(Number);
+      const [eh, em] = endTime.split(":").map(Number);
+      const startDateTime = new Date(Y, M - 1, D, sh, sm,  0);
+      const endDateTime   = new Date(Y, M - 1, D, eh, em,  0);
+  
+      const now = new Date();
 
       if (
         isNaN(parsedSessionDate.getTime()) ||
@@ -109,7 +118,7 @@ router
         throw new Error("Invalid Date or Time format.");
       }
 
-      if (parsedSessionDate < now) {
+      if (parsedSessionDate < new Date(now.getFullYear(), now.getMonth(), now.getDate())) {
         return res
           .status(400)
           .json({ error: "Session date must be in the future." });
@@ -152,6 +161,29 @@ router
         );
       }
 
+      const apiKey = process.env.GOOGLE_MAPS_API_KEY;
+      const encodedLoc = encodeURIComponent(gymlocation);
+      const geoRes = await axios.get(
+        `https://maps.googleapis.com/maps/api/geocode/json?address=${encodedLoc}&key=${apiKey}`
+      );
+
+      if (
+        !geoRes.data ||
+        !geoRes.data.results ||
+        !geoRes.data.results[0]?.geometry?.location
+      ) {
+        return res.status(400).json({
+          error: "Invalid gym address — unable to fetch coordinates.",
+        });
+      }
+
+      const { lat, lng } = geoRes.data.results[0].geometry.location;
+      const geoLocation = {
+        type: "Point",
+        coordinates: [lng, lat],
+      };
+
+
       // Log inputs for debugging
       console.log("Creating session with:", {
         title,
@@ -178,7 +210,8 @@ router
         experience,
         workoutType,
         hostedBy,
-        Number(maxMembers)
+        Number(maxMembers),
+        geoLocation
       );
 
       return res.json({

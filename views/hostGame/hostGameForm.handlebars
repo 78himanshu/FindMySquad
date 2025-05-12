@@ -43,7 +43,7 @@
         <div class="row g-3">
           <div class="col-md-4">
             <label for="gameDate" class="form-label">Date <span class="text-danger">*</span></label>
-            <input type="date" id="gameDate" name="gameDate" class="form-control"
+            <input type="date" id="gameDate" name="gameDate" class="form-control" min="{{today}}"
               value="{{formatDateInput game.startTime}}">
           </div>
           <div class="col-md-4">
@@ -136,6 +136,10 @@
         }
       });
     }
+    const today = new Date().toISOString().split("T")[0];
+    document.querySelectorAll('input[type="date"]').forEach(input => {
+      input.setAttribute("min", today);
+    });
 
     document.querySelector("input[name='userTimeZone']").value =
       Intl.DateTimeFormat().resolvedOptions().timeZone;
