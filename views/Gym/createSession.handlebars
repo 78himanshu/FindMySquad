@@ -12,9 +12,7 @@
           <div class="col-md-6">
             <label for="gym_title">Title:<span
                 class="text-danger">*</span></label>
-            <input type="text" name="gym_title" class="form-control"
-              placeholder="Workout Title"
-              value="{{title}}" />
+            <input type="text" name="gym_title" class="form-control" placeholder="Workout Title" value="{{#if isEditMode}}{{title}}{{/if}}" />
           </div>
           <div class="col-md-6">
             <label for="gym">Gym Name:<span class="text-danger">*</span></label>

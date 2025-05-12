@@ -5,7 +5,7 @@ export function requireAuth(req, res, next) {
   const token = req.cookies.token;
 
   if (!token) {
-    return res.redirect("/login?error=loginRequired");
+    return res.redirect(`/login?redirect=${encodeURIComponent(req.originalUrl)}`);
   }
 
   try {
