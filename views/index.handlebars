@@ -94,6 +94,16 @@
     transform: scale(1.03);
     transition: transform 0.3s;
   }
+
+  /* Gamification card tweaks */
+.gamification-section .card-body {
+  background: #f8f9fa;
+  border-radius: 1rem;
+}
+.gamification-section h2 {
+  color: #343a40;
+}
+
 </style>
 
 <section class="hero d-flex align-items-center text-white bg-dark" style="
@@ -284,6 +294,22 @@
 <p class="text-center text-muted">No gym sessions coming up.</p>
 {{/if}}
 </section>
+
+  <!-- ===== Gamification Section ===== -->
+  <section class="container my-5 gamification-section">
+    <div class="card shadow-sm border-0">
+      <div class="card-body text-center">
+        <h2 class="fw-bold mb-3">Level Up with Gamification</h2>
+        <p class="lead text-muted mb-4">
+          Earn karma points by hosting games, joining sessions, and sharing reviews.  
+          Climb the leaderboard, unlock achievement badges, and show off your squad-building skills!
+        </p>
+        <a href="/gamification" class="btn btn-primary btn-lg">Read More</a>
+      </div>
+    </div>
+  </section>
+  <!-- ===== End Gamification Section ===== -->
+
 
 <section class="about-team py-5 bg-white rounded shadow-sm">
   <div class="container">
