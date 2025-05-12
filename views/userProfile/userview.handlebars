@@ -106,7 +106,8 @@
                                 <p class="text-muted">Karma Points</p>
                             </div>
                             <div class="col-md-3">
-                                <h5>{{viewedUser.followers.length}}</h5>
+                                {{!-- <h5>{{viewedUser.followers.length}}</h5> --}}
+                                <h5 id="followerCount">{{viewedUser.followers.length}}</h5>
                                 <p class="text-muted">Followers</p>
                             </div>
                             <div class="col-md-3">
@@ -203,37 +204,41 @@
         });
 
 
-        const followButton = document.getElementById('followButton');
-        if (followButton) {
-            followButton.addEventListener('click', async () => {
-                const targetUserId = followButton.dataset.userId;
-                const isFollowing = followButton.innerText.trim() === 'Following';
-                const action = isFollowing ? 'unfollow' : 'follow';
+      const followButton    = document.getElementById('followButton');
+  const followerCountEl = document.getElementById('followerCount');
 
-                try {
-                    const res = await fetch(`/profile/${action}/${targetUserId}`, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        credentials: 'include'
-                    });
+  if (followButton) {
+    followButton.addEventListener('click', async () => {
+      const targetUserId = followButton.dataset.userId;
+      const isFollowing  = followButton.innerText.trim() === 'Following';
+      const action       = isFollowing ? 'unfollow' : 'follow';
 
-                    const result = await res.json();
+      try {
+        const res    = await fetch(`/profile/${action}/${targetUserId}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include'
+        });
+        const newCount = await res.json();  // <-- this should be the updated follower count
+        console.log("new count log", newCount);
 
-                    if (res.ok) {
-                        // ✅ Toggle Follow/Following
-                        followButton.innerText = isFollowing ? 'Follow' : 'Following';
-                        showToast(`${isFollowing ? 'Unfollowed' : 'Followed'} successfully! 🎉`, true);
-                    } else {
-                        // ❌ Handle server error like "Already following"
-                        showToast(result.error || 'Something went wrong.', false);
-                    }
-                } catch (err) {
-                    showToast('Server error. Please try again.', false);
-                }
-            });
+        if (res.ok) {
+          // 1) Toggle button text
+          followButton.innerText = isFollowing ? 'Follow' : 'Following';
+
+          // 2) Immediately refresh the sidebar count
+          followerCountEl.textContent = newCount.followersCount;
+
+          showToast(`${isFollowing ? 'Unfollowed' : 'Followed'} successfully! 🎉`, true);
+        } else {
+          showToast(newCount.error || 'Something went wrong.', false);
         }
+      } catch (err) {
+        showToast('Server error. Please try again.', false);
+      }
+    });
+  }
+
     });
 
     // Popup message (basic version)
