@@ -15,7 +15,7 @@ export function requireAuth(req, res, next) {
       userId: decoded.userId,
       username: decoded.username,
       profilePic: decoded.profilePic || "/images/default-avatar.png",
-      profileCompleted: decoded.profileCompleted || false
+      profileCompleted: decoded.profileCompleted || false,
     };
 
     next();

@@ -105,8 +105,5 @@ export const signup = async (username, email, password) => {
     }
     throw new Error("Signup failed. Please try again.");
   }
-
-  console.log("newUser", newUser);
-
   return newUser;
 };

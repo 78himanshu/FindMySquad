@@ -78,51 +78,52 @@
 
     {{!-- MEMBER VIEW --}}
     {{else if isAlreadyInTeam}}
-      <div class="card mb-4 p-3">
-        <h4>You’re in <strong>{{userTeam.teamName}}</strong></h4>
-        <p class="fst-italic text-muted">{{userTeam.description}}</p>
+    <div class="card mb-4 p-3">
+      <h4>You’re in <strong>{{userTeam.teamName}}</strong></h4>
+      <p class="fst-italic text-muted">{{userTeam.description}}</p>
 
-        {{!-- Current slot usage --}}
+      {{!-- Current slot usage --}}
+      <p class="fst-italic text-muted">
+        Members: {{userTeam.players.length}} / {{playersPerTeam}}
+      </p>
+
+      {{!-- List all teammates --}}
+      <ul class="list-group mb-3">
+        {{#each userTeam.players}}
+        <li
+          class="list-group-item d-flex justify-content-between align-items-center">
+          {{this.username}}
+        </li>
+        {{/each}}
+      </ul>
+
+      {{!-- Leave team button --}}
+      <form action="/esports/{{tournament._id}}/leave-team" method="POST">
+        <button type="submit" class="btn btn-warning">Leave Team</button>
+      </form>
+    </div>
+
+    {{!-- BELOW: SHOW ALL OTHER TEAMS --}}
+    <div class="card mb-4 p-3">
+      <h4>Other Teams in This Tournament : </h4>
+      {{#if otherTeams.length}}
+      {{#each tournament.teams}}
+      <div class="mb-4">
+        <h5>{{this.teamName}}</h5>
+        <p class="fst-italic text-muted">{{this.description}}</p>
         <p class="fst-italic text-muted">
-          Members: {{userTeam.players.length}} / {{playersPerTeam}}
+          Members: {{length this.players}} / {{../playersPerTeam}}
         </p>
-
-        {{!-- List all teammates --}}
-        <ul class="list-group mb-3">
-          {{#each userTeam.players}}
-            <li class="list-group-item d-flex justify-content-between align-items-center">
-              {{this.username}}
-            </li>
+        <ul class="list-group">
+          {{#each this.players}}
+          <li class="list-group-item">{{this.username}}</li>
           {{/each}}
         </ul>
-
-        {{!-- Leave team button --}}
-        <form action="/esports/{{tournament._id}}/leave-team" method="POST">
-          <button type="submit" class="btn btn-warning">Leave Team</button>
-        </form>
       </div>
-
-      {{!-- BELOW: SHOW ALL OTHER TEAMS --}}
-  <div class="card mb-4 p-3">
-    <h4>Other Teams in This Tournament : </h4>
-    {{#if otherTeams.length}}
-    {{#each tournament.teams}}
-        <div class="mb-4">
-          <h5>{{this.teamName}}</h5>
-          <p class="fst-italic text-muted">{{this.description}}</p>
-          <p class="fst-italic text-muted">
-            Members: {{length this.players}} / {{../playersPerTeam}}
-          </p>
-          <ul class="list-group">
-            {{#each this.players}}
-              <li class="list-group-item">{{this.username}}</li>
-            {{/each}}
-          </ul>
-        </div>
-    {{/each}}
-    {{else}}
+      {{/each}}
+      {{else}}
       <p class="text-muted">No other teams have been created yet.</p>
-    {{/if}}
+      {{/if}}
     </div>
 
     {{!-- NEW USER VIEW --}}
@@ -158,49 +159,50 @@
     </form>
     {{/if}}
 
-
     {{!-- 2) Always list _all_ existing teams (even if full) --}}
-  {{#if tournament.teams.length}}
+    {{#if tournament.teams.length}}
     <h5 class="text-center mb-3">Existing Teams</h5>
     <div class="row g-3">
       {{#each tournament.teams}}
-        <div class="col-12 col-md-6">
-          <div class="card shadow-sm">
-            <div class="card-body">
-              <h6 class="card-title">{{this.teamName}}</h6>
-              <p class="fst-italic text-muted mb-2">{{this.description}}</p>
-              <p>
-                <strong>Players:</strong> {{length this.players}} /
-                {{../playersPerTeam}}
-              </p>
-              <form action="/esports/{{../tournament._id}}/register-team"
-                    method="POST">
-                <input type="hidden" name="action" value="join">
-                <input type="hidden" name="joinTeamId" value="{{this._id}}">
-                <button class="btn btn-outline-success w-100"
-                        type="submit"
-                        {{#if (gte (length this.players) ../playersPerTeam)}}disabled{{/if}}>
-                  {{#if (lt (length this.players) ../playersPerTeam)}}Join Team{{else}}Full{{/if}}
-                </button>
-              </form>
-            </div>
+      <div class="col-12 col-md-6">
+        <div class="card shadow-sm">
+          <div class="card-body">
+            <h6 class="card-title">{{this.teamName}}</h6>
+            <p class="fst-italic text-muted mb-2">{{this.description}}</p>
+            <p>
+              <strong>Players:</strong> {{length this.players}} /
+              {{../playersPerTeam}}
+            </p>
+            <form action="/esports/{{../tournament._id}}/register-team"
+              method="POST">
+              <input type="hidden" name="action" value="join">
+              <input type="hidden" name="joinTeamId" value="{{this._id}}">
+              <button class="btn btn-outline-success w-100"
+                type="submit"
+                {{#if (gte (length this.players)
+                ../playersPerTeam)}}disabled{{/if}}>
+                {{#if (lt (length this.players) ../playersPerTeam)}}Join
+                Team{{else}}Full{{/if}}
+              </button>
+            </form>
           </div>
         </div>
+      </div>
       {{/each}}
     </div>
 
-      {{else if hasTimeConflict}}
-      <p class="text-center text-danger">
-        You’re already registered in a tournament that overlaps this time.
-      </p>
-      {{else if tournament.teams.length}}
-      <p class="text-center text-muted">
-        All slots in existing teams are full.
-      </p>
+    {{else if hasTimeConflict}}
+    <p class="text-center text-danger">
+      You’re already registered in a tournament that overlaps this time.
+    </p>
+    {{else if tournament.teams.length}}
+    <p class="text-center text-muted">
+      All slots in existing teams are full.
+    </p>
 
-      {{else}}
-      <p class="text-muted">No teams have been created yet.</p>
-      {{/if}}
+    {{else}}
+    <p class="text-muted">No teams have been created yet.</p>
+    {{/if}}
     {{/if}}
   </div>
 </div>

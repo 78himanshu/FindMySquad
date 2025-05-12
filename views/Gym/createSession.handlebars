@@ -12,12 +12,14 @@
           <div class="col-md-6">
             <label for="gym_title">Title:<span
                 class="text-danger">*</span></label>
-            <input type="text" name="gym_title" class="form-control" placeholder="Workout Title" value="{{#if isEditMode}}{{title}}{{/if}}" />
+            <input type="text" name="gym_title" class="form-control"
+              placeholder="Workout Title"
+              value="{{#if isEditMode}}{{title}}{{/if}}" />
           </div>
           <div class="col-md-6">
             <label for="gym">Gym Name:<span class="text-danger">*</span></label>
             <input type="text" id="gym" name="gym" class="form-control"
-              placeholder="Enter Gym Name" value="{{gym}}" />
+              placeholder="Enter Gym Name" value="{{gym}}">
           </div>
         </div>
 
@@ -32,20 +34,20 @@
         <div class="row g-3">
           <div class="col-md-4">
             <label for="date">Date:<span class="text-danger">*</span></label>
-            <input type="date" name="date" class="form-control" min="{{today}}"
-              value="{{date}}" />
+            <input type="date" id="date" name="date" class="form-control"
+              min="{{today}}" value="{{date}}">
           </div>
           <div class="col-md-4">
             <label for="startTime">Start Time:<span
                 class="text-danger">*</span></label>
-            <input type="time" name="startTime" class="form-control"
-              value="{{startTime}}" />
+            <input type="time" id="startTime" name="startTime"
+              class="form-control" value="{{startTime}}">
           </div>
           <div class="col-md-4">
             <label for="endTime">End Time:<span
                 class="text-danger">*</span></label>
-            <input type="time" name="endTime" class="form-control"
-              value="{{endTime}}" />
+            <input type="time" id="endTime" name="endTime" class="form-control"
+              value="{{endTime}}">
           </div>
         </div>
 
@@ -56,8 +58,9 @@
 
             <input type="text" id="gym-location" name="gymlocation"
               class="form-control"
-              placeholder="Enter Gym Location" value="{{gymlocation}}" />
+              placeholder="Enter Gym Location" value="{{gymlocation}}">
           </div>
+
           <div class="col-md-6">
             <label for="experience">Experience:<span
                 class="text-danger">*</span></label>
@@ -79,39 +82,40 @@
 
         <div class="row g-3 mt-3">
           <div class="col-md-6">
-            <label for="workoutType">Workout Type:<span
+            <label for="experience" class="form-label">Experience:<span
                 class="text-danger">*</span></label>
-            <select name="workoutType" class="form-select">
-              <option value>Select Workout Type</option>
-              <option value="Cardio" {{#if (eq workoutType "Cardio"
-                )}}selected{{/if}}>Cardio</option>
-              <option value="Body Building" {{#if (eq workoutType
-                "Body Building" )}}selected{{/if}}>Body Building
-              </option>
-              <option value="Power Lifting" {{#if (eq workoutType
-                "Power Lifting" )}}selected{{/if}}>Power Lifting
-              </option>
-              <option value="Calisthenics" {{#if (eq workoutType "Calisthenics"
-                )}}selected{{/if}}>Calisthenics</option>
-              <option value="Yoga" {{#if (eq workoutType "Yoga"
-                )}}selected{{/if}}>Yoga</option>
-              <option value="Other" {{#if (eq workoutType "Other"
-                )}}selected{{/if}}>Other</option>
+            <select id="experience" name="experience" class="form-select">
+              <option value>Select Experience</option>
+              <option value="newcomer" {{#if (eq experience
+                "newcomer")}}selected{{/if}}>Newcomer</option>
+              <option value="1+ year" {{#if (eq experience
+                "1+ year")}}selected{{/if}}>1+ Year</option>
+              <option value="3+ year" {{#if (eq experience
+                "3+ year")}}selected{{/if}}>3+ Years</option>
+              <option value="5+ year" {{#if (eq experience
+                "5+ year")}}selected{{/if}}>5+ Years</option>
+              <option value="10+ year" {{#if (eq experience
+                "10+ year")}}selected{{/if}}>10+ Years</option>
             </select>
           </div>
+
           <div class="col-md-6">
-            <label for="maxMembers">Group Size:<span
+            <label for="workoutType" class="form-label">Workout Type:<span
                 class="text-danger">*</span></label>
-            <select id="maxMembers" name="maxMembers" class="form-select">
-              <option value>Select Group Size</option>
-              <option value="1" {{#if (eq maxMembers "1"
-                )}}selected{{/if}}>Buddy (1)</option>
-              <option value="2" {{#if (eq maxMembers "2" )}}selected{{/if}}>Trio
-                (2)</option>
-              <option value="3" {{#if (eq maxMembers "3" )}}selected{{/if}}>Gang
-                (3)</option>
-              <option value="4" {{#if (eq maxMembers "4"
-                )}}selected{{/if}}>Group (4)</option>
+            <select id="workoutType" name="workoutType" class="form-select">
+              <option value>Select Workout Type</option>
+              <option value="Cardio" {{#if (eq workoutType
+                "Cardio")}}selected{{/if}}>Cardio</option>
+              <option value="Body Building" {{#if (eq workoutType
+                "Body Building")}}selected{{/if}}>Body Building</option>
+              <option value="Power Lifting" {{#if (eq workoutType
+                "Power Lifting")}}selected{{/if}}>Power Lifting</option>
+              <option value="Calisthenics" {{#if (eq workoutType
+                "Calisthenics")}}selected{{/if}}>Calisthenics</option>
+              <option value="Yoga" {{#if (eq workoutType
+                "Yoga")}}selected{{/if}}>Yoga</option>
+              <option value="Other" {{#if (eq workoutType
+                "Other")}}selected{{/if}}>Other</option>
             </select>
           </div>
         </div>
@@ -119,8 +123,8 @@
         <div class="mt-3">
           <input type="text" class="form-control" value="{{user.username}}"
             readonly
-            style="color: gray; background-color: #f0f0f0;" />
-          <input type="hidden" name="hostedBy" value="{{user.userId}}" />
+            style="color: gray; background-color: #f0f0f0;">
+          <input type="hidden" name="hostedBy" value="{{user.userId}}">
         </div>
 
         <div class="d-grid mt-4">

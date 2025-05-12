@@ -7,7 +7,6 @@ import { userProfileData } from "../data/userProfile.js";
 // Home route with session handling
 router.get("/", async (req, res) => {
   try {
-    // console.log("landing routes entered");
     res.render("index", {
       user: req.session?.user,
       isLoggedIn: !!req.session?.user,

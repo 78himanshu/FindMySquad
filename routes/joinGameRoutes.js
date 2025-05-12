@@ -11,7 +11,6 @@ import { scheduleJobFromReminder } from "../emailScheduler.js";
 
 router
   .get("/", async (req, res) => {
-    // get http://localhost:8080/join  get all games
     try {
       let userId = null;
       let recommendation = [];
@@ -36,13 +35,11 @@ router
                   $maxDistance: 10000,
                 },
               },
-              //sport: { $in: userProfile.sportsInterests.map((a) => a.sport)},
               sport: { $in: userProfile.sportsInterests || [] },
             };
           } else {
             filters = {
               location: userProfile.city, //need to check this
-              //sport: { $in: userProfile.sportsInterests.map((a) => a.sport)},
               sport: { $in: userProfile.sportsInterests || [] },
               skillLevel: userProfile.gymPreferences?.skillLevel || "Beginner",
             };
@@ -50,12 +47,6 @@ router
         }
         await Promise.all(allGames.map((game) => game.populate("host")));
         const now = new Date();
-
-        //Filter out games that are already over
-        // const upcomingGames = allGames.filter((game) => {
-        //   return new Date(game.endTime) > now;
-        // });
-
         const upcomingGames = [];
 
         for (const game of allGames) {
@@ -78,9 +69,6 @@ router
                   "../helpers/karmaHelper.js"
                 );
                 await updateKarmaPoints(hostId, -15);
-                // console.log(
-                //   `Applied -15 karma to host ${hostId} for unplayed game: ${game._id}`
-                // );
               } catch (err) {
                 console.error(
                   "Failed to apply karma penalty for unplayed game:",
@@ -123,7 +111,9 @@ router
         }
       }
       if (Object.keys(filters).length > 0) {
-        console.log("Filters for recommendation:", JSON.stringify(filters, null, 2)
+        console.log(
+          "Filters for recommendation:",
+          JSON.stringify(filters, null, 2)
         );
         recommendation = await hostGameData.getAllGames(filters);
       }
@@ -177,28 +167,23 @@ router
     const game = await hostGameData.getGameById(gameId);
     try {
       const targetGame = await hostGameData.getGameById(gameId);
+      // const now = new Date();
+      // const gameStart = new Date(targetGame.startTime);
 
-      // Check if the game is in the past
-      // if (new Date(targetGame.startTime) < new Date()) {
-      //   return res.redirect(`/join/${gameId}?error=This game has already started and cannot be joined.`);
-      // }
-      const now = new Date();
-      const gameStart = new Date(targetGame.startTime);
-
-      const nowRounded = new Date(
-        now.getFullYear(),
-        now.getMonth(),
-        now.getDate(),
-        now.getHours(),
-        now.getMinutes()
-      );
-      const gameStartRounded = new Date(
-        gameStart.getFullYear(),
-        gameStart.getMonth(),
-        gameStart.getDate(),
-        gameStart.getHours(),
-        gameStart.getMinutes()
-      );
+      // const nowRounded = new Date(
+      //   now.getFullYear(),
+      //   now.getMonth(),
+      //   now.getDate(),
+      //   now.getHours(),
+      //   now.getMinutes()
+      // );
+      // const gameStartRounded = new Date(
+      //   gameStart.getFullYear(),
+      //   gameStart.getMonth(),
+      //   gameStart.getDate(),
+      //   gameStart.getHours(),
+      //   gameStart.getMinutes()
+      // );
 
       if (new Date(targetGame.startTime).getTime() <= Date.now()) {
         return res.redirect(
@@ -228,7 +213,8 @@ router
       await sendGameEmail(
         user.email,
         `🎮 Game Confirmation: ${targetGame.title}`,
-        `<p>Hi ${user.username},</p><p>You have successfully joined <strong>${targetGame.title
+        `<p>Hi ${user.username},</p><p>You have successfully joined <strong>${
+          targetGame.title
         }</strong> on ${new Date(targetGame.startTime).toLocaleString()}.</p>`
       );
 
@@ -334,19 +320,6 @@ router.get("/filter", async (req, res) => {
       .sort((a, b) => new Date(a.startTime) - new Date(b.startTime))
       .map((g) => g.toObject());
 
-    // res.render("joinGame/joinGameForm", {
-    //   recommendedGames: [],
-    //   allGames: plainAll,
-    //   userId: req.user.userId,
-    //   title: "Join Games",
-    //   layout: "main",
-    //   profileCompleted: req.user?.profileCompleted || false,
-    //   head: `
-    //               <link rel="stylesheet" href="/css/joinGame.css">
-    //               <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
-    //               <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-    //             `,
-    // });
     res.json({ games: plainGames });
   } catch (error) {
     console.error("🔥 Filter route error:", error);
@@ -452,12 +425,6 @@ router.post("/leave/:id", auth, async (req, res) => {
     await joinGameData.leaveGame(gameId, userId);
     res.redirect("/join");
   } catch (e) {
-    //Removing them since logivc added in data layer
-    // if (game.host.toString() === userId) {
-    //   const isLoggedIn = true;
-    //   const joinedGames = await joinGameData.getJoinedGamesByUser(userId);
-    //   const joinedGameIdStrings = joinedGames.map((g) => g._id.toString());
-
     return res.render("joinGame/gameDetails", {
       game: game.toObject(),
       isLoggedIn,

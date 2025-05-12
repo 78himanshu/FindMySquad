@@ -14,7 +14,6 @@ import { scheduleAllPendingReminders } from "./emailScheduler.js";
 await connectDB();
 await scheduleAllPendingReminders();
 
-// Fix __dirname issue in ES Modules
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
@@ -39,7 +38,6 @@ import { attachProfileStatus } from "./middleware/profileStatus.js";
 
 const app = express();
 
-// Handlebars setup with eq helper
 const hbs = exphbs.create({
   defaultLayout: false,
   extname: ".handlebars",
@@ -297,7 +295,7 @@ const io = new Server(server, {
 app.set("io", io);
 
 // Store active chat sessions by game ID
-const activeChats = {}; // { gameId: { sockets: Set, endTime: Number } }
+const activeChats = {};
 
 // Handle socket connections
 io.on("connection", (socket) => {

@@ -27,7 +27,7 @@
       <div class="container-fluid">
         <!-- Logo -->
         <a class="navbar-brand require-profile" href="/">
-          <img src="/images/navlogo.png" alt="FindMySquad Logo" height="40" />
+          <img src="/images/navlogo.png" alt="FindMySquad Logo" height="40">
         </a>
 
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
@@ -36,17 +36,28 @@
           <span class="navbar-toggler-icon"></span>
         </button>
 
-      <!-- Collapsible nav content -->
-      <div class="collapse navbar-collapse" id="navbarContent">
-        <!-- Left nav buttons -->
-      <ul class="align-items-center justify-content-center gap-4 m-auto mb-2 mb-lg-0 me-auto navbar-nav">
-        <a href="/join" class="require-profile">
-          <button class="btn btn-outline-success">Join</button>
-        </a>
-        <a href="/host" class="btn btn-outline-success require-profile">Host</a>
-        <a href="/esports" class="btn btn-outline-success require-profile">Esports</a>
-        <a href="/gymBuddy" class="btn btn-outline-success require-profile">gymBuddy</a>
-      </ul>
+        <!-- Collapsible nav content -->
+        <div class="collapse navbar-collapse" id="navbarContent">
+          <!-- Left nav buttons -->
+          <ul
+            class="align-items-center justify-content-center gap-4 m-auto mb-2 mb-lg-0 me-auto navbar-nav">
+            <li class="nav-item">
+              <a href="/join"
+                class="btn btn-outline-success require-profile nav-link">Join</a>
+            </li>
+            <li class="nav-item">
+              <a href="/host"
+                class="btn btn-outline-success require-profile nav-link">Host</a>
+            </li>
+            <li class="nav-item">
+              <a href="/esports"
+                class="btn btn-outline-success require-profile nav-link">Esports</a>
+            </li>
+            <li class="nav-item">
+              <a href="/gymBuddy"
+                class="btn btn-outline-success require-profile nav-link">gymBuddy</a>
+            </li>
+          </ul>
 
           <div class="d-flex gap-2">
             {{#if isLoggedIn}}
@@ -100,6 +111,7 @@
                   class="text-light text-decoration-none">Profile</a></li>
             </ul>
           </div>
+
           <div class="col-md-4 text-center text-md-end">
             <a href="#" class="text-light me-3"><i
                 class="fab fa-instagram"></i></a>
@@ -110,13 +122,14 @@
           </div>
         </div>
 
-        <hr class="bg-light my-3" />
+        <hr class="bg-light my-3">
 
-      <div class="text-center small">
-        Made with ❤️, way too much ☕, and some 3AM bug-fixes — by <strong>The Debug Ninjas</strong>:Akshu, Addy,
-        Himanshi, Jittu,
-        and Chitte.
-      </div>
+        <div class="text-center small">
+          Made with ❤️, way too much ☕, and some 3AM bug-fixes — by <strong>The
+            Debug Ninjas</strong>:Akshu, Addy,
+          Himanshi, Jittu,
+          and Chitte.
+        </div>
 
         <div class="text-center small">
           &copy; {{currentYear}} FindMySquad. All Rights Reserved.
@@ -162,7 +175,7 @@
     });
   </script>
 
-  <script>
+    <script>
     document.addEventListener('DOMContentLoaded', () => {
       const disableNav = {{#if disableNav}}true{{else}}false{{/if}};
 
@@ -187,6 +200,6 @@
     });
   </script>
 
-</body>
+  </body>
 
 </html>

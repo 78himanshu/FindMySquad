@@ -10,33 +10,36 @@
         <div class="col-md-6">
           <p><strong>🏅 Sport:</strong> {{game.sport}}</p>
           <p><strong>📍 Location:</strong> {{game.location}}</p>
-          <p><strong>📆 Date & Time:</strong> {{formatDate game.startTime}} | {{formatTime game.startTime}} –
+          <p><strong>📆 Date & Time:</strong> {{formatDate game.startTime}} |
+            {{formatTime game.startTime}} –
             {{formatTime game.endTime}}</p>
-          <p><strong>👥 Players:</strong> {{game.playersGoing}} / {{game.playersRequired}}</p>
+          <p><strong>👥 Players:</strong> {{game.playersGoing}} /
+            {{game.playersRequired}}</p>
         </div>
         <div class="col-md-6">
           <p><strong>📝 Description:</strong> {{game.description}}</p>
-        {{#if game.costPerHead}}
+          {{#if game.costPerHead}}
           <p>💰 <strong>Cost per Head:</strong> ${{game.costPerHead}}</p>
-        {{/if}}
+          {{/if}}
 
-        {{#if game.bringEquipment}}
+          {{#if game.bringEquipment}}
           <p>🎒 <strong>Bring Equipment:</strong> Yes</p>
-        {{else}}
+          {{else}}
           <p>🎒 <strong>Bring Equipment:</strong> No</p>
-        {{/if}}
+          {{/if}}
 
-        {{#if game.costShared}}
+          {{#if game.costShared}}
           <p>🤝 <strong>Cost Shared:</strong> Yes</p>
-        {{else}}
+          {{else}}
           <p>🤝 <strong>Cost Shared:</strong> No</p>
-        {{/if}}
+          {{/if}}
 
-        {{#if game.extraInfo}}
+          {{#if game.extraInfo}}
           <p>📝 <strong>Additional Info:</strong> {{game.extraInfo}}</p>
-        {{/if}}
+          {{/if}}
           <p><strong>🏠 Hosted By:</strong>
-            <a href="/profile/view/{{game.host._id}}" class="text-decoration-none fw-semibold text-dark">
+            <a href="/profile/view/{{game.host._id}}"
+              class="text-decoration-none fw-semibold text-dark">
               {{game.host.username}}
             </a>
           </p>
@@ -44,7 +47,8 @@
           <p><strong>✅ Joined Players:</strong></p>
           <ul class="list-unstyled">
             {{#each joinedPlayers}}
-            <li><a href="/profile/userview/{{this._id}}" class="text-primary">{{this.username}}</a></li>
+            <li><a href="/profile/userview/{{this._id}}"
+                class="text-primary">{{this.username}}</a></li>
             {{/each}}
           </ul>
           {{/if}}
@@ -68,7 +72,8 @@
     {{#if isLoggedIn}}
     {{#if (eq userId hostId)}}
     <a href="/host/edit/{{game._id}}" class="btn btn-warning me-2">Edit</a>
-    <form action="/host/delete/{{game._id}}" method="POST" style="display:inline;">
+    <form action="/host/delete/{{game._id}}" method="POST"
+      style="display:inline;">
       <button type="submit" class="btn btn-danger">Delete</button>
     </form>
     {{else if hasJoined}}
@@ -86,27 +91,32 @@
     </form>
     {{/if}}
     {{else}}
-    <a href="/login?redirect=/join/{{game._id}}" class="btn btn-outline-primary">Login to Join</a>
+    <a href="/login?redirect=/join/{{game._id}}"
+      class="btn btn-outline-primary">Login to Join</a>
     {{/if}}
   </div>
 
   <!-- Chat Section -->
   {{#if hasJoined}}
   <div class="text-center">
-    <button id="toggleChatBtn" class="btn btn-outline-primary mb-3">💬 Open Chat</button>
+    <button id="toggleChatBtn" class="btn btn-outline-primary mb-3">💬 Open
+      Chat</button>
   </div>
 
   <section id="chatSection" style="display: none;">
     <div class="card shadow-sm mb-4">
       <div class="card-body">
         <h5 class="card-title">🗨️ Game Chat</h5>
-        <div id="chatBox" class="border rounded p-2 mb-3" style="height: 250px; overflow-y: auto; background: #f8f9fa;">
+        <div id="chatBox" class="border rounded p-2 mb-3"
+          style="height: 250px; overflow-y: auto; background: #f8f9fa;">
         </div>
         <form id="chatForm" class="d-flex">
-          <input type="text" id="chatMessage" class="form-control me-2" placeholder="Type your message..." required />
+          <input type="text" id="chatMessage" class="form-control me-2"
+            placeholder="Type your message..." required />
           <button type="submit" class="btn btn-success">Send</button>
         </form>
-        <div id="chatEndedMessage" class="text-danger fw-bold mt-2" style="display: none;">
+        <div id="chatEndedMessage" class="text-danger fw-bold mt-2"
+          style="display: none;">
           🚫 This chat has ended as the game is over.
         </div>
       </div>
@@ -116,7 +126,7 @@
 
 </div>
 <!-- Scripts -->
-<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css">
 <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 <script src="/socket.io/socket.io.js"></script>
 
@@ -175,4 +185,3 @@
   });
     });
 </script>
-</main>
