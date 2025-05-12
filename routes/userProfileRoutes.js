@@ -247,8 +247,8 @@ router.route("/view").get(verifyToken, async (req, res) => {
       city: profile.location?.city || "",
       ratings: profile.ratings,
       achievements: profile.achievements || "",
-      isOwn, // 👈 pass true
-      isFollowing, // 👈 pass false
+      isOwn, //  pass true
+      isFollowing, //  pass false
       head: `<link rel="stylesheet" href="/css/userProfile.css">`,
       query: req.query,
       showContactInfo: profile.showContactInfo,
@@ -301,11 +301,32 @@ router
 
 router.route("/addprofile").get(verifyToken, async (req, res) => {
   // console.log("req", req)
+   const formData = {
+      firstName:       req.query.firstName      || "",
+      lastName:        req.query.lastName       || "",
+      gender:          req.query.gender         || "",
+      profilePic:      req.query.profilePic     || "",
+      city:            req.query.city           || "",
+      phoneNumber:     req.query.phoneNumber    || "",
+      // coerce single-value vs repeated params into arrays
+      sportsInterests: Array.isArray(req.query.sportsInterests)
+                          ? req.query.sportsInterests
+                          : (req.query.sportsInterests ? [req.query.sportsInterests] : []),
+      workoutTypes:    Array.isArray(req.query.workoutTypes)
+                          ? req.query.workoutTypes
+                          : (req.query.workoutTypes ? [req.query.workoutTypes] : []),
+      gamingOptions:   Array.isArray(req.query.gamingOptions)
+                          ? req.query.gamingOptions
+                          : (req.query.gamingOptions ? [req.query.gamingOptions] : []),
+      showContactInfo: req.query.showContactInfo === "true",
+    };
   res.render("userProfile/complete-profile", {
     title: "Complete Profile",
     layout: "main",
     disableNav: true,
     error: req.query.error,
+    success:      req.query.success,
+    formData,
     username: req.username || null || "",
     email: req.query.email || "",
     head: `
@@ -350,6 +371,72 @@ router.route("/addprofile").get(verifyToken, async (req, res) => {
     ],
   });
 });
+
+// POST /addprofile — handle “Complete Your Profile” submission
+router.post("/addprofile", verifyToken, async (req, res) => {
+  // 1) pull raw values
+  const {
+    firstName = "",
+    lastName  = "",
+    gender    = "",
+    profilePic= "",
+    city      = "",
+    phoneNumber = ""
+  } = req.body;
+
+  // 2) coerce your checkbox arrays
+  const sportsInterests = Array.isArray(req.body.sportsInterests)
+    ? req.body.sportsInterests
+    : (req.body.sportsInterests ? [req.body.sportsInterests] : []);
+  const workoutTypes = Array.isArray(req.body.workoutTypes)
+    ? req.body.workoutTypes
+    : (req.body.workoutTypes ? [req.body.workoutTypes] : []);
+  const gamingOptions = Array.isArray(req.body.gamingOptions)
+    ? req.body.gamingOptions
+    : (req.body.gamingOptions ? [req.body.gamingOptions] : []);
+
+  // 3) rebuild a query-string so we can echo it back on errors
+  const qs = new URLSearchParams({
+    firstName, lastName, gender, profilePic, city, phoneNumber
+  });
+  sportsInterests.forEach(v =>  qs.append("sportsInterests", v));
+  workoutTypes.forEach(v =>   qs.append("workoutTypes", v));
+  gamingOptions.forEach(v =>  qs.append("gamingOptions", v));
+  if (req.body.showContactInfo) qs.append("showContactInfo", "true");
+
+  // 4) server-side validation
+  if (!firstName.trim())      return res.redirect(`/profile/addprofile?error=${encodeURIComponent("First name is required")}&${qs}`);
+  if (!lastName.trim())       return res.redirect(`/profile/addprofile?error=${encodeURIComponent("Last name is required")}&${qs}`);
+  if (!gender)                return res.redirect(`/profile/addprofile?error=${encodeURIComponent("Please select a gender")}&${qs}`);
+  if (!profilePic)            return res.redirect(`/profile/addprofile?error=${encodeURIComponent("Please pick a profile picture")}&${qs}`);
+  if (sportsInterests.length===0)
+                               return res.redirect(`/profile/addprofile?error=${encodeURIComponent("Select at least one sport")}&${qs}`);
+  if (workoutTypes.length===0)
+                               return res.redirect(`/profile/addprofile?error=${encodeURIComponent("Select at least one workout type")}&${qs}`);
+  if (gamingOptions.length===0)
+                               return res.redirect(`/profile/addprofile?error=${encodeURIComponent("Select at least one gaming interest")}&${qs}`);
+  if (!city.trim())           return res.redirect(`/profile/addprofile?error=${encodeURIComponent("City is required")}&${qs}`);
+  if (!phoneNumber.trim())    return res.redirect(`/profile/addprofile?error=${encodeURIComponent("Phone number is required")}&${qs}`);
+
+  // 5) all validations passed → create profile
+  try {
+    await userProfileData.createProfile(req.user.userID, {
+      profile: { firstName, lastName, gender, avatar: profilePic },
+      sportsInterests,
+      workoutTypes,
+      gamingOptions,
+      city,
+      phoneNumber,
+      showContactInfo: req.body.showContactInfo === "true"
+    });
+
+    // on success, trigger a success toast
+    return res.redirect(`/?success=${encodeURIComponent("Profile completed successfully!")}`);
+  } catch (e) {
+    return res.redirect(`/profile/addprofile?error=${encodeURIComponent(e.message)}&${qs}`);
+  }
+});
+
 
 // ————— Show All Bookings Page ——————
 

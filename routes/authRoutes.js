@@ -33,7 +33,6 @@ router
         return res.status(400).json({ error: "All fields are required" });
       }
 
-      // console.log("==>>>>", username, email, password, confirmPassword);
 
       if (password !== confirmPassword) {
         return res.status(400).json({ error: "Passwords do not match" });
@@ -43,8 +42,6 @@ router
       checkString(password, "password");
 
       const newUser = await authUserData.signup(username, email, password);
-
-      // console.log("newUser", newUser);
 
       // Redirect to add profile page
       return res.status(200).json({
@@ -91,8 +88,8 @@ router
         password
       );
 
-      // console.log("✅ Setting token cookie:", token);
-      // console.log("✅ Token payload:", jwt.decode(token));
+      // console.log(" Setting token cookie:", token);
+      // console.log(" Token payload:", jwt.decode(token));
 
       // console.log(token, user, profilePic);
 
