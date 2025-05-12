@@ -44,7 +44,7 @@ router
       return res.status(400).json({ error: "Request body cannot be empty" });
     }
 
-    console.log("data", data);
+    // console.log("data", data);
     const {
       title,
       gymName,
@@ -85,7 +85,7 @@ router
 
     try {
       // Log date & time inputs
-      console.log("Raw inputs:", { date, startTime, endTime });
+      // console.log("Raw inputs:", { date, startTime, endTime });
 
       checkString(title, "Title");
       checkString(gymName, "Gym Name");
@@ -100,14 +100,14 @@ router
 
       // ── keep your padded strings for DB storage ──
       const paddedStartTime = startTime.length === 5 ? `${startTime}:00` : startTime;
-      const paddedEndTime   = endTime.length === 5   ? `${endTime}:00`   : endTime;
-  
+      const paddedEndTime = endTime.length === 5 ? `${endTime}:00` : endTime;
+
       // parse hours/mins into local‐time Date objects
       const [sh, sm] = startTime.split(":").map(Number);
       const [eh, em] = endTime.split(":").map(Number);
-      const startDateTime = new Date(Y, M - 1, D, sh, sm,  0);
-      const endDateTime   = new Date(Y, M - 1, D, eh, em,  0);
-  
+      const startDateTime = new Date(Y, M - 1, D, sh, sm, 0);
+      const endDateTime = new Date(Y, M - 1, D, eh, em, 0);
+
       const now = new Date();
 
       if (
@@ -184,20 +184,19 @@ router
       };
 
 
-      // Log inputs for debugging
-      console.log("Creating session with:", {
-        title,
-        gymName,
-        description,
-        parsedSessionDate,
-        startTime,
-        endTime,
-        gymlocation,
-        experience,
-        workoutType,
-        hostedBy,
-        maxMembers,
-      });
+      // console.log("Creating session with:", {
+      //   title,
+      //   gymName,
+      //   description,
+      //   parsedSessionDate,
+      //   startTime,
+      //   endTime,
+      //   gymlocation,
+      //   experience,
+      //   workoutType,
+      //   hostedBy,
+      //   maxMembers,
+      // });
 
       await gymBuddyData.createGymSession(
         title,
@@ -476,6 +475,7 @@ router.get("/edit/:id", requireAuth, async (req, res) => {
       .populate("hostedBy", "username")
       .lean();
 
+    console.log("session", session)
     if (!session) {
       return res.status(404).render("error", { error: "Session not found" });
     }
@@ -505,6 +505,7 @@ router.get("/edit/:id", requireAuth, async (req, res) => {
         userId: session.hostedBy._id.toString(),
         username: session.hostedBy.username,
       },
+      gym_title: session.title
     });
   } catch (e) {
     console.error("Error loading edit page:", e);

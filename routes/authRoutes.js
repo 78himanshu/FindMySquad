@@ -8,7 +8,7 @@ import redirectIfLoggedIn from "../middleware/redirectIfLoggedIn.js";
 
 router
   .route("/signup")
-  .get(redirectIfLoggedIn,(req, res) => {
+  .get(redirectIfLoggedIn, (req, res) => {
     res.render("auth/signup", {
       title: "Sign Up",
       layout: "main",
@@ -33,7 +33,7 @@ router
         return res.status(400).json({ error: "All fields are required" });
       }
 
-      console.log("==>>>>", username, email, password, confirmPassword);
+      // console.log("==>>>>", username, email, password, confirmPassword);
 
       if (password !== confirmPassword) {
         return res.status(400).json({ error: "Passwords do not match" });
@@ -44,7 +44,7 @@ router
 
       const newUser = await authUserData.signup(username, email, password);
 
-      console.log("newUser", newUser);
+      // console.log("newUser", newUser);
 
       // Redirect to add profile page
       return res.status(200).json({
@@ -57,7 +57,7 @@ router
   });
 router
   .route("/login")
-  .get(redirectIfLoggedIn,(req, res) => {
+  .get(redirectIfLoggedIn, (req, res) => {
     res.render("auth/login", {
       title: "Login",
       layout: "main",
@@ -91,10 +91,10 @@ router
         password
       );
 
-      console.log("✅ Setting token cookie:", token);
-      console.log("✅ Token payload:", jwt.decode(token));
+      // console.log("✅ Setting token cookie:", token);
+      // console.log("✅ Token payload:", jwt.decode(token));
 
-      console.log(token, user, profilePic);
+      // console.log(token, user, profilePic);
 
       res.cookie("token", token, {
         httpOnly: true,
@@ -118,7 +118,7 @@ router
       if (!user.profileCompleted) {
         redirectTo = "/profile/addprofile";
       }
-      console.log(redirectTo, "test redirectTo:");
+      // console.log(redirectTo, "test redirectTo:");
       return res.status(200).json({
         message: "Login successful",
         redirect: redirectTo,

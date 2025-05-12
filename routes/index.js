@@ -31,7 +31,7 @@ const configRoutesFunction = (app) => {
       }
     }
 
-    console.log("req,", req.user);
+    // console.log("req,", req.user);
     const topUsers = await userProfileData.getTopKarmaUsers();
     // console.log("TOP USERS FOR HOMEPAGE:", topUsers);
     const upcomingGames = await hostGameData.getUpcomingGames();

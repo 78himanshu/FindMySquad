@@ -78,9 +78,9 @@ router
                   "../helpers/karmaHelper.js"
                 );
                 await updateKarmaPoints(hostId, -15);
-                console.log(
-                  `Applied -15 karma to host ${hostId} for unplayed game: ${game._id}`
-                );
+                // console.log(
+                //   `Applied -15 karma to host ${hostId} for unplayed game: ${game._id}`
+                // );
               } catch (err) {
                 console.error(
                   "Failed to apply karma penalty for unplayed game:",
@@ -123,9 +123,7 @@ router
         }
       }
       if (Object.keys(filters).length > 0) {
-        console.log(
-          "Filters for recommendation:",
-          JSON.stringify(filters, null, 2)
+        console.log("Filters for recommendation:", JSON.stringify(filters, null, 2)
         );
         recommendation = await hostGameData.getAllGames(filters);
       }
@@ -230,8 +228,7 @@ router
       await sendGameEmail(
         user.email,
         `🎮 Game Confirmation: ${targetGame.title}`,
-        `<p>Hi ${user.username},</p><p>You have successfully joined <strong>${
-          targetGame.title
+        `<p>Hi ${user.username},</p><p>You have successfully joined <strong>${targetGame.title
         }</strong> on ${new Date(targetGame.startTime).toLocaleString()}.</p>`
       );
 

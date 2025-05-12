@@ -67,7 +67,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
       const data = await res.json();
 
-      console.log("data", data);
+      // console.log("data", data);
       if (!res.ok) {
         showToast(data.error || "Update failed", "error");
       } else {

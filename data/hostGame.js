@@ -207,6 +207,8 @@ export const getUpcomingGames = async () => {
     .sort({ startTime: 1 })
     .lean();
 
+
+  console.log("games", games);
   const enriched = await Promise.all(
     games.map(async (game) => {
       // look up the host’s profile

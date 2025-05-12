@@ -26,7 +26,7 @@ const router = Router();
 router
   .route("/")
   .get(verifyToken, async (req, res) => {
-    console.log("Rendering edit view");
+    // console.log("Rendering edit view");
     try {
       const profile = await userProfileData.getProfile(req.user.userID);
       res.status(200).json(profile);
@@ -52,7 +52,7 @@ router
         xss(i.trim())
       );
 
-      console.log(">>>", req.body);
+      // console.log(">>>", req.body);
 
       if (
         !firstName ||
