@@ -44,16 +44,35 @@ import UserProfile from "../models/userProfile.js";
 import Game from "../models/hostGame.js";
 import Gym from "../models/Gym.js";
 import Tournament from "../models/tournament.js";
+import mongoose from "mongoose";
 
 
 const countHostedGames = async (userId) => {
     return await Game.countDocuments({ host: userId });
   };
   
-  const countJoinedGames = async (userId) => {
-    return await Game.countDocuments({ players: userId });
+//   const countJoinedGames = async (userId) => {
+//     return await Game.countDocuments({ players: userId });
+//   };
+  
+// const countJoinedGames = async (userId) => {
+//     return await Game.countDocuments({
+//       players: userId,
+//       host: { $ne: userId } // Only count games joined but not hosted
+//     });
+//   };
+const countJoinedGames = async (userId) => {
+    const userObjId = new mongoose.Types.ObjectId(userId);
+    return await Game.countDocuments({
+      players: userObjId,
+      host: { $ne: userObjId } // Only count games joined but not hosted
+    });
   };
   
+
+  
+  
+
   const countHostedGymSessions = async (userId) => {
     return await Gym.countDocuments({ hostedBy: userId });
   };
@@ -82,6 +101,14 @@ export const evaluateAchievements = async (userId) => {
   const hostedTournamentCount = await countHostedTournaments(userId);
   const registeredTournamentCount = await countRegisteredTournaments(userId);
 
+  console.log("Achievement Evaluation for:", userId);
+  console.log("Hosted Games:", hostedGameCount);
+  console.log("Joined Games (not hosted):", joinedGameCount);
+  console.log("Hosted Gyms:", hostedGymCount);
+  console.log("Joined Gyms:", joinedGymCount);
+  console.log("Hosted Tournaments:", hostedTournamentCount);
+  console.log("Registered Tournaments:", registeredTournamentCount);
+
   const newAchievements = new Set(profile.achievements || []);
 
   // Host
@@ -95,16 +122,24 @@ export const evaluateAchievements = async (userId) => {
     newAchievements.delete("Host");
   }
 
-  // Rookie
-  if (
-    joinedGameCount > 0 ||
-    joinedGymCount > 0 ||
-    registeredTournamentCount > 0
-  ) {
-    newAchievements.add("Rookie");
-  } else {
-    newAchievements.delete("Rookie");
-  }
+//   // Rookie
+//   if (
+//     joinedGameCount > 0 ||
+//     joinedGymCount > 0 ||
+//     registeredTournamentCount > 0
+//   ) {
+//     newAchievements.add("Rookie");
+//   } else {
+//     newAchievements.delete("Rookie");
+//   }
+
+// Rookie: Must have joined at least 2 combined across all
+const totalJoins = joinedGameCount + joinedGymCount + registeredTournamentCount;
+if (totalJoins >= 1) {
+  newAchievements.add("Rookie");
+} else {
+  newAchievements.delete("Rookie");
+}
 
   // Pro Host
   if (
