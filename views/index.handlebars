@@ -118,12 +118,12 @@
             <span>More Info</span>
             <i class="bi bi-chevron-down ms-1"></i>
           </button>
-          <a href="/join/{{_id}}" class="game-card-link text-decoration-none text-reset">
+          {{!-- <a href="/join/{{_id}}" class="game-card-link text-decoration-none text-reset"> --}}
 
             <button type="button" class="btn btn-primary btn-sm ms-auto" onclick="window.location.href='/join/{{_id}}'">
               View
             </button>
-          </a>
+            {{!-- </a> --}}
         </div>
 
         <div class="collapse mt-2" id="info-{{_id}}">
@@ -194,7 +194,7 @@
 <p class="text-center text-muted">No gym sessions coming up.</p>
 {{/if}}
 
-</section>
+
 
 <!-- ===== Gamification Section ===== -->
 <section class="container my-5 gamification-section">
