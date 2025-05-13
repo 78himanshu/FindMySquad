@@ -7,6 +7,7 @@ import userProfileRoutes from "./userProfileRoutes.js";
 import gymBuddyRoutes from "./gymBuddyRoutes.js";
 import tournamentRoutes from "./tournamentRoutes.js";
 import { hostGameData, gymBuddyData, userProfileData } from "../data/index.js";
+import { parse, format } from "date-fns";
 
 const configRoutesFunction = (app) => {
   // Base route - simplified since we're using middleware
@@ -24,9 +25,24 @@ const configRoutesFunction = (app) => {
 
     const topUsers = await userProfileData.getTopKarmaUsers();
     const upcomingGames = await hostGameData.getUpcomingGames();
-    console.log("upcomingGames", upcomingGames);
+    // console.log("upcomingGames", upcomingGames);
     const upcomingGymSessions = await gymBuddyData.getUpcomingSessions();
-    // console.log("upcomingGymSessions", upcomingGymSessions)
+    // console.log("upcomingGymSessions", upcomingGymSessions);
+
+    function formatTime(timeStr) {
+      let [h, m] = timeStr.split(":");
+      h = +h;
+      const suffix = h >= 12 ? "PM" : "AM";
+      const h12 = ((h + 11) % 12) + 1;
+      return `${h12}:${m} ${suffix}`;
+    }
+    const formattedGymSessions = upcomingGymSessions.map((s) => ({
+      ...s,
+      formattedStartTime: formatTime(s.startTime),
+      formattedEndTime: formatTime(s.endTime),
+    }));
+
+    // console.log("formattedGymSessions", formattedGymSessions)
 
     res.render("index", {
       title: "FindMySquad",
@@ -34,7 +50,7 @@ const configRoutesFunction = (app) => {
       layout: "main",
       upcomingGames: upcomingGames,
       topUsers: topUsers,
-      upcomingGymSessions,
+      upcomingGymSessions: formattedGymSessions,
       profileCompleted,
 
     });
