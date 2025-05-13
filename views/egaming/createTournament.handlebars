@@ -1,90 +1,95 @@
 <div class="py-4">
   <div class="host-game-container">
     <h1>Create Tournament</h1>
-    <form id="createTournamentForm" action="/tournaments/create" method="POST"
-      class="host-game-form">
+    <form id="createTournamentForm" action="/tournaments/create" method="POST" class="host-game-form">
 
       <!-- Game Selection -->
-      <select name="game">
-        <option value disabled {{#unless
-          formData.game}}selected{{/unless}}>Select Game</option>
+      <label for="game" class="form-label">
+        Select Game <span class="text-danger">*</span>
+      </label>
+      <select id="game" name="game" class="form-select">
+        <option value disabled {{#unless formData.game}}selected{{/unless}}>Select Game</option>
         {{#each games}}
-        <option value="{{this}}" {{#if (eq this
-          ../formData.game)}}selected{{/if}}>{{this}}</option>
+        <option value="{{this}}" {{#if (eq this ../formData.game)}}selected{{/if}}>{{this}}</option>
         {{/each}}
       </select>
 
       <!-- Format -->
-      <select name="format">
-        <option value disabled {{#unless
-          formData.format}}selected{{/unless}}>Select Format</option>
+      <label for="format" class="form-label mt-3">
+        Select Format <span class="text-danger">*</span>
+      </label>
+      <select id="format" name="format" class="form-select">
+        <option value disabled {{#unless formData.format}}selected{{/unless}}>Select Format</option>
         {{#each (array "1v1" "2v2" "3v3" "4v4" "5v5")}}
-        <option value="{{this}}" {{#if (eq this
-          ../formData.format)}}selected{{/if}}>{{this}}</option>
+        <option value="{{this}}" {{#if (eq this ../formData.format)}}selected{{/if}}>{{this}}</option>
         {{/each}}
       </select>
 
       <!-- Date -->
-      <input
-        type="date"
-        name="date"
-        min="{{minDate}}"
-        value="{{formData.date}}">
+      <label for="date" class="form-label mt-3">
+        Date <span class="text-danger">*</span>
+      </label>
+      <input id="date" type="date" name="date" class="form-control" min="{{minDate}}" value="{{formData.date}}">
 
       <!-- Start & End Time -->
       <div class="form-row">
-        <input
-          type="time"
-          name="startTime"
-          value="{{formData.startTime}}">
-        <input
-          type="time"
-          name="endTime"
-          value="{{formData.endTime}}">
+        <div class="col">
+          <label for="startTime" class="form-label">
+            Start Time <span class="text-danger">*</span>
+          </label>
+          <input id="startTime" type="time" name="startTime" class="form-control" value="{{formData.startTime}}">
+        </div>
+        <div class="col">
+          <label for="endTime" class="form-label">
+            End Time <span class="text-danger">*</span>
+          </label>
+          <input id="endTime" type="time" name="endTime" class="form-control" value="{{formData.endTime}}">
+        </div>
       </div>
 
       <!-- Skill Level -->
-      <select name="skillLevel">
-        <option value disabled {{#unless
-          formData.skillLevel}}selected{{/unless}}>Select Skill Level</option>
-        {{#each (array "Novice 1" "Novice 2" "Novice 3" "Amateur 1" "Amateur 2"
-        "Amateur 3" "Expert 1" "Expert 2" "Expert 3")}}
-        <option value="{{this}}" {{#if (eq this
-          ../formData.skillLevel)}}selected{{/if}}>{{this}}</option>
+      <label for="skillLevel" class="form-label mt-3">
+        Skill Level <span class="text-danger">*</span>
+      </label>
+      <select id="skillLevel" name="skillLevel" class="form-select">
+        <option value disabled {{#unless formData.skillLevel}}selected{{/unless}}>Select Skill Level</option>
+        {{#each (array "Novice 1" "Novice 2" "Novice 3" "Amateur 1" "Amateur 2" "Amateur 3" "Expert 1" "Expert 2"
+        "Expert 3")}}
+        <option value="{{this}}" {{#if (eq this ../formData.skillLevel)}}selected{{/if}}>{{this}}</option>
         {{/each}}
       </select>
 
       <!-- Max Teams -->
-      <input
-        type="number"
-        name="maxTeams"
-        min="1"
-        max="100"
-        value="{{formData.maxTeams}}"
-        placeholder="Max Teams (1–100)">
+      <label for="maxTeams" class="form-label mt-3">
+        Max Teams (1–100) <span class="text-danger">*</span>
+      </label>
+      <input id="maxTeams" type="number" name="maxTeams" class="form-control" min="1" max="100"
+        value="{{formData.maxTeams}}" placeholder="Max Teams (1–100)">
 
       <!-- Tournament Description -->
-      <textarea
-        name="description"
-        placeholder="Tournament Description (10–200 chars)"
-        minlength="10"
+      <label for="description" class="form-label mt-3">
+        Description (10–200 chars) <span class="text-danger">*</span>
+      </label>
+      <textarea id="description" name="description" class="form-control"
+        placeholder="Tournament Description (10–200 chars)" minlength="10"
         maxlength="200">{{formData.description}}</textarea>
 
       <!-- Prize Details -->
-      <textarea
-        name="prizeDescription"
-        placeholder="Prize Details (e.g. 1st: $100, 2nd: $50, 3rd: $25)"
-        minlength="5"
+      <label for="prizeDescription" class="form-label mt-3">
+        Prize Details (5–50 chars) <span class="text-danger">*</span>
+      </label>
+      <textarea id="prizeDescription" name="prizeDescription" class="form-control"
+        placeholder="Prize Details (e.g. 1st: $100, 2nd: $50, 3rd: $25)" minlength="5"
         maxlength="50">{{formData.prizeDescription}}</textarea>
 
-      <button type="submit" class="submit-btn">Create Tournament</button>
+      <button type="submit" class="submit-btn btn btn-primary mt-4">Create Tournament</button>
     </form>
   </div>
 </div>
 
 <script>
   document.addEventListener('DOMContentLoaded', () => {
-    const dateInput = document.querySelector('input[name="date"]');
+    const dateInput = document.getElementById('date');
     dateInput.min = '{{minDate}}';
 
     const form = document.getElementById('createTournamentForm');

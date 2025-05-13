@@ -83,65 +83,8 @@
   color: #2c3e50;
 }
 
-
-#toast-container {
-  position: fixed;
-  bottom: 1.5rem;
-  right: 0%;
-  transform: translateX(-50%);
-  z-index: 9999;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.75rem;
-}
-
-.toast {
-  min-width: 280px;
-  padding: 1rem 1.5rem;
-  border-radius: 8px;
-  color: #fff;
-  font-weight: 500;
-  box-shadow: 0 10px 15px rgba(0, 0, 0, 0.2);
-  animation: slideUpFade 0.4s ease forwards;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
-  position: relative;
-  opacity: 0;
-}
-
-.toast--success {
-  background: linear-gradient(to right, #00b09b, #96c93d);
-}
-
-.toast--error {
-  background: linear-gradient(to right, #e52d27, #b31217);
-}
-
-.toast--info {
-  background: linear-gradient(to right, #2193b0, #6dd5ed);
-}
-
-.toast__close {
-  cursor: pointer;
-  font-weight: bold;
-  background: none;
-  border: none;
-  color: white;
-  font-size: 1.1rem;
-  line-height: 1;
-}
-
-@keyframes slideUpFade {
-  0% {
-    transform: translateY(30px);
-    opacity: 0;
-  }
-
-  100% {
-    transform: translateY(0);
-    opacity: 1;
-  }
+.toggle-password {
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+  padding: 0.375rem 0.75rem;   /* match Bootstrap’s .form-control vertical & horizontal padding */
 }

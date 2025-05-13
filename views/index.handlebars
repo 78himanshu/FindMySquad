@@ -1,121 +1,3 @@
-<style>
-  .game-card {
-    border-radius: 1rem;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-    overflow: hidden;
-  }
-
-  .skill-badge {
-    background-color: #28a745;
-    font-size: 0.85rem;
-    padding: 0.5em 1em;
-    border-radius: 0.5rem;
-    color: white;
-  }
-
-  .feature-badge {
-    font-size: 0.85rem;
-    padding: 0.5em 0.75em;
-    border-radius: 0.5rem;
-    white-space: nowrap;
-  }
-
-  .feature-badge.equipment {
-    background-color: #ffdd57;
-    color: #212529;
-  }
-
-  .feature-badge.shared {
-    background-color: #cfe2ff;
-    color: #084298;
-  }
-
-  .host-avatar {
-    width: 48px;
-    height: 48px;
-    border-radius: 50%;
-    object-fit: cover;
-    border: 2px solid white;
-  }
-
-  .card-title {
-    font-size: 1.25rem;
-    font-weight: 600;
-  }
-
-  .more-info .link-primary {
-    font-size: 0.9rem;
-    font-weight: 500;
-  }
-
-  .more-info .collapse.show+a .bi-chevron-down {
-    transform: rotate(-180deg);
-  }
-
-  .section-header .border-top {
-    border-top-width: 3px !important;
-    border-color: #6f42c1 !important;
-  }
-
-  .about-grid .grid-item {
-    aspect-ratio: 1/1;
-    overflow: hidden;
-  }
-
-  .grid-item.span-2 {
-    grid-column: span 2;
-    grid-row: span 2;
-  }
-
-  .shape-block {
-    width: 100%;
-    height: 100%;
-  }
-
-  .about-grid .grid-item:hover img,
-  .about-grid .grid-item:hover .shape-block {
-    transform: scale(1.03);
-    transition: transform 0.3s;
-  }
-
-  /* Gamification card tweaks */
-.gamification-section .card-body {
-  background: #f8f9fa;
-  border-radius: 1rem;
-}
-.gamification-section h2 {
-  color: #343a40;
-}
-
-  .card-link {
-    display: block;
-  }
-
-  .card-link.text-decoration-none {
-    text-decoration: none !important;
-    color: inherit !important;
-  }
-
-  .card-link:hover .game-card {
-    transform: translateY(-4px);
-    transition: transform 0.2s;
-    cursor: pointer;
-  }
-
-  .session-card .card-body {
-    padding-bottom: 3rem !important;
-  }
-
-  .session-card .host-avatar {
-    bottom: 1rem;
-    right: 1rem;
-  }
-
-  .session-card .more-info .btn-primary {
-    z-index: 1;
-  }
-</style>
-
 <section class="hero d-flex align-items-center text-white bg-dark" style="
     min-height: 80vh;
   ">
@@ -154,7 +36,7 @@
 <section class="container my-5">
   <div class="card shadow-sm">
     <div class="card-header text-white text-center py-3 bg-primary">
-      <h4 class="mb-0">🏆 Top Karma Users</h4>
+      <h4 class="mb-0">Top Users</h4>
     </div>
 
     <ul class="list-group list-group-flush">
@@ -196,7 +78,7 @@
   {{!-- <a href="/join/{{_id}}" class="game-card-link text-decoration-none text-reset"> --}}
     <div class="card game-card h-100 position-relative">
       <div class="card-body pb-4 p-0">
-        <span class="badge skill-badge position-absolute top-0 end-0 m-3">
+        <span class="badge skill-badge position-absolute end-0 top-0">
           {{skillLevel}}
         </span>
 
@@ -216,7 +98,7 @@
         </ul>
 
         <div class="d-flex flex-wrap gap-2 mb-3">
-          {{#if equipmentRequired}}
+          {{#if bringEquipment}}
           <span class="badge feature-badge equipment">
             <i class="bi bi-backpack-fill me-1"></i> BYO Equipment
           </span>
@@ -236,12 +118,12 @@
             <span>More Info</span>
             <i class="bi bi-chevron-down ms-1"></i>
           </button>
-          <a href="/join/{{_id}}" class="game-card-link text-decoration-none text-reset">
+          {{!-- <a href="/join/{{_id}}" class="game-card-link text-decoration-none text-reset"> --}}
 
             <button type="button" class="btn btn-primary btn-sm ms-auto" onclick="window.location.href='/join/{{_id}}'">
               View
             </button>
-          </a>
+            {{!-- </a> --}}
         </div>
 
         <div class="collapse mt-2" id="info-{{_id}}">
@@ -259,9 +141,6 @@
 
 
 
-
-
-
 <div class="container p-0">
   <div class="d-flex align-items-center my-4 section-header">
     <div class="flex-grow-1 border-top"></div>
@@ -274,65 +153,63 @@
 {{#if upcomingGymSessions.length}}
 <div id="sessionCarousel" class="game-scroll-wrapper container">
   {{#each upcomingGymSessions}}
-  {{#ifCond @index '<' 15}} <a href="/gymBuddy/find/{{_id}}"
-    class="card-link text-decoration-none text-reset mb-4 d-block">
-    <div class="card game-card session-card h-100 position-relative">
-      <div class="card-body pb-4 p-0">
-        <h5 class="card-title mb-3">{{title}}</h5>
+  {{#ifCond @index '<' 15}} <div class="card game-card session-card h-100 position-relative">
+    <div class="card-body pb-4 p-0">
+      <h5 class="card-title mb-3">{{title}}</h5>
 
-        <ul class="list-unstyled mb-3 small text-secondary flex-grow-1">
-          <li><strong>Date:</strong> {{date}}</li>
-          <li><strong>Time:</strong> {{startTime}} – {{endTime}}</li>
-          <li><strong>Gym:</strong> {{gym}}</li>
-          <li><strong>Members:</strong> {{members.length}} / {{maxMembers}}</li>
-        </ul>
+      <ul class="list-unstyled mb-3 small text-secondary flex-grow-1">
+        <li><strong>Date:</strong> {{date}}</li>
+        <li><strong>Time:</strong> {{startTime}} – {{endTime}}</li>
+        <li><strong>Gym:</strong> {{gym}}</li>
+        <li><strong>Members:</strong> {{members.length}} / {{maxMembers}}</li>
+      </ul>
 
-        <hr class="my-3">
+      <hr class="my-3">
 
-        <div class="d-flex align-items-center mt-auto">
-          <button type="button" class="btn btn-link link-primary p-0 me-3 d-flex align-items-center"
-            data-bs-toggle="collapse" data-bs-target="#sess-info-{{_id}}" aria-expanded="false"
-            aria-controls="sess-info-{{_id}}">
-            More Info <i class="bi bi-chevron-down ms-1"></i>
-          </button>
+      <div class="d-flex align-items-center mt-auto">
+        <button type="button" class="btn btn-link link-primary p-0 me-3 d-flex align-items-center"
+          data-bs-toggle="collapse" data-bs-target="#sess-info-{{_id}}" aria-expanded="false"
+          aria-controls="sess-info-{{_id}}">
+          More Info <i class="bi bi-chevron-down ms-1"></i>
+        </button>
 
-          <button type="button" class="btn btn-primary btn-sm ms-auto" onclick="location.href='/gymBuddy/find/{{_id}}'">
-            View
-          </button>
-        </div>
-
-        <div class="collapse mt-2" id="sess-info-{{_id}}">
-          <p class="text-secondary mb-0">{{description}}</p>
-        </div>
+        <button type="button" class="btn btn-primary btn-sm ms-auto" onclick="location.href='/gymBuddy/find/{{_id}}'">
+          View
+        </button>
       </div>
 
-      <img src="{{#if host.avatarUrl}}{{host.avatarUrl}}{{else}}/images/avatar-placeholder.png{{/if}}" alt="Host avatar"
-        class="host-avatar position-absolute bottom-0 end-0 m-3">
+      <div class="collapse mt-2" id="sess-info-{{_id}}">
+        <p class="text-secondary mb-0 discription">{{description}}</p>
+      </div>
     </div>
-    </a>
-    {{/ifCond}}
-    {{/each}}
+
+    <img src="{{#if host.avatarUrl}}{{host.avatarUrl}}{{else}}/images/avatar-placeholder.png{{/if}}" alt="Host avatar"
+      class="host-avatar position-absolute bottom-0 end-0 m-3">
+</div>
+
+{{/ifCond}}
+{{/each}}
 </div>
 {{else}}
 <p class="text-center text-muted">No gym sessions coming up.</p>
 {{/if}}
 
-</section>
 
-  <!-- ===== Gamification Section ===== -->
-  <section class="container my-5 gamification-section">
-    <div class="card shadow-sm border-0">
-      <div class="card-body text-center">
-        <h2 class="fw-bold mb-3">Level Up with Gamification</h2>
-        <p class="lead text-muted mb-4">
-          Earn karma points by hosting games, joining sessions, and sharing reviews.  
-          Climb the leaderboard, unlock achievement badges, and show off your squad-building skills!
-        </p>
-        <a href="/gamification" class="btn btn-primary btn-lg">Read More</a>
-      </div>
+
+<!-- ===== Gamification Section ===== -->
+<section class="container my-5 gamification-section">
+  <div class="card shadow-sm border-0">
+    <div class="card-body text-center">
+      <h2 class="fw-bold mb-3">Level Up with Gamification</h2>
+      <p class="lead text-muted mb-4">
+        Earn karma points by hosting games, joining sessions, and sharing reviews.
+        Climb the leaderboard, unlock achievement badges, and show off your squad-building skills!
+      </p>
+      <a href="/gamification" class="btn btn-primary btn-lg">Read More</a>
     </div>
-  </section>
-  <!-- ===== End Gamification Section ===== -->
+  </div>
+</section>
+<!-- ===== End Gamification Section ===== -->
 
 
 <section class="about-team py-5 bg-white rounded shadow-sm">
@@ -341,15 +218,13 @@
       <div class="col-lg-6">
         <h2 class="fw-bold display-6 mb-3">About the Team</h2>
         <p class="text-muted mb-4">
-          At FindMySquad, our team thrives on collaboration and shared passion for sports.
+          At FindMySquad, we thrives on collaboration and shared passion for sports.
           We bring together diverse skills—from coding and design to community building—to craft
           seamless, engaging experiences for every player.
           With open communication, mutual respect, and a relentless drive to innovate,
           we tackle challenges as one united squad and celebrate every victory together.
         </p>
-        <div class="d-flex gap-3">
-          <a href="#" class="btn btn-success btn-lg">READ OUR STORY</a>
-        </div>
+        <!-- (removed READ OUR STORY button) -->
       </div>
 
       <div class="col-lg-6">

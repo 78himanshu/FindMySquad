@@ -127,8 +127,8 @@ if (followBtn) {
   });
 }
 
-// Reuse your existing toast helper from auth.js:
-function showToast(message, type = "info", duration = 5000) {
+
+function showToast(message, type = "info", duration = 10000) {
   const container = document.getElementById("toast-container");
   if (!container) return;
   const toast = document.createElement("div");
