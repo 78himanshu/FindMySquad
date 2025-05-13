@@ -559,36 +559,38 @@ router.post("/update/:id", requireAuth, async (req, res) => {
 });
 
 // Delete Gym Session
-router.post("/delete/:id", requireAuth, async (req, res) => {
+router.delete("/delete/:id", requireAuth, async (req, res) => {
   const { id } = req.params;
 
   if (!ObjectId.isValid(id)) {
-    return res.status(400).render("error", { message: "Invalid session ID" });
+    return res.status(400).json({ error: "Invalid session ID" });
   }
 
   try {
     const session = await Gym.findById(id);
 
     if (!session) {
-      return res.status(404).render("error", { message: "Session not found" });
+      return res.status(404).json({ error: "Session not found" });
     }
 
     if (session.hostedBy.toString() !== req.user.userId) {
       return res
         .status(403)
-        .render("error", { message: "Unauthorized to delete this session" });
+        .json({ error: "Unauthorized to delete this session" });
     }
 
     await updateKarmaPoints(session.hostedBy.toString(), -15);
     await evaluateAchievements(session.hostedBy.toString());
 
     await Gym.deleteOne({ _id: id });
-    res.redirect("/gymBuddy/mySessions");
+
+    return res.json({ success: true, message: "Session deleted" }); 
   } catch (e) {
     console.error("Error deleting session:", e);
-    res.status(500).render("error", { message: "Internal server error" });
+    return res.status(500).json({ error: "Internal server error" });
   }
 });
+
 
 // View session details
 router.get("/find/:id", async (req, res) => {

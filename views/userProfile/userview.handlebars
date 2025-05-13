@@ -4,15 +4,13 @@
         <div class="col-md-3">
             <div class="card border rounded shadow-sm">
                 <div class="card-body text-center">
-                    <img src="{{viewedUser.avatar}}" alt="avatar"
-                        class="rounded-circle mb-3" width="90" height="90">
+                    <img src="{{viewedUser.avatar}}" alt="avatar" class="rounded-circle mb-3" width="90" height="90">
                     <h5 class="fw-semibold mb-1">{{viewedUser.firstName}}
                         {{viewedUser.lastName}}</h5>
-                    <small
-                        class="text-muted d-block">{{viewedUser.email}}</small>
+                    <small class="text-muted d-block">{{viewedUser.email}}</small>
                     <small class="text-muted">{{viewedUser.gender}}</small>
                 </div>
-                --}}
+
 
                 {{#if isOwn}}
                 <!-- Do not show Follow button if it’s your own profile -->
@@ -23,9 +21,7 @@
                 {{/if}}
 
                 <ul class="list-group list-group-flush">
-                    <li
-                        class="list-group-item bg-success text-white fw-semibold nav-btn"
-                        data-target="overview">
+                    <li class="list-group-item bg-success text-white fw-semibold nav-btn" data-target="overview">
                         <i class="bi bi-bookmark-fill me-2"></i> Overview
                     </li>
 
@@ -34,8 +30,7 @@
                         <li class="list-group-item nav-btn" data-target="edit">
                             <i class="bi bi-pencil me-2"></i> Edit Profile
                         </li>
-                        <li class="list-group-item nav-btn"
-                            data-target="bookings">
+                        <li class="list-group-item nav-btn" data-target="bookings">
                             <i class="bi bi-reply me-2"></i> Show All Bookings
                         </li>
                     </ul>
@@ -51,11 +46,9 @@
                 <div class="card-body">
                     {{#if query.msg}}
                     {{#if (eq query.msg "already_logged_in")}}
-                    <div class="alert alert-warning alert-dismissible fade show"
-                        role="alert">
+                    <div class="alert alert-warning alert-dismissible fade show" role="alert">
                         You are already logged in.
-                        <button type="button" class="btn-close"
-                            data-bs-dismiss="alert" aria-label="Close"></button>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                     </div>
                     {{/if}}
                     {{/if}}
@@ -96,8 +89,7 @@
                                 <p class="text-muted">Karma Points</p>
                             </div>
                             <div class="col-md-3">
-                                <h5
-                                    id="followerCount">{{viewedUser.followers.length}}</h5>
+                                <h5 id="followerCount">{{viewedUser.followers.length}}</h5>
                                 <p class="text-muted">Followers</p>
                             </div>
                             <div class="col-md-3">
@@ -105,12 +97,10 @@
                                 <p class="text-muted">Following</p>
                             </div>
                             <div class="col-md-3">
-                                <div
-                                    class="align-items-center d-flex justify-content-center mt-4 row text-center">
+                                <div class="align-items-center d-flex justify-content-center mt-4 row text-center">
 
                                     {{#if viewedUser.ratingCount}}
-                                    <p
-                                        class="mb-0 fs-5">{{viewedUser.averageRating}}
+                                    <p class="mb-0 fs-5">{{viewedUser.averageRating}}
                                         / 5</p>
                                     <small class="text-muted">Based on
                                         {{viewedUser.ratingCount}}
@@ -194,40 +184,40 @@
         });
 
 
-      const followButton    = document.getElementById('followButton');
-  const followerCountEl = document.getElementById('followerCount');
+        const followButton = document.getElementById('followButton');
+        const followerCountEl = document.getElementById('followerCount');
 
-  if (followButton) {
-    followButton.addEventListener('click', async () => {
-      const targetUserId = followButton.dataset.userId;
-      const isFollowing  = followButton.innerText.trim() === 'Following';
-      const action       = isFollowing ? 'unfollow' : 'follow';
+        if (followButton) {
+            followButton.addEventListener('click', async () => {
+                const targetUserId = followButton.dataset.userId;
+                const isFollowing = followButton.innerText.trim() === 'Following';
+                const action = isFollowing ? 'unfollow' : 'follow';
 
-      try {
-        const res    = await fetch(`/profile/${action}/${targetUserId}`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          credentials: 'include'
-        });
-        const newCount = await res.json();  //this should be the updated follower count
-        console.log("new count log", newCount);
+                try {
+                    const res = await fetch(`/profile/${action}/${targetUserId}`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        credentials: 'include'
+                    });
+                    const newCount = await res.json();  //this should be the updated follower count
+                    console.log("new count log", newCount);
 
-        if (res.ok) {
-          // 1) Toggle button text
-          followButton.innerText = isFollowing ? 'Follow' : 'Following';
+                    if (res.ok) {
+                        // 1) Toggle button text
+                        followButton.innerText = isFollowing ? 'Follow' : 'Following';
 
-          // 2) Immediately refresh the sidebar count
-          followerCountEl.textContent = newCount.followersCount;
+                        // 2) Immediately refresh the sidebar count
+                        followerCountEl.textContent = newCount.followersCount;
 
-          showToast(`${isFollowing ? 'Unfollowed' : 'Followed'} successfully! 🎉`, true);
-        } else {
-          showToast(newCount.error || 'Something went wrong.', false);
+                        showToast(`${isFollowing ? 'Unfollowed' : 'Followed'} successfully! 🎉`, true);
+                    } else {
+                        showToast(newCount.error || 'Something went wrong.', false);
+                    }
+                } catch (err) {
+                    showToast('Server error. Please try again.', false);
+                }
+            });
         }
-      } catch (err) {
-        showToast('Server error. Please try again.', false);
-      }
-    });
-  }
 
     });
 

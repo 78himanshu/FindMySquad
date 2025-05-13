@@ -1,5 +1,6 @@
 document.addEventListener("DOMContentLoaded", () => {
   const form = document.querySelector(".host-game-form");
+  const submitBtn = form.querySelector('button[type="submit"]');
   const hostId = document.querySelector("input[name='host']").value;
   const isEditMode = form.dataset.edit === "true";
   const gameId = form.dataset.gameId;
@@ -152,6 +153,10 @@ document.addEventListener("DOMContentLoaded", () => {
         return showToastError("Description contains inappropriate language.");
     }
 
+
+    submitBtn.disabled = true;
+    const originalLabel = submitBtn.textContent;
+    submitBtn.textContent = isEditMode ? "Updating…" : "Hosting…";
     // Build the form payload
     const formData = {
       title,
@@ -197,6 +202,8 @@ document.addEventListener("DOMContentLoaded", () => {
     } catch (err) {
       console.error("AJAX error:", err);
       showToastError(err.message);
+      submitBtn.disabled = false;
+      submitBtn.textContent = originalLabel;
     }
   });
 });

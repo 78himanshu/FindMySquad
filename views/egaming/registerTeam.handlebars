@@ -103,25 +103,25 @@
       </form>
     </div>
 
-    {{!-- BELOW: SHOW ALL OTHER TEAMS --}}
-    <div class="card mb-4 p-3">
-      <h4>Other Teams in This Tournament : </h4>
-      {{#if otherTeams.length}}
-      {{#each tournament.teams}}
-      <div class="mb-4">
-        <h5>{{this.teamName}}</h5>
-        <p class="fst-italic text-muted">{{this.description}}</p>
-        <p class="fst-italic text-muted">
-          Members: {{length this.players}} / {{../playersPerTeam}}
-        </p>
-        <ul class="list-group">
-          {{#each this.players}}
-          <li class="list-group-item">{{this.username}}</li>
-          {{/each}}
-        </ul>
-      </div>
-      {{/each}}
-      {{else}}
+      {{!-- BELOW: SHOW ALL OTHER TEAMS --}}
+  <div class="card mb-4 p-3">
+    <h4>Other Teams in This Tournament : </h4>
+    {{#if otherTeams.length}}
+    {{#each otherTeams}}
+        <div class="mb-4">
+          <h5>{{this.teamName}}</h5>
+          <p class="fst-italic text-muted">{{this.description}}</p>
+          <p class="fst-italic text-muted">
+            Members: {{length this.players}} / {{../playersPerTeam}}
+          </p>
+          <ul class="list-group">
+            {{#each this.players}}
+              <li class="list-group-item">{{this.username}}</li>
+            {{/each}}
+          </ul>
+        </div>
+    {{/each}}
+    {{else}}
       <p class="text-muted">No other teams have been created yet.</p>
       {{/if}}
     </div>
@@ -204,5 +204,10 @@
     <p class="text-muted">No teams have been created yet.</p>
     {{/if}}
     {{/if}}
+<div class="mt-4">
+    <a href="/esports/game/{{encodeURI tournament.game}}" class="btn btn-outline-secondary w-100">
+      &larr; Back to {{tournament.game}} Tournaments
+    </a>
+    </div>
   </div>
 </div>

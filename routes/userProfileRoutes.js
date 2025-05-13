@@ -2,7 +2,7 @@ import express from "express";
 import { Router } from "express";
 import { userProfileData, joinGameData, gymBuddyData } from "../data/index.js";
 import verifyToken from "../middleware/auth.js";
-import { checkString } from "../utils/helper.js";
+import { checkString } from "../utils/Helper.js";
 import Userlist from "../models/User.js";
 import mongoose from "mongoose";
 import UserProfile from "../models/userProfile.js";
@@ -285,11 +285,33 @@ router
   });
 
 router.route("/addprofile").get(verifyToken, async (req, res) => {
+  // console.log("req", req)
+   const formData = {
+      firstName:       req.query.firstName      || "",
+      lastName:        req.query.lastName       || "",
+      gender:          req.query.gender         || "",
+      profilePic:      req.query.profilePic     || "",
+      city:            req.query.city           || "",
+      phoneNumber:     req.query.phoneNumber    || "",
+      // coerce single-value vs repeated params into arrays
+      sportsInterests: Array.isArray(req.query.sportsInterests)
+                          ? req.query.sportsInterests
+                          : (req.query.sportsInterests ? [req.query.sportsInterests] : []),
+      workoutTypes:    Array.isArray(req.query.workoutTypes)
+                          ? req.query.workoutTypes
+                          : (req.query.workoutTypes ? [req.query.workoutTypes] : []),
+      gamingOptions:   Array.isArray(req.query.gamingOptions)
+                          ? req.query.gamingOptions
+                          : (req.query.gamingOptions ? [req.query.gamingOptions] : []),
+      showContactInfo: req.query.showContactInfo === "true",
+    };
   res.render("userProfile/complete-profile", {
     title: "Complete Profile",
     layout: "main",
     disableNav: true,
     error: req.query.error,
+    success:      req.query.success,
+    formData,
     username: req.username || null || "",
     email: req.query.email || "",
     head: `

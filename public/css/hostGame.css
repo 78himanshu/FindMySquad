@@ -1,125 +1,127 @@
 body {
-    background-color: #f2f6fc;
-    font-family: 'Segoe UI', sans-serif;
-    margin: 0;
-    padding: 0;
-  }
-  
-  .host-game-container {
-    max-width: 600px;
-    margin: 4rem auto;
-    padding: 2rem 3rem;
-    background-color: #fff;
-    border-radius: 16px;
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
-  }
-  
-  .host-game-container h1 {
-    text-align: center;
-    margin-bottom: 1.5rem;
-    font-size: 1.8rem;
-  }
-  
-  .host-game-form {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-  }
-  
-  .host-game-form input,
-  .host-game-form select,
-  .host-game-form textarea {
-    padding: 0.75rem 1rem;
-    font-size: 1rem;
-    border-radius: 8px;
-    border: 1px solid #ccc;
-    width: 100%;
-    box-sizing: border-box;
-  }
-  
-  textarea {
-    resize: vertical;
-    min-height: 80px;
-  }
-  
-  .form-checks {
-    display: flex;
-    justify-content: space-between;
-    gap: 1rem;
-    font-size: 0.95rem;
-    padding: 0.5rem 0;
-  }
-  .form-row {
-    display: flex;
-    gap: 1rem;
-    flex-wrap: wrap;
-  }
-  
-  .form-row input {
-    flex: 1;
-  }
-  .submit-btn {
-    background-color: #4caf50;
-    color: white;
-    font-weight: bold;
-    padding: 0.75rem;
-    font-size: 1rem;
-    border-radius: 10px;
-    border: none;
-    cursor: pointer;
-    transition: background-color 0.3s;
-  }
-  
-  .submit-btn:hover {
-    background-color: #3e8e41;
-  }
-  
+  background-color: #f2f6fc;
+  font-family: 'Segoe UI', sans-serif;
+  margin: 0;
+  padding: 0;
+}
 
-  /* Host Game Success */
-  .success-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 80vh;
-    background-color: #f2f6fc;
-  }
-  
-  .success-box {
-    background-color: #ffffff;
-    padding: 3rem;
-    border-radius: 20px;
-    text-align: center;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
-  }
-  
-  .success-box h1 {
-    font-size: 2rem;
-    color: #4caf50;
-    margin-bottom: 1rem;
-  }
-  
-  .success-box p {
-    font-size: 1.1rem;
-    margin-bottom: 2rem;
-  }
-  
-  .success-btn {
-    display: inline-block;
-    padding: 0.8rem 1.5rem;
-    background-color: #4caf50;
-    color: #fff;
-    font-weight: bold;
-    border-radius: 12px;
-    text-decoration: none;
-    margin-right: 1rem;
-    transition: background-color 0.3s;
-  }
-  
-  .success-btn:hover {
-    background-color: #3e8e41;
-  }
-  
-  .home-link {
-    text-decoration: underline;
-    color: #007bff;
-  }
+.host-game-container {
+  max-width: 600px;
+  margin: 4rem auto;
+  padding: 2rem 3rem;
+  background-color: #fff;
+  border-radius: 16px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+}
+
+.host-game-container h1 {
+  text-align: center;
+  margin-bottom: 1.5rem;
+  font-size: 1.8rem;
+}
+
+.host-game-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+
+.host-game-form select,
+.host-game-form textarea {
+  padding: 0.75rem 1rem;
+  font-size: 1rem;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+textarea {
+  resize: vertical;
+  min-height: 80px;
+}
+
+.form-checks {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  font-size: 0.95rem;
+  padding: 0.5rem 0;
+}
+
+.form-row {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.form-row input {
+  flex: 1;
+}
+
+.submit-btn {
+  background-color: #4caf50;
+  color: white;
+  font-weight: bold;
+  padding: 0.75rem;
+  font-size: 1rem;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.submit-btn:hover {
+  background-color: #3e8e41;
+}
+
+
+/* Host Game Success */
+.success-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 80vh;
+  background-color: #f2f6fc;
+}
+
+.success-box {
+  background-color: #ffffff;
+  padding: 3rem;
+  border-radius: 20px;
+  text-align: center;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+}
+
+.success-box h1 {
+  font-size: 2rem;
+  color: #4caf50;
+  margin-bottom: 1rem;
+}
+
+.success-box p {
+  font-size: 1.1rem;
+  margin-bottom: 2rem;
+}
+
+.success-btn {
+  display: inline-block;
+  padding: 0.8rem 1.5rem;
+  background-color: #4caf50;
+  color: #fff;
+  font-weight: bold;
+  border-radius: 12px;
+  text-decoration: none;
+  margin-right: 1rem;
+  transition: background-color 0.3s;
+}
+
+.success-btn:hover {
+  background-color: #3e8e41;
+}
+
+.home-link {
+  text-decoration: underline;
+  color: #007bff;
+}
