@@ -37,15 +37,25 @@
     el.style.display = el.style.display === "none" ? "block" : "none";
   }
 
-  function deleteSession(id) {
-    if (confirm("Delete this session?")) {
-      fetch(`/gymBuddy/delete/${id}`, { method: 'DELETE' })
-        .then(res => res.ok ? location.reload() : alert("Failed to delete"));
-    }
+function deleteSession(id) {
+  if (confirm("Delete this session?")) {
+    fetch(`/gymBuddy/delete/${id}`, { method: 'DELETE' })
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          location.reload();
+        } else {
+          alert(data.error || "Failed to delete");
+        }
+      })
+      .catch(() => alert("Request failed"));
   }
+}
 
-  function leaveSession(id) {
-    fetch(`/gymBuddy/leave/${id}`, { method: 'POST' })
-      .then(res => res.ok ? location.reload() : alert("Failed to leave session"));
+ function leaveSession(id) {
+    fetch(`/gymBuddy/leave/${id}`, {
+      method: 'POST'
+    })
+    .then(res => res.ok ? location.reload() : alert("Failed to leave session"));
   }
 </script>
