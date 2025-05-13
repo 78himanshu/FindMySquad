@@ -24,7 +24,7 @@ const configRoutesFunction = (app) => {
 
     const topUsers = await userProfileData.getTopKarmaUsers();
     const upcomingGames = await hostGameData.getUpcomingGames();
-    // console.log("upcomingGames", upcomingGames);
+    console.log("upcomingGames", upcomingGames);
     const upcomingGymSessions = await gymBuddyData.getUpcomingSessions();
     // console.log("upcomingGymSessions", upcomingGymSessions)
 
