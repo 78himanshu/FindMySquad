@@ -126,6 +126,9 @@ router.post("/create", requireAuth, async (req, res, next) => {
   if (description.length < 10) {
     return respondError("Description must be at least 10 characters.");
   }
+  if (description.length > 200) {
+    return respondError("Description must be at max 200 characters.");
+  }
 
   // 1) Prize Description: 5–50 chars
   if (

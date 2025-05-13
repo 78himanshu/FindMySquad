@@ -169,34 +169,28 @@ export const getAllGymSessions = async () => {
   return await Gym.find({}).populate("hostedBy", "username");
 };
 
-// get all gym sessions where this user is a member
 export const getJoinedSessionsByUser = async (userId) => {
   if (!ObjectId.isValid(userId)) throw "Invalid user ID";
-  // Assumes your Gym schema has a `members: [ObjectId]` field
   return await Gym.find({ members: userId }).populate("hostedBy", "username");
 };
 
 export const getUpcomingSessions = async () => {
   const now = new Date();
 
-  // 1) Load every session, populate hostedBy → { _id, username }
   const sessions = await Gym.find({})
     .populate("hostedBy", "username")
     .lean();
 
-  // 2) Convert your string date+time into a real Date object
   const withDates = sessions.map((s) => ({
     ...s,
     __startDate: new Date(`${s.date}T${s.startTime}`)
   }));
 
-  // 3) Filter out past sessions, sort by start, and take the first 15
   const upcoming = withDates
     .filter((s) => s.__startDate > now)
     .sort((a, b) => a.__startDate - b.__startDate)
     .slice(0, 15);
 
-  // 4) Enrich each session with host profile info
   const enriched = await Promise.all(
     upcoming.map(async (session) => {
       const profile = await UserProfile.findOne(
