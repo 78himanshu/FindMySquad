@@ -265,7 +265,6 @@ router.get("/find", async (req, res) => {
     } catch {
       obj.formattedDateTime = "Invalid Date";
     }
-
     obj.currentMembers = session.members.length;
     obj.maxMembers = session.maxMembers;
     obj.members = session.members.map((m) => ({
@@ -636,7 +635,7 @@ router.get("/find/:id", async (req, res) => {
     } catch {
       sessionObj.formattedDateTime = "Invalid Date";
     }
-
+    sessionObj.hostUsername = session.hostedBy.username;
     sessionObj.currentMembers = session.members.length;
     sessionObj.maxMembers = session.maxMembers;
     sessionObj.members = session.members.map((m) => ({
@@ -653,6 +652,7 @@ router.get("/find/:id", async (req, res) => {
       isHost,
       hasJoined,
       username: req.user?.username || "",
+      hostUsername: sessionObj.hostUsername
     });
   } catch (e) {
     console.error("Error in /gymBuddy/find/:id:", e);
