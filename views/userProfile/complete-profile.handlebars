@@ -1,4 +1,4 @@
-<main class="container my-5 pb-5">
+<div class="container my-5 pb-5">
     <h2 class="text-center mb-4">Complete Your Profile</h2>
 
     <form id="profileForm" class="mx-auto" method="POST" action="/profile/addprofile"
@@ -7,21 +7,21 @@
         <div class="row mb-3 g-3">
             <div class="col-md-4">
                 <label for="firstName" class="form-label">First Name *</label>
-                <input type="text" name="firstName" id="firstName"
-                    class="form-control" placeholder="First Name" value="{{formData.firstName}}">
+                <input type="text" name="firstName" id="firstName" class="form-control" placeholder="First Name"
+                    value="{{formData.firstName}}">
             </div>
             <div class="col-md-4">
                 <label for="lastName" class="form-label">Last Name *</label>
-                <input type="text" name="lastName" id="lastName"
-                    class="form-control" placeholder="Last Name" value="{{formData.lastName}}">
+                <input type="text" name="lastName" id="lastName" class="form-control" placeholder="Last Name"
+                    value="{{formData.lastName}}">
             </div>
             <div class="col-md-4">
                 <label for="gender" class="form-label">Gender *</label>
                 <select class="form-select" name="gender" id="gender">
                     <option value="" disabled selected>Select Gender</option>
-                    <option value="Male" {{#if (eq formData.gender "Male")}}selected{{/if}}>Male</option>
-                    <option value="Female" {{#if (eq formData.gender "Female")}}selected{{/if}}>Female</option>
-                    <option value="Other" {{#if (eq formData.gender "Other")}}selected{{/if}}>Other</option>
+                    <option value="Male" {{#if (eq formData.gender "Male" )}}selected{{/if}}>Male</option>
+                    <option value="Female" {{#if (eq formData.gender "Female" )}}selected{{/if}}>Female</option>
+                    <option value="Other" {{#if (eq formData.gender "Other" )}}selected{{/if}}>Other</option>
                 </select>
             </div>
         </div>
@@ -30,29 +30,28 @@
         <label>Select a Profile Pic *</label>
         <div class="d-flex gap-3">
             <label>
-                <input type="radio" name="profilePic"
-                    value="/images/profile1.PNG" hidden
-                    {{#if (eq formData.profilePic "/images/profile1.PNG")}}checked{{/if}}>
-                <img src="/images/profile1.PNG"
-                    class="img-thumbnail profile-option {{#if (eq formData.profilePic "/images/profile1.PNG")}}selected{{/if}}" width="60">
+                <input type="radio" name="profilePic" value="/images/profile1.PNG" hidden {{#if (eq
+                    formData.profilePic "/images/profile1.PNG" )}}checked{{/if}}>
+                <img src="/images/profile1.PNG" class="img-thumbnail profile-option {{#if (eq formData.profilePic "
+                    /images/profile1.PNG")}}selected{{/if}}" width="60" alt="Profile option: avatar 1">
             </label>
             <label>
-                <input type="radio" name="profilePic"
-                    value="/images/profile2.jpg" hidden  {{#if (eq formData.profilePic "/images/profile2.jpg")}}checked{{/if}}>
-                <img src="/images/profile2.jpg"
-                    class="img-thumbnail profile-option  {{#if (eq formData.profilePic "/images/profile2.jpg")}}selected{{/if}}" width="60">
+                <input type="radio" name="profilePic" value="/images/profile2.jpg" hidden {{#if (eq
+                    formData.profilePic "/images/profile2.jpg" )}}checked{{/if}}>
+                <img src="/images/profile2.jpg" class="img-thumbnail profile-option  {{#if (eq formData.profilePic "
+                    /images/profile2.jpg")}}selected{{/if}}" width="60" alt="Profile option: avatar 2">
             </label>
             <label>
-                <input type="radio" name="profilePic"
-                    value="/images/profile3.jpg" hidden {{#if (eq formData.profilePic "/images/profile3.jpg")}}checked{{/if}}>
-                <img src="/images/profile3.jpg"
-                    class="img-thumbnail profile-option {{#if (eq formData.profilePic "/images/profile3.jpg")}}selected{{/if}}" width="60">
+                <input type="radio" name="profilePic" value="/images/profile3.jpg" hidden {{#if (eq
+                    formData.profilePic "/images/profile3.jpg" )}}checked{{/if}}>
+                <img src="/images/profile3.jpg" class="img-thumbnail profile-option {{#if (eq formData.profilePic "
+                    /images/profile3.jpg")}}selected{{/if}}" width="60" alt="Profile option: avatar 3">
             </label>
             <label>
-                <input type="radio" name="profilePic"
-                    value="/images/profile4.jpg" hidden {{#if (eq formData.profilePic "/images/profile4.jpg")}}checked{{/if}}>
-                <img src="/images/profile4.jpg"
-                    class="img-thumbnail profile-option{{#if (eq formData.profilePic "/images/profile4.jpg")}}selected{{/if}}" width="60">
+                <input type="radio" name="profilePic" value="/images/profile4.jpg" hidden {{#if (eq
+                    formData.profilePic "/images/profile4.jpg" )}}checked{{/if}}>
+                <img src="/images/profile4.jpg" class="img-thumbnail profile-option{{#if (eq formData.profilePic "
+                    /images/profile4.jpg")}}selected{{/if}}" width="60" alt="Profile option: avatar 4">
             </label>
         </div>
 
@@ -60,19 +59,16 @@
         <div class="row mt-4">
             <div class="col-md-6">
                 <label for="city" class="form-label">City *</label>
-                <input type="text" id="city" name="city" class="form-control"
-                    placeholder="Enter your city" value="{{formData.city}}" >
+                <input type="text" id="city" name="city" class="form-control" placeholder="Enter your city"
+                    value="{{formData.city}}">
             </div>
             <div class="col-md-6">
-                <label for="phoneNumber" class="form-label">Phone Number <span
-                        class="text-danger">*</span></label>
-                <input type="tel" id="phoneNumber" name="phoneNumber"
-                    class="form-control"
-                    placeholder="Enter a valid phone number"
-                    value="{{formData.phoneNumber}}" />
+                <label for="phoneNumber" class="form-label">Phone Number <span class="text-danger">*</span></label>
+                <input type="tel" id="phoneNumber" name="phoneNumber" class="form-control"
+                    placeholder="Enter a valid phone number" value="{{formData.phoneNumber}}">
                 <div id="phoneError" class="form-text text-danger"></div>
                 <small class="form-text text-muted">Format: 123-456-7890</small>
-                <div id="phoneError" class="form-text text-danger"></div>
+
             </div>
         </div>
 
@@ -85,10 +81,11 @@
         <div class="row row-cols-2 row-cols-md-4 g-2 mt-2" id="sportsList">
             {{#each sportsList}}
             <div class="col text-center">
-                <label class="btn btn-outline-success w-100 {{#if (includes ../formData.sportsInterests this)}}active{{/if}}">
-                    <input type="checkbox" name="sportsInterests"
-                        value="{{this}}" class="d-none" {{#if (includes ../formData.sportsInterests this)}}checked{{/if}} > 
-                        {{this}}
+                <label
+                    class="btn btn-outline-success w-100 {{#if (includes ../formData.sportsInterests this)}}active{{/if}}">
+                    <input type="checkbox" name="sportsInterests" value="{{this}}" class="d-none" {{#if (includes
+                        ../formData.sportsInterests this)}}checked{{/if}}>
+                    {{this}}
                 </label>
             </div>
             {{/each}}
@@ -99,9 +96,10 @@
             <div class="row row-cols-2 row-cols-md-4 g-2 mt-2" id="workoutList">
                 {{#each workoutTypes}}
                 <div class="col text-center">
-                    <label class="btn btn-outline-success w-100 {{#if (includes ../formData.workoutTypes this)}}active{{/if}}">
-                        <input type="checkbox" name="workoutTypes"
-                            value="{{this}}" class="d-none" {{#if (includes ../formData.workoutTypes this)}}checked{{/if}}> {{this}}
+                    <label
+                        class="btn btn-outline-success w-100 {{#if (includes ../formData.workoutTypes this)}}active{{/if}}">
+                        <input type="checkbox" name="workoutTypes" value="{{this}}" class="d-none" {{#if (includes
+                            ../formData.workoutTypes this)}}checked{{/if}}> {{this}}
                     </label>
                 </div>
                 {{/each}}
@@ -114,24 +112,26 @@
             <div class="row row-cols-2 row-cols-md-4 g-2 mt-2" id="gamingList">
                 {{#each gamingOptions}}
                 <div class="col text-center">
-                    <label class="btn btn-outline-success w-100 {{#if (includes ../formData.gamingOptions this)}}active{{/if}}">
-                        <input type="checkbox" name="gamingOptions"
-                            value="{{this}}" class="d-none" {{#if (includes ../formData.gamingOptions this)}}checked{{/if}}> 
-                            {{this}}
+                    <label
+                        class="btn btn-outline-success w-100 {{#if (includes ../formData.gamingOptions this)}}active{{/if}}">
+                        <input type="checkbox" name="gamingOptions" value="{{this}}" class="d-none" {{#if (includes
+                            ../formData.gamingOptions this)}}checked{{/if}}>
+                        {{this}}
                     </label>
                 </div>
                 {{/each}}
             </div>
         </div>
         <div class="form-check mt-3">
-            <input class="form-check-input" type="checkbox" id="showContactInfo" name="showContactInfo" {{#if formData.showContactInfo}}checked{{/if}}>
+            <input class="form-check-input" type="checkbox" id="showContactInfo" name="showContactInfo" {{#if
+                formData.showContactInfo}}checked{{/if}}>
             <label class="form-check-label" for="showContactInfo">
                 Show contact information on your profile
             </label>
         </div>
         <button type="submit" class="btn btn-primary mt-4">Save Profile</button>
     </form>
-</main>
+</div>
 
 
 <script src="/js/main.js"></script>
@@ -230,24 +230,24 @@
         const allowedGenders = new Set(["Male", "Female", "Other"]);
         if (!allowedGenders.has(gender)) return showToast('Please select a valid gender.');
         if (sports.length === 0 || !sports.every(s => allowedSports.has(s)))
-        return showToast("Please select valid sports from the list.");
+            return showToast("Please select valid sports from the list.");
 
         if (workouts.length > 0 && !workouts.every(w => allowedWorkouts.has(w)))
-        return showToast("Please select valid workout types from the list.");
+            return showToast("Please select valid workout types from the list.");
 
         if (games.length > 0 && !games.every(g => allowedGames.has(g)))
-        return showToast("Please select valid gaming interests from the list.");
+            return showToast("Please select valid gaming interests from the list.");
 
-const city = form.city.value.trim();
-const phoneNumber = form.phoneNumber.value.trim();
+        const city = form.city.value.trim();
+        const phoneNumber = form.phoneNumber.value.trim();
 
-if (!city) return showToast('Please enter your city.');
-if (!phoneNumber) return showToast('Phone number is required.');
+        if (!city) return showToast('Please enter your city.');
+        if (!phoneNumber) return showToast('Phone number is required.');
 
-const phonePattern = /^(\+?1\s?)?(\(\d{3}\)|\d{3})[\s.-]?\d{3}[\s.-]?\d{4}$/;
-if (!phonePattern.test(phoneNumber)) {
-  return showToast('Please enter a valid phone number (e.g., 123-456-7890)');
-}
+        const phonePattern = /^(\+?1\s?)?(\(\d{3}\)|\d{3})[\s.-]?\d{3}[\s.-]?\d{4}$/;
+        if (!phonePattern.test(phoneNumber)) {
+            return showToast('Please enter a valid phone number (e.g., 123-456-7890)');
+        }
 
         // Prepare and send the data
         const profileData = {
@@ -273,7 +273,7 @@ if (!phonePattern.test(phoneNumber)) {
             });
 
             const result = await res.json();
-            console.log("result hbd",result);
+            console.log("result hbd", result);
             if (res.ok) {
                 showToast('Profile saved successfully!', true);
                 setTimeout(() => window.location.href = '/', 1500);
@@ -294,10 +294,10 @@ if (!phonePattern.test(phoneNumber)) {
     async defer></script>
 
 <script>
-  function initAutocomplete() {
-    const input = document.getElementById('city');
-    new google.maps.places.Autocomplete(input, {
-      types: ['(cities)']
-    });
-  }
+    function initAutocomplete() {
+        const input = document.getElementById('city');
+        new google.maps.places.Autocomplete(input, {
+            types: ['(cities)']
+        });
+    }
 </script>
