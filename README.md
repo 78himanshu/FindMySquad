@@ -52,6 +52,13 @@
 ### 👫 Friend System
 - Users can follow others to keep track of their activity; followers/following numbers are visible on profiles.
 
+### 🕹️ Esports Tournaments
+- ⁠*Create & Manage:* Hosts can spin up new tournaments (choose game, format, date/time, skill level, prize pool), then edit or delete them before they start.
+-  ⁠*Team Registration:* Users can either create a new team or join an existing one—team‐size & slot counts are enforced, and overlaps (e.g. time conflicts) are blocked.
+-⁠  ⁠*Leader Controls:* Tournament creators see a “Manage Teams” view; team leaders can add/remove members or disband their squads.
+-⁠  ⁠*Live Status:* Once the tournament’s start time passes, a “Started” badge replaces all join/create buttons.
+-  **⁠*Conflict Prevention* blocks overlapping tournament registrations for the same user.**
+
 ---
 
 ## 🚀 Technologies Used
