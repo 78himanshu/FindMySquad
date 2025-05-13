@@ -221,12 +221,12 @@ body {
 }
 
 
-/* error tost code  */
+
 #toast-container {
   position: fixed;
   bottom: 1.5rem;
-  top: 20%;
-  right: 30%;
+  right: 0%;
+  top: 10%;
   /* transform: translateX(-50%); */
   z-index: 9999;
   display: flex;
@@ -234,7 +234,6 @@ body {
   align-items: center;
   gap: 0.75rem;
 }
-
 
 .toast {
   min-width: 280px;
@@ -250,12 +249,6 @@ body {
   gap: 1rem;
   position: relative;
   opacity: 0;
-  transition: opacity 0.3s ease, transform 0.3s ease;
-}
-
-.toast.fade-out {
-  opacity: 0 !important;
-  transform: translateY(20px);
 }
 
 .toast--success {
@@ -865,8 +858,10 @@ a.disabled {
 }
 
 .card-title-strong {
-  font-weight: 900 !important;   /* super-bold */
-  color: #000000 !important;     /* pure black */
+  font-weight: 900 !important;
+  /* super-bold */
+  color: #000000 !important;
+  /* pure black */
 }
 
 .required-star {

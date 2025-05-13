@@ -20,6 +20,8 @@ document.addEventListener("DOMContentLoaded", () => {
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
 
+
+
     const gym_title = form.gym_title.value.trim();
     const gymName = form.gym.value.trim();
     const description = form.description.value.trim();
@@ -32,25 +34,57 @@ document.addEventListener("DOMContentLoaded", () => {
     const maxMembers = form.maxMembers.value;
 
     // Validations
-    if (!gym_title) return showToastError("Workout title is required.");
-    if (!gymName) return showToastError("gym  is required.");
-    if (!description) return showToastError("Description is required.");
-    if (!date) return showToastError("Please select a date.");
-    if (!startTime || !endTime)
-      return showToastError("Start and end times are required.");
+    if (!gym_title) {
+      showToastError("Workout title is required.");
+      return false;
+    }
+    if (!gymName) {
+      showToastError("Gym name is required.");
+      return false;
+    }
+    if (!description) {
+      showToastError("Description is required.");
+      return false;
+    }
+    if (!date) {
+      showToastError("Please select a date.");
+      return false;
+    }
+    if (!startTime || !endTime) {
+      showToastError("Please select start and end time.");
+      return false;
+    }
 
     const start = new Date(`${date}T${startTime}`);
     const end = new Date(`${date}T${endTime}`);
-    if (start >= end)
-      return showToastError("End time must be after start time.");
-    if (start < new Date())
-      return showToastError("Start time cannot be in the past.");
+    if (start >= end) {
+      showToastError("End time must be after start time.");
+      return false;
+    }
 
-    if (!gymLocation) return showToastError("Gym location is required.");
-    if (!experience)
-      return showToastError("Please select your experience level.");
-    if (!workoutType) return showToastError("Please select a workout type.");
-    if (!maxMembers) return showToastError("Please select number of members.");
+    if (start < new Date()) {
+      showToastError("Start time cannot be in the past.");
+      return false;
+    }
+
+
+    if (!gymLocation) {
+      showToastError("Gym location is required.");
+      return false;
+    }
+    if (!experience) {
+      showToastError("Please select your experience level.");
+      return false;
+    }
+
+    if (!workoutType) {
+      showToastError("Please select a workout type.");
+      return false;
+    }
+    if (!maxMembers) {
+      showToastError("Please select number of members.");
+      return false;
+    }
 
     const formData = {
       title: gym_title,
@@ -66,9 +100,16 @@ document.addEventListener("DOMContentLoaded", () => {
       hostedBy: hostId,
     };
 
+    const submitBtn = form.querySelector('button[type="submit"]');
+    submitBtn.disabled = true;
+    const originalText = submitBtn.textContent;
+    submitBtn.textContent = isEditMode ? "Updating…" : "Creating…";
+
     const endpoint = isEditMode
       ? `/gymBuddy/update/${sessionId}`
       : "/gymBuddy/create";
+
+
 
     try {
       const response = await fetch(endpoint, {
@@ -79,14 +120,19 @@ document.addEventListener("DOMContentLoaded", () => {
         body: JSON.stringify(formData),
       });
 
+
+
       const data = await response.json();
 
+      console.log("data", data)
+
       if (!response.ok)
+        // showToastError(data.error || "Failed to save gym session.");
         throw new Error(data.error || "Failed to save gym session.");
 
       showToast(
         `Gym session successfully ${isEditMode ? "updated" : "created"}!`,
-        true
+        "success"
       );
 
       setTimeout(() => {
@@ -96,6 +142,8 @@ document.addEventListener("DOMContentLoaded", () => {
     } catch (err) {
       console.error("AJAX error:", err);
       showToastError(err.message);
+      submitBtn.disabled = false;
+      submitBtn.textContent = originalText;
     }
   });
 });
