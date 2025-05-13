@@ -2,7 +2,7 @@ const { ObjectId } = mongoose.Types;
 import { geocodeCity } from "../utils/geocode.js";
 
 import UserProfile from "../models/userProfile.js";
-import { checkString } from "../utils/helper.js";
+import { checkString } from "../utils/Helper.js";
 import Userlist from "../models/User.js";
 import mongoose from "mongoose";
 import HostGame from "../models/hostGame.js";

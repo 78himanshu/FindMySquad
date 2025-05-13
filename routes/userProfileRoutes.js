@@ -2,7 +2,7 @@ import express from "express";
 import { Router } from "express";
 import { userProfileData, joinGameData, gymBuddyData } from "../data/index.js";
 import verifyToken from "../middleware/auth.js";
-import { checkString } from "../utils/helper.js";
+import { checkString } from "../utils/Helper.js";
 import Userlist from "../models/User.js";
 import mongoose from "mongoose";
 import UserProfile from "../models/userProfile.js";
