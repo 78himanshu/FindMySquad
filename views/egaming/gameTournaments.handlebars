@@ -81,6 +81,8 @@
             </form>
 
             {{!-- 3a) future but full --}}
+             {{else if this.hasJoined}}
+            <a href="/esports/{{this._id}}/register-team" class="btn btn-primary">View Team</a>
             {{else}}
             {{#if this.canJoin}}
             <a href="/esports/{{this._id}}/register-team"

@@ -50,6 +50,13 @@ const configRoutesFunction = (app) => {
     });
   });
 
+  app.get("/gamification", (req, res) => {
+    res.render("gamification", {
+      title: "How Gamification Works",
+      layout: "main",
+      currentYear: new Date().getFullYear()
+    });
+  });
   // Auth routes
   app.use("/", authRoutes);
 

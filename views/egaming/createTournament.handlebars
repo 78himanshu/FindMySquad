@@ -5,6 +5,9 @@
       class="host-game-form">
 
       <!-- Game Selection -->
+      <label for="game" class="form-label">
+        Select Game <span class="text-danger">*</span>
+      </label>
       <select name="game">
         <option value disabled {{#unless
           formData.game}}selected{{/unless}}>Select Game</option>
@@ -15,6 +18,9 @@
       </select>
 
       <!-- Format -->
+      <label for="format" class="form-label mt-3">
+        Select Format <span class="text-danger">*</span>
+      </label>
       <select name="format">
         <option value disabled {{#unless
           formData.format}}selected{{/unless}}>Select Format</option>
@@ -25,6 +31,9 @@
       </select>
 
       <!-- Date -->
+      <label for="date" class="form-label mt-3">
+        Date <span class="text-danger">*</span>
+      </label>
       <input
         type="date"
         name="date"
@@ -33,17 +42,31 @@
 
       <!-- Start & End Time -->
       <div class="form-row">
+        <div class="col">
+          <label for="startTime" class="form-label">
+            Start Time <span class="text-danger">*</span>
+          </label>
+
         <input
           type="time"
           name="startTime"
           value="{{formData.startTime}}">
+       </div> 
+        <div class="col">
+          <label for="endTime" class="form-label">
+            End Time <span class="text-danger">*</span>
+          </label>
         <input
           type="time"
           name="endTime"
           value="{{formData.endTime}}">
       </div>
+      </div>
 
       <!-- Skill Level -->
+      <label for="skillLevel" class="form-label mt-3">
+        Skill Level <span class="text-danger">*</span>
+      </label>
       <select name="skillLevel">
         <option value disabled {{#unless
           formData.skillLevel}}selected{{/unless}}>Select Skill Level</option>
@@ -55,6 +78,9 @@
       </select>
 
       <!-- Max Teams -->
+      <label for="maxTeams" class="form-label mt-3">
+        Max Teams (1–100) <span class="text-danger">*</span>
+      </label>
       <input
         type="number"
         name="maxTeams"
@@ -64,6 +90,9 @@
         placeholder="Max Teams (1–100)">
 
       <!-- Tournament Description -->
+      <label for="description" class="form-label mt-3">
+        Description (10–200 chars) <span class="text-danger">*</span>
+      </label>
       <textarea
         name="description"
         placeholder="Tournament Description (10–200 chars)"
@@ -72,6 +101,9 @@
         >{{formData.description}}</textarea>
 
       <!-- Prize Details -->
+      <label for="prizeDescription" class="form-label mt-3">
+        Prize Details (5–50 chars) <span class="text-danger">*</span>
+      </label>
       <textarea
         name="prizeDescription"
         placeholder="Prize Details (e.g. 1st: $100, 2nd: $50, 3rd: $25)"

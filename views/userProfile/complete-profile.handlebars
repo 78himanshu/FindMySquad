@@ -18,7 +18,7 @@
             <div class="col-md-4">
                 <label for="gender" class="form-label">Gender *</label>
                 <select class="form-select" name="gender" id="gender">
-                    <option value>Select Gender</option>
+                    <option value="" disabled selected>Select Gender</option>
                     <option value="Male" {{#if (eq formData.gender "Male")}}selected{{/if}}>Male</option>
                     <option value="Female" {{#if (eq formData.gender "Female")}}selected{{/if}}>Female</option>
                     <option value="Other" {{#if (eq formData.gender "Other")}}selected{{/if}}>Other</option>
@@ -136,6 +136,10 @@
 
 <script src="/js/main.js"></script>
 <script>
+    const allowedSports = new Set(["Soccer", "Basketball", "Baseball", "Tennis", "Swimming", "Running", "Cycling", "Hiking", "Golf", "Volleyball"]);
+    const allowedWorkouts = new Set(["Cardio", "Weight Training", "CrossFit", "Yoga", "HIIT", "Pilates", "Zumba", "Bodyweight"]);
+    const allowedGames = new Set(["FPS (e.g., Call of Duty)", "Battle Royale (e.g., Fortnite)", "MOBA (e.g., Dota 2)", "Sports (e.g., FIFA)", "Racing (e.g., Forza)", "Simulation (e.g., Sims)", "RPG (e.g., Elden Ring)", "MMORPG", "Strategy", "Puzzle"]);
+
     document.addEventListener('DOMContentLoaded', () => {
         const profilePics = document.querySelectorAll('input[name="profilePic"]');
         const profileImages = document.querySelectorAll('.profile-option');
@@ -171,6 +175,117 @@
             }
         });
     });
+
+    function showToast(message, isSuccess = false) {
+        const toast = document.getElementById('toastMsg');
+        const toastBody = document.getElementById('toastBody');
+
+        // Set message and color
+        toastBody.textContent = message;
+        toast.classList.remove('bg-danger', 'bg-success');
+        toast.classList.add(isSuccess ? 'bg-success' : 'bg-danger');
+
+        // Show toast
+        const toastBootstrap = bootstrap.Toast.getOrCreateInstance(toast);
+        toastBootstrap.show();
+    }
+
+
+
+    const form = document.getElementById('profileForm');
+
+    form.onsubmit = async function (e) {
+        e.preventDefault();
+
+        // Clear any previous error
+        const existingError = document.getElementById('formError');
+        if (existingError) existingError.remove();
+
+        const showError = (msg) => {
+            const errorDiv = document.createElement('div');
+            errorDiv.id = 'formError';
+            errorDiv.className = 'alert alert-danger mt-3';
+            errorDiv.textContent = msg;
+            form.prepend(errorDiv);
+        };
+
+        // Gather form data
+        const firstName = form.firstName.value.trim();
+        const lastName = form.lastName.value.trim();
+        const gender = form.gender.value;
+        const profilePic = form.querySelector('input[name="profilePic"]:checked');
+        const sports = Array.from(form.querySelectorAll('input[name="sportsInterests"]:checked')).map(i => i.value);
+        const workouts = Array.from(form.querySelectorAll('input[name="workoutTypes"]:checked')).map(i => i.value);
+        const games = Array.from(form.querySelectorAll('input[name="gamingOptions"]:checked')).map(i => i.value);
+        const bio = form.bio.value.trim();
+
+        // Validate required fields
+        if (!firstName || !lastName) return showToast('First and Last name are required.');
+        if (!profilePic) return showToast('Please select a profile picture.');
+        if (sports.length === 0) return showToast('Please select at least one sport.');
+        const nameRegex = /^[A-Za-z]{1,50}$/;
+        if (!nameRegex.test(firstName)) return showToast('First name must be 1-50 letters only.');
+        if (!nameRegex.test(lastName)) return showToast('Last name must be 1-50 letters only.');
+        if (bio.length > 300) return showToast('Bio must be under 300 characters.');
+        const allowedGenders = new Set(["Male", "Female", "Other"]);
+        if (!allowedGenders.has(gender)) return showToast('Please select a valid gender.');
+        if (sports.length === 0 || !sports.every(s => allowedSports.has(s)))
+        return showToast("Please select valid sports from the list.");
+
+        if (workouts.length > 0 && !workouts.every(w => allowedWorkouts.has(w)))
+        return showToast("Please select valid workout types from the list.");
+
+        if (games.length > 0 && !games.every(g => allowedGames.has(g)))
+        return showToast("Please select valid gaming interests from the list.");
+
+const city = form.city.value.trim();
+const phoneNumber = form.phoneNumber.value.trim();
+
+if (!city) return showToast('Please enter your city.');
+if (!phoneNumber) return showToast('Phone number is required.');
+
+const phonePattern = /^(\+?1\s?)?(\(\d{3}\)|\d{3})[\s.-]?\d{3}[\s.-]?\d{4}$/;
+if (!phonePattern.test(phoneNumber)) {
+  return showToast('Please enter a valid phone number (e.g., 123-456-7890)');
+}
+
+        // Prepare and send the data
+        const profileData = {
+            firstName,
+            lastName,
+            gender,
+            profilePic: profilePic.value,
+            bio,
+            sportsInterests: sports,
+            gymPreferences: workouts,
+            gamingInterests: games,
+            city,
+            phoneNumber,
+            showContactInfo: form.showContactInfo?.checked || false,
+            //geoLocation
+        };
+
+        try {
+            const res = await fetch('/profile', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(profileData)
+            });
+
+            const result = await res.json();
+            console.log("result hbd",result);
+            if (res.ok) {
+                showToast('Profile saved successfully!', true);
+                setTimeout(() => window.location.href = '/', 1500);
+            } else {
+                showToast(result.error || 'Something went wrong.', false);
+            }
+
+        } catch (err) {
+            console.error(err);
+            showError('Server error occurred.');
+        }
+    };
 
 </script>
 

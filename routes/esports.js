@@ -255,6 +255,7 @@ router.get("/game/:gameName", async (req, res, next) => {
       t.hasEnded = hasEnded;
       t.isOngoing = isOngoing;
       t.isCreator = userId && t.creator._id.toString() === userId;
+      t.hasJoined     = isParticipant;
       // only mark full when you've hit maxTeams AND every team is itself at capacity
       const maxTeams = t.maxTeams || 0;
       const playersPerTeam = parseInt(t.format.split("v")[0], 10);
@@ -270,6 +271,7 @@ router.get("/game/:gameName", async (req, res, next) => {
       t.isFull = hitTeamLimit && allAtCapacity && !isParticipant && !t.isOngoing;
       t.canJoin = !t.isFull && !t.isCreator;
       t.isParticipant = isParticipant;
+      t.canJoin       = !t.isFull && !t.isCreator && !isParticipant;
 
       if (t.hasEnded) {
         pastTournaments.push(t);
@@ -385,6 +387,14 @@ router.get(
         ? "You’re already registered in a tournament that overlaps this time."
         : "";
 
+       // ── compute the one team the user is on, and filter out all others ──
+       const userTeam = teams.find(t =>
+         t.players.some(p => p._id.toString() === userId)
+       );
+       const otherTeams = userTeam
+         ? teams.filter(t => t._id.toString() !== userTeam._id.toString())
+         : teams;  
+
         for (const ot of occupied) {
       if (new Date(ot.date).toDateString() !== tDate.toDateString()) continue;
       const [oh1, om1] = ot.startTime.split(':').map(Number);
@@ -396,12 +406,6 @@ router.get(
         break;
       }
     }
-      const userTeam = teams.find(t =>
-          t.players.some(p => p._id.toString() === userId)
-        );
-        const otherTeams = teams.filter(t =>
-          !userTeam || t._id.toString() !== userTeam._id.toString()
-        );
       res.render("egaming/registerTeam", {
         tournament,
         layout: "main",
