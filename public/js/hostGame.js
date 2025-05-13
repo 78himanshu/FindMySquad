@@ -54,9 +54,9 @@ document.addEventListener("DOMContentLoaded", () => {
     if (
       form.playersRequired.value.trim() === "" ||
       isNaN(playersRequired) ||
-      playersRequired <= 0
+      playersRequired <= 0 || playersRequired >= 50
     ) {
-      showToastError("Players Required must be a number greater than 0.");
+      showToastError("Players Required must be a number greater than 0 and less than 50");
       return;
     }
 
@@ -64,9 +64,9 @@ document.addEventListener("DOMContentLoaded", () => {
     if (
       form.costPerHead.value.trim() === "" ||
       isNaN(costPerHead) ||
-      costPerHead < 0
+      costPerHead < 0 || costPerHead > 100
     ) {
-      showToastError("Cost per Head must be a valid number (0 or more).");
+      showToastError("Cost per Head must be a valid number (0 or more) and less than 100");
       return;
     }
 

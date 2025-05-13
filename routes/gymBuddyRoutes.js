@@ -9,6 +9,8 @@ import Gym from "../models/Gym.js";
 import { updateKarmaPoints } from "../utils/karmaHelper.js";
 import { evaluateAchievements } from "../utils/achievementHelper.js";
 import axios from "axios";
+import { DateTime } from "luxon";
+import { hasTimeConflict } from "../utils/calendar.js";
 
 // Home
 router.get("/", (req, res) => {
@@ -25,7 +27,7 @@ router.get("/", (req, res) => {
 router
   .get("/create", requireAuth, (req, res) => {
     res.render("Gym/createSession", {
-      title: "",
+      title: "Create Gym session",
       layout: "main",
       today: new Date().toISOString().split("T")[0],
       head: `<link rel="stylesheet" href="/css/gym.css">`,
@@ -70,12 +72,14 @@ router
     if (
       !title ||
       !gymName ||
+      !description ||
       !date ||
       !startTime ||
       !endTime ||
       !gymlocation ||
       !experience ||
-      !workoutType
+      !workoutType ||
+      !maxMembers
     ) {
       return res
         .status(400)
@@ -96,6 +100,10 @@ router
       // build a true local‐midnight for the session date
       const [Y, M, D] = date.split("-").map(Number);
       const parsedSessionDate = new Date(Y, M - 1, D);
+      const parsedDate = new Date(Y, M - 1, D);
+      if (isNaN(parsedDate.getTime())) {
+        return res.status(400).json({ error: 'Invalid session date format' });
+      }
 
       // ── keep your padded strings for DB storage ──
       const paddedStartTime =
@@ -139,32 +147,39 @@ router
           .json({ error: "End Time must be after Start Time." });
       }
 
-      const existingSessions = await Gym.find({
-        $or: [{ hostedBy }, { members: hostedBy }],
-        date: parsedSessionDate,
-      });
 
-      const hasClash = existingSessions.some((s) => {
-        const sPaddedStart =
-          s.startTime.length === 5 ? `${s.startTime}:00` : s.startTime;
-        const sPaddedEnd =
-          s.endTime.length === 5 ? `${s.endTime}:00` : s.endTime;
-        const existingStart = new Date(`${s.date}T${sPaddedStart}`);
-        const existingEnd = new Date(`${s.date}T${sPaddedEnd}`);
-        return (
-          (startDateTime >= existingStart && startDateTime < existingEnd) ||
-          (endDateTime > existingStart && endDateTime <= existingEnd) ||
-          (startDateTime <= existingStart && endDateTime >= existingEnd)
-        );
-      });
-
-      if (hasClash) {
-        return res.redirect(
-          `/gymBuddy/create?error=${encodeURIComponent(
-            "You already have a session within 1 hour of this time."
-          )}`
-        );
+      if (await hasTimeConflict(hostedBy, startDateTime, endDateTime)) {
+        return res.status(400).json({
+          error: "You have another game or gym session that overlaps this time.",
+        });
       }
+
+      // const existingSessions = await Gym.find({
+      //   $or: [{ hostedBy }, { members: hostedBy }],
+      //   date: parsedSessionDate,
+      // });
+
+      // const hasClash = existingSessions.some((s) => {
+      //   const sPaddedStart =
+      //     s.startTime.length === 5 ? `${s.startTime}:00` : s.startTime;
+      //   const sPaddedEnd =
+      //     s.endTime.length === 5 ? `${s.endTime}:00` : s.endTime;
+      //   const existingStart = new Date(`${s.date}T${sPaddedStart}`);
+      //   const existingEnd = new Date(`${s.date}T${sPaddedEnd}`);
+      //   return (
+      //     (startDateTime >= existingStart && startDateTime < existingEnd) ||
+      //     (endDateTime > existingStart && endDateTime <= existingEnd) ||
+      //     (startDateTime <= existingStart && endDateTime >= existingEnd)
+      //   );
+      // });
+
+      // if (hasClash) {
+      //   return res.redirect(
+      //     `/gymBuddy/create?error=${encodeURIComponent(
+      //       "You already have a session within 1 hour of this time."
+      //     )}`
+      //   );
+      // }
 
       const apiKey = process.env.GOOGLE_MAPS_API_KEY;
       const encodedLoc = encodeURIComponent(gymlocation);
@@ -250,7 +265,6 @@ router.get("/find", async (req, res) => {
     } catch {
       obj.formattedDateTime = "Invalid Date";
     }
-
     obj.currentMembers = session.members.length;
     obj.maxMembers = session.maxMembers;
     obj.members = session.members.map((m) => ({
@@ -305,24 +319,19 @@ router.post("/join/:id", requireAuth, async (req, res) => {
       );
     }
 
-    //  Check for time clash (±1 hour with user's other sessions)
-    const userSessions = await Gym.find({
-      $or: [{ members: userId }, { hostedBy: userId }],
-    });
+    const { date, startTime } = sessionToJoin;
+    // Build Luxon DateTimes in session's userTimeZone
+    const [Y, M, D] = date.split('-').map(Number);
+    const [h, m] = startTime.split(':').map(Number);
+    const startDT = DateTime.fromObject(
+      { year: Y, month: M, day: D, hour: h, minute: m },
+      { zone: sessionToJoin.userTimeZone }
+    ).toUTC();
+    const endDT = startDT.plus({ minutes: sessionToJoin.durationMinutes || 60 });
 
-    const targetTime = new Date(
-      `${sessionToJoin.date}T${sessionToJoin.startTime}`
-    );
-
-    const hasClash = userSessions.some((s) => {
-      const existingTime = new Date(`${s.date}T${s.startTime}`);
-      const diffMinutes = Math.abs(targetTime - existingTime) / (1000 * 60); // convert ms to mins
-      return diffMinutes < 60; // clash if within 1 hour
-    });
-
-    if (hasClash) {
+    if (await hasTimeConflict(userId, startDT, endDT)) {
       return res.redirect(
-        "/gymBuddy/find?error=You already have a session within 1 hour of this one."
+        '/gymBuddy/find?error=You have another game or gym session that overlaps this time.'
       );
     }
 
@@ -584,7 +593,7 @@ router.delete("/delete/:id", requireAuth, async (req, res) => {
 
     await Gym.deleteOne({ _id: id });
 
-    return res.json({ success: true, message: "Session deleted" }); 
+    return res.json({ success: true, message: "Session deleted" });
   } catch (e) {
     console.error("Error deleting session:", e);
     return res.status(500).json({ error: "Internal server error" });
@@ -626,7 +635,7 @@ router.get("/find/:id", async (req, res) => {
     } catch {
       sessionObj.formattedDateTime = "Invalid Date";
     }
-
+    sessionObj.hostUsername = session.hostedBy.username;
     sessionObj.currentMembers = session.members.length;
     sessionObj.maxMembers = session.maxMembers;
     sessionObj.members = session.members.map((m) => ({
@@ -643,6 +652,7 @@ router.get("/find/:id", async (req, res) => {
       isHost,
       hasJoined,
       username: req.user?.username || "",
+      hostUsername: sessionObj.hostUsername
     });
   } catch (e) {
     console.error("Error in /gymBuddy/find/:id:", e);

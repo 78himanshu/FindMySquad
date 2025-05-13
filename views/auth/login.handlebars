@@ -1,9 +1,9 @@
 {{#*inline "head"}}
 <style>
-    .form-label span {
-      color: red;
-    }
-  </style>
+  .form-label span {
+    color: red;
+  }
+</style>
 {{/inline}}
 
 <div class="container py-5">
@@ -15,16 +15,14 @@
         <form id="loginForm" method="POST" action="/login" novalidate>
 
           <!-- HIDDEN REDIRECT INPUT HERE -->
-          <input type="hidden" name="redirect" id="redirectInput"
-            value="{{redirect}}">
+          <input type="hidden" name="redirect" id="redirectInput" value="{{redirect}}">
 
           <!-- Email -->
           <div class="mb-3">
             <label for="email" class="form-label">
               E-mail <span style="color: red;">*</span>
             </label>
-            <input type="email" class="form-control" id="email" name="email"
-              placeholder="you@example.com">
+            <input type="email" class="form-control" id="email" name="email" placeholder="you@example.com">
             <div id="emailError" class="form-text text-danger"></div>
           </div>
 
@@ -33,8 +31,7 @@
             <label for="password" class="form-label">
               Password <span style="color: red;">*</span>
             </label>
-            <input type="password" class="form-control" id="password"
-              name="password" placeholder="••••••••">
+            <input type="password" class="form-control" id="password" name="password" placeholder="••••••••">
             <div id="passwordError" class="form-text text-danger"></div>
           </div>
 

@@ -8,6 +8,8 @@ import { userProfileData } from "../data/index.js";
 import { sendGameEmail } from "../utils/emailHelper.js";
 import Reminder from "../models/Reminder.js";
 import { scheduleJobFromReminder } from "../emailScheduler.js";
+import { DateTime } from 'luxon';
+import { hasTimeConflict } from '../utils/calendar.js';
 
 router
   .get("/", async (req, res) => {
@@ -26,24 +28,47 @@ router
         const cookiecontaininglocation = req.cookies.user_location;
 
         if (userProfile) {
+          let interestFilters = {
+            sport: { $in: userProfile.sportsInterests || [] },
+          };
+          let interestMatchedGames = await hostGameData.getAllGames(interestFilters);
           if (cookiecontaininglocation) {
             const { lat, lng } = JSON.parse(cookiecontaininglocation);
-            filters = {
-              geoLocation: {
-                $near: {
-                  $geometry: { type: "Point", coordinates: [lng, lat] },
-                  $maxDistance: 10000,
-                },
-              },
-              sport: { $in: userProfile.sportsInterests || [] },
-            };
-          } else {
-            filters = {
-              location: userProfile.city, //need to check this
-              sport: { $in: userProfile.sportsInterests || [] },
-              skillLevel: userProfile.gymPreferences?.skillLevel || "Beginner",
-            };
+          
+            interestMatchedGames.sort((a, b) => {
+              const [lngA, latA] = a.geoLocation?.coordinates || [];
+              const [lngB, latB] = b.geoLocation?.coordinates || [];
+          
+              const distA = Math.sqrt((lat - latA) ** 2 + (lng - lngA) ** 2);
+              const distB = Math.sqrt((lat - latB) ** 2 + (lng - lngB) ** 2);
+          
+              return distA - distB;
+            });
+          }else {
+            // Fallback to user's profile city (as rough text-based match)
+            interestMatchedGames = interestMatchedGames.filter(game =>
+              game.location?.toLowerCase().includes(userProfile.city?.toLowerCase())
+            );
           }
+          recommendation = interestMatchedGames;
+          // if (cookiecontaininglocation) {
+          //   const { lat, lng } = JSON.parse(cookiecontaininglocation);
+          //   filters = {
+          //     geoLocation: {
+          //       $near: {
+          //         $geometry: { type: "Point", coordinates: [lng, lat] },
+          //         $maxDistance: 10000,
+          //       },
+          //     },
+          //     sport: { $in: userProfile.sportsInterests || [] },
+          //   };
+          // } else {
+          //   filters = {
+          //     location: userProfile.city, //need to check this
+          //     sport: { $in: userProfile.sportsInterests || [] },
+          //     skillLevel: userProfile.gymPreferences?.skillLevel || "Beginner",
+          //   };
+          // }
         }
         await Promise.all(allGames.map((game) => game.populate("host")));
         const now = new Date();
@@ -160,30 +185,19 @@ router
     }
   })
   .post("/", auth, async (req, res) => {
-    //const { gameId } = req.body;
-    const gameId = req.body.gameId?.trim();
-    const userId = req.user?.userID || req.userId;
-
-    const game = await hostGameData.getGameById(gameId);
     try {
-      const targetGame = await hostGameData.getGameById(gameId);
-      // const now = new Date();
-      // const gameStart = new Date(targetGame.startTime);
+      //const { gameId } = req.body;
+      const gameId = req.body.gameId?.trim();
+      const userId = req.user?.userID || req.userId;
 
-      // const nowRounded = new Date(
-      //   now.getFullYear(),
-      //   now.getMonth(),
-      //   now.getDate(),
-      //   now.getHours(),
-      //   now.getMinutes()
-      // );
-      // const gameStartRounded = new Date(
-      //   gameStart.getFullYear(),
-      //   gameStart.getMonth(),
-      //   gameStart.getDate(),
-      //   gameStart.getHours(),
-      //   gameStart.getMinutes()
-      // );
+      if (!gameId) {
+        return res.redirect('/join?error=No game specified');
+      }
+
+      const targetGame = await hostGameData.getGameById(gameId);
+      if (!targetGame) {
+        return res.redirect(`/join/${gameId}?error=Game not found`);
+      }
 
       if (new Date(targetGame.startTime).getTime() <= Date.now()) {
         return res.redirect(
@@ -191,20 +205,29 @@ router
         );
       }
 
-      // Check for time clash with already joined games
-      const joinedGames = await joinGameData.getJoinedGamesByUser(userId);
-      const hasTimeClash = joinedGames.some((g) => {
-        const gStart = new Date(g.startTime);
-        const gEnd = new Date(g.endTime);
-        return (
-          new Date(targetGame.startTime) < gEnd &&
-          new Date(targetGame.endTime) > gStart
+      const startDT = DateTime.fromJSDate(new Date(targetGame.startTime)).toUTC();
+      const endDT = DateTime.fromJSDate(new Date(targetGame.endTime)).toUTC();
+      if (await hasTimeConflict(userId, startDT, endDT)) {
+        return res.redirect(
+          `/join/${gameId}?error=You have another game or gym session that overlaps this time.`
         );
-      });
-
-      if (hasTimeClash) {
-        return res.redirect("/join?error=You already have a game at this time");
       }
+
+
+      // // Check for time clash with already joined games
+      // const joinedGames = await joinGameData.getJoinedGamesByUser(userId);
+      // const hasTimeClash = joinedGames.some((g) => {
+      //   const gStart = new Date(g.startTime);
+      //   const gEnd = new Date(g.endTime);
+      //   return (
+      //     new Date(targetGame.startTime) < gEnd &&
+      //     new Date(targetGame.endTime) > gStart
+      //   );
+      // });
+
+      // if (hasTimeClash) {
+      //   return res.redirect("/join?error=You already have a game at this time");
+      // }
 
       await joinGameData.joinGame(gameId, userId);
 
@@ -212,9 +235,8 @@ router
 
       await sendGameEmail(
         user.email,
-        `🎮 Game Confirmation: ${targetGame.title}`,
-        `<p>Hi ${user.username},</p><p>You have successfully joined <strong>${
-          targetGame.title
+        `Game Confirmation: ${targetGame.title}`,
+        `<p>Hi ${user.username},</p><p>You have successfully joined <strong>${targetGame.title
         }</strong> on ${new Date(targetGame.startTime).toLocaleString()}.</p>`
       );
 
@@ -234,9 +256,10 @@ router
 
       scheduleJobFromReminder(reminder);
 
-      return res.redirect("/join/success");
+      return res.redirect('/join/success');
     } catch (e) {
-      res.status(400).send(e.message);
+      console.error('Error joining game:', e);
+      return res.redirect(`/join?error=${encodeURIComponent(e.message)}`);
     }
   });
 
@@ -434,6 +457,31 @@ router.post("/leave/:id", auth, async (req, res) => {
       layout: "main",
       head: `<link rel="stylesheet" href="/css/joinGame.css">`,
     });
+  }
+});
+
+router.get("/fallback-location", auth, async (req, res) => {
+  try {
+    if (req.user?.userId) {
+      const profile = await userProfileData.getProfile(req.user.userId);
+      if (profile && profile.city) {
+        const city = encodeURIComponent(profile.city);
+        const response = await fetch(
+          `https://nominatim.openstreetmap.org/search?format=json&q=${city}`
+        );
+        const data = await response.json();
+        if (data?.[0]) {
+          return res.json({
+            lat: parseFloat(data[0].lat),
+            lng: parseFloat(data[0].lon),
+          });
+        }
+      }
+    }
+    return res.json({ lat: 40.7128, lng: -74.006 });
+  } catch (e) {
+    console.error("Fallback location error:", e);
+    res.json({ lat: 40.7128, lng: -74.006 });
   }
 });
 
