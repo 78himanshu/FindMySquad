@@ -335,6 +335,9 @@ router.get("/edit/:id", requireAuth, async (req, res) => {
 });
 
 router.post("/edit/:id", requireAuth, async (req, res) => {
+
+  const gameId = req.params.id;
+  const userId = req.user.userID;
   try {
     // console.log("Received body:", req.body);
     const {
@@ -430,6 +433,14 @@ router.post("/edit/:id", requireAuth, async (req, res) => {
       return res.status(400).json({ error: "Cannot host games in the past." });
     }
 
+    const startDT = rawStart.toUTC();
+    const endDT = rawEnd.toUTC();
+    if (await hasTimeConflict(userId, startDT, endDT, { excludeGameId: gameId })) {
+      return res.status(400).json({
+        error: 'Another event overlaps this time.'
+      });
+    }
+
     const updates = {
       title: xss(title.trim()),
       sport: xss(sport.trim()),
@@ -470,9 +481,7 @@ router.post("/edit/:id", requireAuth, async (req, res) => {
     // console.log("✅ Final updates:", updates);
 
     const updatedGame = await hostGameData.updateGame(
-      req.params.id,
-      updates,
-      req.user.userID
+      gameId, updates, userId
     );
 
     return res.json({

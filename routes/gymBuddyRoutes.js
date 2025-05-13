@@ -510,50 +510,123 @@ router.get("/edit/:id", requireAuth, async (req, res) => {
 });
 
 router.post("/update/:id", requireAuth, async (req, res) => {
-  const { id } = req.params;
-  const updates = req.body;
+  let sessionId = req.params.id;
+  let userId = req.user.userId;
 
-  if (!ObjectId.isValid(id)) {
+  console.log("sessionId", sessionId);
+  console.log("userId", userId)
+
+  if (!ObjectId.isValid(sessionId)) {
     return res.status(400).render("error", { message: "Invalid session ID" });
   }
 
-  if (!updates || Object.keys(updates).length === 0) {
-    return res
-      .status(400)
-      .render("error", { message: "No update fields provided" });
+
+  const {
+    title,
+    gymName,
+    description,
+    date,
+    startTime,
+    endTime,
+    gymlocation,
+    experience,
+    workoutType,
+    maxMembers,
+  } = req.body;
+
+  console.log(req.body);
+
+
+  const requiredFields = ['title', 'gymName', 'date', 'startTime', 'endTime', 'gymlocation', 'experience', 'workoutType', 'maxMembers'];
+  for (const field of requiredFields) {
+    if (!req.body[field]) {
+      return res.status(400).render('error', { message: `Missing required field: ${field}` });
+    }
   }
 
   try {
-    const session = await Gym.findById(id);
+    const session = await Gym.findById(sessionId);
+
+    console.log("session", session)
 
     if (!session) {
-      return res.status(404).render("error", { message: "Session not found" });
+      return res.status(404).render('error', { message: 'Session not found' });
+    }
+    if (session.hostedBy.toString() !== userId) {
+      return res.status(403).render('error', { message: 'Unauthorized to update this session' });
     }
 
-    if (session.hostedBy.toString() !== req.user.userId) {
+
+    // build a true local‐midnight for the session date
+    const [Y, M, D] = date.split("-").map(Number);
+    const parsedSessionDate = new Date(Y, M - 1, D);
+    const parsedDate = new Date(Y, M - 1, D);
+    if (isNaN(parsedDate.getTime())) {
+      return res.status(400).json({ error: 'Invalid session date format' });
+    }
+
+    // ── keep your padded strings for DB storage ──
+    const paddedStartTime =
+      startTime.length === 5 ? `${startTime}:00` : startTime;
+    const paddedEndTime = endTime.length === 5 ? `${endTime}:00` : endTime;
+
+    // parse hours/mins into local‐time Date objects
+    const [sh, sm] = startTime.split(":").map(Number);
+    const [eh, em] = endTime.split(":").map(Number);
+    const startDateTime = new Date(Y, M - 1, D, sh, sm, 0);
+    const endDateTime = new Date(Y, M - 1, D, eh, em, 0);
+
+    const now = new Date();
+
+    if (
+      isNaN(parsedSessionDate.getTime()) ||
+      isNaN(startDateTime.getTime()) ||
+      isNaN(endDateTime.getTime())
+    ) {
+      throw new Error("Invalid Date or Time format.");
+    }
+
+    if (
+      parsedSessionDate <
+      new Date(now.getFullYear(), now.getMonth(), now.getDate())
+    ) {
       return res
-        .status(403)
-        .render("error", { message: "Unauthorized to update this session" });
+        .status(400)
+        .json({ error: "Session date must be in the future." });
     }
 
-    const allowedFields = [
-      "title",
-      "gym",
-      "description",
-      "date",
-      "startTime",
-      "endTime",
-      "gymlocation",
-      "experience",
-      "workoutType",
-      "maxMembers",
-    ];
+    if (startDateTime < now) {
+      return res
+        .status(400)
+        .json({ error: "Session start time must be in the future." });
+    }
 
-    allowedFields.forEach((field) => {
-      if (updates[field] !== undefined) {
-        session[field] = updates[field];
-      }
-    });
+    if (startDateTime >= endDateTime) {
+      return res
+        .status(400)
+        .json({ error: "End Time must be after Start Time." });
+    }
+
+
+    if (await hasTimeConflict(session.hostedBy, startDateTime, endDateTime)) {
+      return res.status(400).json({
+        error: "You have another game or gym session that overlaps this time.",
+      });
+    }
+
+
+
+    session.title = title.trim();
+    session.gymName = gymName.trim();
+    session.description = description?.trim() || session.description;
+    session.date = date;
+    session.startTime = paddedStartTime;
+    session.endTime = paddedEndTime;
+    session.gymlocation = gymlocation.trim();
+    session.experience = experience.trim();
+    session.workoutType = workoutType.trim();
+    session.maxMembers = Number(maxMembers);
+
 
     await session.save();
     return res.json({

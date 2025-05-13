@@ -3,6 +3,8 @@ import { DateTime } from "luxon";
 
 
 export async function hasTimeConflict(userId, startDT, endDT) {
+
+    console.log(">>", userId, startDT, endDT);
     const joinedGames = await joinGameData.getJoinedGamesByUser(userId);
     const hostedGames = await joinGameData.getHostedGamesByUser(userId);
 
