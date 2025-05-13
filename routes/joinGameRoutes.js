@@ -8,6 +8,8 @@ import { userProfileData } from "../data/index.js";
 import { sendGameEmail } from "../utils/emailHelper.js";
 import Reminder from "../models/Reminder.js";
 import { scheduleJobFromReminder } from "../emailScheduler.js";
+import { DateTime } from 'luxon';
+import { hasTimeConflict } from '../utils/calendar.js';
 
 router
   .get("/", async (req, res) => {
@@ -160,30 +162,19 @@ router
     }
   })
   .post("/", auth, async (req, res) => {
-    //const { gameId } = req.body;
-    const gameId = req.body.gameId?.trim();
-    const userId = req.user?.userID || req.userId;
-
-    const game = await hostGameData.getGameById(gameId);
     try {
-      const targetGame = await hostGameData.getGameById(gameId);
-      // const now = new Date();
-      // const gameStart = new Date(targetGame.startTime);
+      //const { gameId } = req.body;
+      const gameId = req.body.gameId?.trim();
+      const userId = req.user?.userID || req.userId;
 
-      // const nowRounded = new Date(
-      //   now.getFullYear(),
-      //   now.getMonth(),
-      //   now.getDate(),
-      //   now.getHours(),
-      //   now.getMinutes()
-      // );
-      // const gameStartRounded = new Date(
-      //   gameStart.getFullYear(),
-      //   gameStart.getMonth(),
-      //   gameStart.getDate(),
-      //   gameStart.getHours(),
-      //   gameStart.getMinutes()
-      // );
+      if (!gameId) {
+        return res.redirect('/join?error=No game specified');
+      }
+
+      const targetGame = await hostGameData.getGameById(gameId);
+      if (!targetGame) {
+        return res.redirect(`/join/${gameId}?error=Game not found`);
+      }
 
       if (new Date(targetGame.startTime).getTime() <= Date.now()) {
         return res.redirect(
@@ -191,20 +182,29 @@ router
         );
       }
 
-      // Check for time clash with already joined games
-      const joinedGames = await joinGameData.getJoinedGamesByUser(userId);
-      const hasTimeClash = joinedGames.some((g) => {
-        const gStart = new Date(g.startTime);
-        const gEnd = new Date(g.endTime);
-        return (
-          new Date(targetGame.startTime) < gEnd &&
-          new Date(targetGame.endTime) > gStart
+      const startDT = DateTime.fromJSDate(new Date(targetGame.startTime)).toUTC();
+      const endDT = DateTime.fromJSDate(new Date(targetGame.endTime)).toUTC();
+      if (await hasTimeConflict(userId, startDT, endDT)) {
+        return res.redirect(
+          `/join/${gameId}?error=You have another game or gym session that overlaps this time.`
         );
-      });
-
-      if (hasTimeClash) {
-        return res.redirect("/join?error=You already have a game at this time");
       }
+
+
+      // // Check for time clash with already joined games
+      // const joinedGames = await joinGameData.getJoinedGamesByUser(userId);
+      // const hasTimeClash = joinedGames.some((g) => {
+      //   const gStart = new Date(g.startTime);
+      //   const gEnd = new Date(g.endTime);
+      //   return (
+      //     new Date(targetGame.startTime) < gEnd &&
+      //     new Date(targetGame.endTime) > gStart
+      //   );
+      // });
+
+      // if (hasTimeClash) {
+      //   return res.redirect("/join?error=You already have a game at this time");
+      // }
 
       await joinGameData.joinGame(gameId, userId);
 
@@ -212,9 +212,8 @@ router
 
       await sendGameEmail(
         user.email,
-        `🎮 Game Confirmation: ${targetGame.title}`,
-        `<p>Hi ${user.username},</p><p>You have successfully joined <strong>${
-          targetGame.title
+        `Game Confirmation: ${targetGame.title}`,
+        `<p>Hi ${user.username},</p><p>You have successfully joined <strong>${targetGame.title
         }</strong> on ${new Date(targetGame.startTime).toLocaleString()}.</p>`
       );
 
@@ -234,9 +233,10 @@ router
 
       scheduleJobFromReminder(reminder);
 
-      return res.redirect("/join/success");
+      return res.redirect('/join/success');
     } catch (e) {
-      res.status(400).send(e.message);
+      console.error('Error joining game:', e);
+      return res.redirect(`/join?error=${encodeURIComponent(e.message)}`);
     }
   });
 
