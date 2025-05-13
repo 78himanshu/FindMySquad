@@ -642,7 +642,8 @@ label.btn.active {
 }
 
 .location,
-.venue {
+.venue,
+.discription {
   text-overflow: ellipsis;
   overflow: hidden;
   white-space: nowrap;
@@ -716,7 +717,7 @@ label.btn.active {
 .game-card .badge {
   font-size: 0.75rem;
   padding: 0.4em 0.7em;
-  border-radius: 12px;
+  /* border-radius: 12px; */
 }
 
 .badge.free {

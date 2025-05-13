@@ -79,13 +79,14 @@
   }
 
   /* Gamification card tweaks */
-.gamification-section .card-body {
-  background: #f8f9fa;
-  border-radius: 1rem;
-}
-.gamification-section h2 {
-  color: #343a40;
-}
+  .gamification-section .card-body {
+    background: #f8f9fa;
+    border-radius: 1rem;
+  }
+
+  .gamification-section h2 {
+    color: #343a40;
+  }
 
   .card-link {
     display: block;
@@ -196,7 +197,7 @@
   {{!-- <a href="/join/{{_id}}" class="game-card-link text-decoration-none text-reset"> --}}
     <div class="card game-card h-100 position-relative">
       <div class="card-body pb-4 p-0">
-        <span class="badge skill-badge position-absolute top-0 end-0 m-3">
+        <span class="badge skill-badge position-absolute end-0 top-0">
           {{skillLevel}}
         </span>
 
@@ -259,9 +260,6 @@
 
 
 
-
-
-
 <div class="container p-0">
   <div class="d-flex align-items-center my-4 section-header">
     <div class="flex-grow-1 border-top"></div>
@@ -274,44 +272,42 @@
 {{#if upcomingGymSessions.length}}
 <div id="sessionCarousel" class="game-scroll-wrapper container">
   {{#each upcomingGymSessions}}
-  {{#ifCond @index '<' 15}} <a href="/gymBuddy/find/{{_id}}"
-    class="card-link text-decoration-none text-reset mb-4 d-block">
-    <div class="card game-card session-card h-100 position-relative">
-      <div class="card-body pb-4 p-0">
-        <h5 class="card-title mb-3">{{title}}</h5>
+  {{#ifCond @index '<' 15}} <div class="card game-card session-card h-100 position-relative">
+    <div class="card-body pb-4 p-0">
+      <h5 class="card-title mb-3">{{title}}</h5>
 
-        <ul class="list-unstyled mb-3 small text-secondary flex-grow-1">
-          <li><strong>Date:</strong> {{date}}</li>
-          <li><strong>Time:</strong> {{startTime}} – {{endTime}}</li>
-          <li><strong>Gym:</strong> {{gym}}</li>
-          <li><strong>Members:</strong> {{members.length}} / {{maxMembers}}</li>
-        </ul>
+      <ul class="list-unstyled mb-3 small text-secondary flex-grow-1">
+        <li><strong>Date:</strong> {{date}}</li>
+        <li><strong>Time:</strong> {{startTime}} – {{endTime}}</li>
+        <li><strong>Gym:</strong> {{gym}}</li>
+        <li><strong>Members:</strong> {{members.length}} / {{maxMembers}}</li>
+      </ul>
 
-        <hr class="my-3">
+      <hr class="my-3">
 
-        <div class="d-flex align-items-center mt-auto">
-          <button type="button" class="btn btn-link link-primary p-0 me-3 d-flex align-items-center"
-            data-bs-toggle="collapse" data-bs-target="#sess-info-{{_id}}" aria-expanded="false"
-            aria-controls="sess-info-{{_id}}">
-            More Info <i class="bi bi-chevron-down ms-1"></i>
-          </button>
+      <div class="d-flex align-items-center mt-auto">
+        <button type="button" class="btn btn-link link-primary p-0 me-3 d-flex align-items-center"
+          data-bs-toggle="collapse" data-bs-target="#sess-info-{{_id}}" aria-expanded="false"
+          aria-controls="sess-info-{{_id}}">
+          More Info <i class="bi bi-chevron-down ms-1"></i>
+        </button>
 
-          <button type="button" class="btn btn-primary btn-sm ms-auto" onclick="location.href='/gymBuddy/find/{{_id}}'">
-            View
-          </button>
-        </div>
-
-        <div class="collapse mt-2" id="sess-info-{{_id}}">
-          <p class="text-secondary mb-0">{{description}}</p>
-        </div>
+        <button type="button" class="btn btn-primary btn-sm ms-auto" onclick="location.href='/gymBuddy/find/{{_id}}'">
+          View
+        </button>
       </div>
 
-      <img src="{{#if host.avatarUrl}}{{host.avatarUrl}}{{else}}/images/avatar-placeholder.png{{/if}}" alt="Host avatar"
-        class="host-avatar position-absolute bottom-0 end-0 m-3">
+      <div class="collapse mt-2" id="sess-info-{{_id}}">
+        <p class="text-secondary mb-0 discription">{{description}}</p>
+      </div>
     </div>
-    </a>
-    {{/ifCond}}
-    {{/each}}
+
+    <img src="{{#if host.avatarUrl}}{{host.avatarUrl}}{{else}}/images/avatar-placeholder.png{{/if}}" alt="Host avatar"
+      class="host-avatar position-absolute bottom-0 end-0 m-3">
+</div>
+
+{{/ifCond}}
+{{/each}}
 </div>
 {{else}}
 <p class="text-center text-muted">No gym sessions coming up.</p>
@@ -319,20 +315,20 @@
 
 </section>
 
-  <!-- ===== Gamification Section ===== -->
-  <section class="container my-5 gamification-section">
-    <div class="card shadow-sm border-0">
-      <div class="card-body text-center">
-        <h2 class="fw-bold mb-3">Level Up with Gamification</h2>
-        <p class="lead text-muted mb-4">
-          Earn karma points by hosting games, joining sessions, and sharing reviews.  
-          Climb the leaderboard, unlock achievement badges, and show off your squad-building skills!
-        </p>
-        <a href="/gamification" class="btn btn-primary btn-lg">Read More</a>
-      </div>
+<!-- ===== Gamification Section ===== -->
+<section class="container my-5 gamification-section">
+  <div class="card shadow-sm border-0">
+    <div class="card-body text-center">
+      <h2 class="fw-bold mb-3">Level Up with Gamification</h2>
+      <p class="lead text-muted mb-4">
+        Earn karma points by hosting games, joining sessions, and sharing reviews.
+        Climb the leaderboard, unlock achievement badges, and show off your squad-building skills!
+      </p>
+      <a href="/gamification" class="btn btn-primary btn-lg">Read More</a>
     </div>
-  </section>
-  <!-- ===== End Gamification Section ===== -->
+  </div>
+</section>
+<!-- ===== End Gamification Section ===== -->
 
 
 <section class="about-team py-5 bg-white rounded shadow-sm">
