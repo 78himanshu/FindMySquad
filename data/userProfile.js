@@ -2,11 +2,10 @@ const { ObjectId } = mongoose.Types;
 import { geocodeCity } from "../utils/geocode.js";
 
 import UserProfile from "../models/userProfile.js";
-import { checkString } from "../utils/Helper.js";
+import { checkString } from "../utils/helper.js";
 import Userlist from "../models/User.js";
 import mongoose from "mongoose";
-import HostGame    from "../models/hostGame.js";
-
+import HostGame from "../models/hostGame.js";
 
 export const createProfile = async (userId, data) => {
   console.log(">>>", userId);
@@ -57,25 +56,23 @@ export const getProfile = async (userId) => {
     .populate("userId", "username email")
     // pull in each rating’s rater → firstName, lastName
     .populate({
-      path: "ratings.rater",        // the path in YOUR doc
-      model: "UserProfile",         // which model to pull from
-      localField: "ratings.rater",  // the ObjectId stored
-      foreignField: "userId",       // match against this field in UserProfile
-      select: "profile.firstName profile.lastName"
+      path: "ratings.rater", // the path in YOUR doc
+      model: "UserProfile", // which model to pull from
+      localField: "ratings.rater", // the ObjectId stored
+      foreignField: "userId", // match against this field in UserProfile
+      select: "profile.firstName profile.lastName",
     })
     // pull in each rating’s bookingId → the HostGame’s title
     .populate({
       path: "ratings.bookingId",
       model: "Game",
-      select: "title startTime"
+      select: "title startTime",
     });
 
   if (!profile) throw "Profile not found";
 
-  console.log("profile>>>>",profile.ratings)
   return profile;
 };
-
 
 export const updateProfile = async (userId, data) => {
   const update = {};
@@ -123,7 +120,6 @@ export const deleteProfile = async (userId) => {
   return true;
 };
 
-
 export const ratePlayers = async (raterId, ratingsArray, bookingId) => {
   if (!ObjectId.isValid(raterId)) throw "Invalid rater ID";
   if (!ObjectId.isValid(bookingId)) throw "Invalid booking ID";
@@ -165,7 +161,8 @@ export const ratePlayers = async (raterId, ratingsArray, bookingId) => {
     // Update counts
     profile.ratingCount = profile.ratings.length;
     profile.averageRating =
-      profile.ratings.reduce((sum, r) => sum + r.score, 0) / profile.ratingCount;
+      profile.ratings.reduce((sum, r) => sum + r.score, 0) /
+      profile.ratingCount;
 
     await profile.save();
 
@@ -174,7 +171,6 @@ export const ratePlayers = async (raterId, ratingsArray, bookingId) => {
 
   return results;
 };
-
 
 /**
  * Have userId follow targetUserId.

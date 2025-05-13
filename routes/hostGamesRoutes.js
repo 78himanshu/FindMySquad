@@ -294,10 +294,12 @@ router.route("/success").get((req, res) => {
 
 router.route("/form").get(requireAuth, (req, res) => {
   const hostId = req.user.userID;
+  const today = new Date().toISOString().split("T")[0]; // ✅ ADD THIS
   res.render("hostGame/hostGameForm", {
     hostId,
     title: "Host a Game",
     layout: "main",
+    today,
     profileCompleted: req.user?.profileCompleted || false,
     head: `
           <link rel="stylesheet" href="/css/hostGame.css">
@@ -319,12 +321,15 @@ router.get("/edit/:id", requireAuth, async (req, res) => {
       return res.status(403).render("error", { error: "Unauthorized access" });
     }
 
+    const today = new Date().toISOString().split("T")[0]; 
+
     res.render("hostGame/hostGameForm", {
       game: game.toObject(),
       hostId: req.user.userID,
       title: "Edit Game",
       layout: "main",
       profileCompleted: req.user?.profileCompleted || false,
+      today,
       head: `<link rel="stylesheet" href="/css/hostGame.css">`,
     });
   } catch (err) {

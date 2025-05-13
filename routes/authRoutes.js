@@ -2,7 +2,6 @@ import { Router } from "express";
 const router = Router();
 import { authUserData } from "../data/index.js";
 import { checkString } from "../utils/helper.js";
-import jwt from "jsonwebtoken";
 import xss from "xss";
 import redirectIfLoggedIn from "../middleware/redirectIfLoggedIn.js";
 
@@ -88,11 +87,6 @@ router
         password
       );
 
-      // console.log(" Setting token cookie:", token);
-      // console.log(" Token payload:", jwt.decode(token));
-
-      // console.log(token, user, profilePic);
-
       res.cookie("token", token, {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
@@ -115,7 +109,6 @@ router
       if (!user.profileCompleted) {
         redirectTo = "/profile/addprofile";
       }
-      // console.log(redirectTo, "test redirectTo:");
       return res.status(200).json({
         message: "Login successful",
         redirect: redirectTo,
@@ -126,7 +119,6 @@ router
           profileCompleted: user.profileCompleted,
           profilepic: user.profilePic || "/images/default-avatar.png",
         },
-        // redirect: redirect || "/", // Included redirect in the response
       });
     } catch (error) {
       return res.status(400).json({

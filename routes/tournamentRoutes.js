@@ -1,6 +1,6 @@
 import express from "express";
 import Tournament from "../models/tournament.js";
-import { requireAuth } from "../middleware/authMiddleware.js"; // Optional middleware
+import { requireAuth } from "../middleware/authMiddleware.js";
 import { updateKarmaPoints } from "../utils/karmaHelper.js";
 import { evaluateAchievements } from "../utils/achievementHelper.js";
 
@@ -56,7 +56,7 @@ router.get("/create", requireAuth, (req, res) => {
     games: esportsGames,
     username: req.user.username,
     profileCompleted: req.user?.profileCompleted || false,
-  minDate,
+    minDate,
   });
 });
 // POST: Handle Form Submission
@@ -107,7 +107,7 @@ router.post("/create", requireAuth, async (req, res, next) => {
       json: () => res.status(400).json({ error: msg }),
     });
   }
-   // ─── 0) Check that every top‐level field is present ─────────────
+  //  0) Check that every top‐level field is present
   if (!game || !esportsGames.includes(game)) {
     return respondError("Please select a valid game.");
   }
@@ -118,7 +118,7 @@ router.post("/create", requireAuth, async (req, res, next) => {
     return respondError("Please choose a skill level.");
   }
   if (!date) {
-     return respondError("Date is required.");
+    return respondError("Date is required.");
   }
   if (!description) {
     return respondError("Tournament description cannot be empty.");
@@ -154,7 +154,7 @@ router.post("/create", requireAuth, async (req, res, next) => {
   const endDateTime = new Date(y, m - 1, d, eh, emin);
   const now = new Date();
 
-  // 4) CONFLICT CHECK: no overlapping tournaments for this user
+  // no overlapping tournaments for this user
   //    (as creator OR participant)
   const userId = req.user.userId.toString();
   const occupied = await Tournament.find({

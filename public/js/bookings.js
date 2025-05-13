@@ -43,7 +43,6 @@ document.addEventListener("DOMContentLoaded", () => {
   >${player.review || ""}</textarea>
 `;
 
-
         fieldsWrap.appendChild(group);
       });
 
@@ -65,7 +64,9 @@ document.addEventListener("DOMContentLoaded", () => {
         star.classList.toggle("selected", score <= selectedScore);
       });
 
-      const hiddenInput = document.querySelector(`input[name="rating_${userId}"]`);
+      const hiddenInput = document.querySelector(
+        `input[name="rating_${userId}"]`
+      );
       if (hiddenInput) hiddenInput.value = selectedScore;
     }
   });

@@ -29,7 +29,7 @@
     <div id="game-map" style="height: 400px; margin-bottom: 20px;"></div>
   </section>
 
-  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css">
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 
   <script>
@@ -122,16 +122,15 @@ const games = {{{json allGames}}};
 
       <!-- Min Players -->
       <label for="minPlayers">Min Players Required:</label>
-      <input type="number" name="minPlayers" id="minPlayers" min="1" />
+      <input type="number" name="minPlayers" id="minPlayers" min="1">
 
       <!-- Max Cost -->
       <label for="maxCost">Max Cost Per Head ($):</label>
-      <input type="number" name="maxCost" id="maxCost" min="0" />
+      <input type="number" name="maxCost" id="maxCost" min="0">
 
       <!-- City -->
       <label for="city">City:</label>
-      <input type="text" name="city" id="city"
-        placeholder="e.g., Jersey City" />
+      <input type="text" name="city" id="city" placeholder="e.g., Jersey City">
 
       {{#if isLoggedIn}}
       <!-- Friends -->
@@ -384,4 +383,4 @@ const games = {{{json allGames}}};
   });
 </script>
 
-</main>
+</div>

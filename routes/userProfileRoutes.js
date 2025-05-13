@@ -2,13 +2,11 @@ import express from "express";
 import { Router } from "express";
 import { userProfileData, joinGameData, gymBuddyData } from "../data/index.js";
 import verifyToken from "../middleware/auth.js";
-import { checkString } from "../utils/Helper.js";
+import { checkString } from "../utils/helper.js";
 import Userlist from "../models/User.js";
 import mongoose from "mongoose";
-// import { userProfileData } from "../data/index.js";
 import UserProfile from "../models/userProfile.js";
 const ObjectId = mongoose.Types.ObjectId;
-//import { geocodeCity } from '../utils/geocode.js';
 import { format } from "date-fns";
 import axios from "axios";
 import xss from "xss";
@@ -20,13 +18,10 @@ import jwt from "jsonwebtoken";
 
 const router = Router();
 
-// -----------------------------------------
 // API Routes - For frontend AJAX / Postman use
-// -----------------------------------------
 router
   .route("/")
   .get(verifyToken, async (req, res) => {
-    // console.log("Rendering edit view");
     try {
       const profile = await userProfileData.getProfile(req.user.userID);
       res.status(200).json(profile);
@@ -51,8 +46,6 @@ router
       const gamingInterests = req.body.gamingInterests.map((i) =>
         xss(i.trim())
       );
-
-      // console.log(">>>", req.body);
 
       if (
         !firstName ||
@@ -80,8 +73,6 @@ router
         checkString(interest, "gamingInterests")
       );
 
-      //const geoLocation = await geocodeCity(city);
-
       let profileData = {
         profile: {
           firstName,
@@ -95,8 +86,9 @@ router
         gamingInterests,
         city,
         phoneNumber,
-        showContactInfo: req.body.showContactInfo === true || req.body.showContactInfo === "true",
-        //geoLocation
+        showContactInfo:
+          req.body.showContactInfo === true ||
+          req.body.showContactInfo === "true",
       };
 
       const profile = await userProfileData.createProfile(
@@ -107,7 +99,7 @@ router
       const newPayload = {
         userId: req.user.userID,
         username: req.user.username,
-        profilePic: profileData.profile.avatar,   // <-- updated
+        profilePic: profileData.profile.avatar,
         profileCompleted: true,
       };
 
@@ -158,13 +150,14 @@ router
           gender: profile.gender || "",
         },
         phoneNumber: profile.phoneNumber || "",
-        showContactInfo: profile.showContactInfo === true || profile.showContactInfo === "true",
+        showContactInfo:
+          profile.showContactInfo === true ||
+          profile.showContactInfo === "true",
         location: {
           city: location?.city?.trim() || "",
           // You can extend this to include state, zipCode, etc.
         },
       };
-      console.log("showContactInfo received:", profile.showContactInfo);
       const encodedLoc = encodeURIComponent(updateData.location.city);
       const apiKey = process.env.GOOGLE_MAPS_API_KEY;
 
@@ -212,16 +205,12 @@ router
     }
   });
 
-// -----------------------------------------
 // View Route - Render UserProfile Frontend Page
-// -----------------------------------------
 router.route("/view").get(verifyToken, async (req, res) => {
   try {
     const profile = await userProfileData.getProfile(req.user.userID);
-    const isOwn = true; // Important: mark as your own
+    const isOwn = true;
     const isFollowing = false; // You can't follow yourself
-
-    console.log("profile from routes ", profile)
 
     res.render("userProfile/view", {
       title: "Your Profile",
@@ -247,8 +236,8 @@ router.route("/view").get(verifyToken, async (req, res) => {
       city: profile.location?.city || "",
       ratings: profile.ratings,
       achievements: profile.achievements || "",
-      isOwn, //  pass true
-      isFollowing, //  pass false
+      isOwn,
+      isFollowing,
       head: `<link rel="stylesheet" href="/css/userProfile.css">`,
       query: req.query,
       showContactInfo: profile.showContactInfo,
@@ -257,9 +246,8 @@ router.route("/view").get(verifyToken, async (req, res) => {
     res.status(404).render("error", { error: e.toString() });
   }
 });
-// -----------------------------------------
+
 // Edit Profile Routes - Render Edit Form & Process Updates
-// -----------------------------------------
 router
   .route("/edit")
   .get(verifyToken, async (req, res) => {
@@ -272,11 +260,8 @@ router
         lastName: profile.profile.lastName,
         bio: profile.profile.bio,
         avatar: profile.profile.avatar,
-        // city: profile.location?.city || "",
-        // state: profile.location?.state || "",
-        // zipCode: profile.location?.zipCode || "",
         location: {
-          city: profile.location?.city || ""
+          city: profile.location?.city || "",
         },
         phoneNumber: profile.phoneNumber || "",
         head: `<link rel="stylesheet" href="/css/editProfile.css">`,
@@ -373,7 +358,6 @@ router.route("/addprofile").get(verifyToken, async (req, res) => {
 });
 
 // ————— Show All Bookings Page ——————
-
 router.get("/bookings", verifyToken, async (req, res) => {
   const userId = req.user.userID;
 
@@ -516,59 +500,6 @@ router.get("/bookings", verifyToken, async (req, res) => {
   }
 });
 
-// ————— Rate Players API ——————
-
-// router.post("/bookings/rate", verifyToken, async (req, res) => {
-//   const raterId = req.user.userID; // Ensure this is a valid ObjectId
-//   const { bookingId, ratings } = req.body;
-
-//   try {
-//     if (!bookingId || !ratings || !Array.isArray(ratings)) {
-//       return res.status(400).json({ error: "Missing bookingId or ratings" });
-//     }
-
-//     for (const r of ratings) {
-//       const ratedUserId = r.userId;
-//       const score = r.score;
-
-//       // Validate ObjectId
-//       if (!ObjectId.isValid(ratedUserId)) {
-//         console.error(`Invalid rated user ID: ${ratedUserId}`);
-//         continue; // Skip invalid entries
-//       }
-
-//       // Find the UserProfile of the rated user
-//       const profile = await UserProfile.findOne({ userId: ratedUserId });
-//       if (!profile) {
-//         console.error(`No profile found for user ID: ${ratedUserId}`);
-//         continue; // Skip if profile not found
-//       }
-
-//       // Add the new rating
-//       profile.ratings.push({
-//         rater: new ObjectId(raterId), // Ensure rater is an ObjectId
-//         score: score,
-//         bookingId: new ObjectId(bookingId),
-//       });
-
-//       // Update rating count and average rating
-//       profile.ratingCount = profile.ratings.length;
-//       profile.averageRating =
-//         profile.ratings.reduce((sum, rating) => sum + rating.score, 0) /
-//         profile.ratingCount;
-
-//       await profile.save();
-//     }
-
-//     return res.json({ success: true });
-//   } catch (e) {
-//     console.error("Error saving ratings:", e);
-//     return res
-//       .status(500)
-//       .json({ error: "An error occurred while saving ratings." });
-//   }
-// });
-
 router.post("/bookings/rate", verifyToken, async (req, res) => {
   try {
     const raterId = req.user.userID;
@@ -605,7 +536,7 @@ router.post("/bookings/rate", verifyToken, async (req, res) => {
   }
 });
 
-// ————— Show Rate Players Form ——————
+//  Show Rate Players Form
 router.get("/bookings/rate/:bookingId", verifyToken, async (req, res) => {
   const { bookingId } = req.params;
   const userId = req.user.userID;
@@ -638,9 +569,7 @@ router.get("/bookings/rate/:bookingId", verifyToken, async (req, res) => {
   }
 });
 
-// -----------------------------------------
 // Follow / Unfollow APIs
-// -----------------------------------------
 router.get("/view/:targetUserId", verifyToken, async (req, res) => {
   try {
     const profile = await userProfileData.getProfile(req.params.targetUserId);

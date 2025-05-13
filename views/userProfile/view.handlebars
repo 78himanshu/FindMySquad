@@ -4,7 +4,8 @@
     <div class="col-md-3">
       <div class="card border rounded shadow-sm">
         <div class="card-body text-center">
-          <img src="{{avatar}}" alt="avatar" class="rounded-circle mb-3" width="90" height="90">
+          <img src="{{avatar}}" alt="avatar" class="rounded-circle mb-3"
+            width="90" height="90">
           <h5 class="fw-semibold mb-1">{{firstName}} {{ lastName}}</h5>
           <small class="text-muted d-block">{{ email}}</small>
           <small class="text-muted">{{ gender}}</small>
@@ -19,7 +20,8 @@
         {{/if}}
 
         <ul class="list-group list-group-flush">
-          <li class="list-group-item bg-success text-white fw-semibold nav-btn" data-target="overview">
+          <li class="list-group-item bg-success text-white fw-semibold nav-btn"
+            data-target="overview">
             <i class="bi bi-bookmark-fill me-2"></i> Overview
           </li>
           {{#if isOwn}}
@@ -39,12 +41,14 @@
       <div class="card border rounded shadow-sm">
         <div class="card-body">
           {{#if query.msg}}
-            {{#if (eq query.msg "already_logged_in")}}
-              <div class="alert alert-warning alert-dismissible fade show" role="alert">
-                You are already logged in.
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-              </div>
-            {{/if}}
+          {{#if (eq query.msg "already_logged_in")}}
+          <div class="alert alert-warning alert-dismissible fade show"
+            role="alert">
+            You are already logged in.
+            <button type="button" class="btn-close" data-bs-dismiss="alert"
+              aria-label="Close"></button>
+          </div>
+          {{/if}}
           {{/if}}
           <!-- Section: Profile Overview -->
           <div id="section-overview">
@@ -53,17 +57,20 @@
 
             <div class="mb-3">
               <strong>Sports Interests:</strong>
-              {{#each sportsInterests}}<span class="badge bg-primary me-1">{{this}}</span>{{/each}}
+              {{#each sportsInterests}}<span
+                class="badge bg-primary me-1">{{this}}</span>{{/each}}
             </div>
 
             <div class="mb-3">
               <strong>Gym Preferences:</strong>
-              {{#each gymPreferences}}<span class="badge bg-success me-1">{{this}}</span>{{/each}}
+              {{#each gymPreferences}}<span
+                class="badge bg-success me-1">{{this}}</span>{{/each}}
             </div>
 
             <div class="mb-3">
               <strong>Gaming Interests:</strong>
-              {{#each gamingInterests}}<span class="badge bg-warning text-dark me-1">{{this}}</span>{{/each}}
+              {{#each gamingInterests}}<span
+                class="badge bg-warning text-dark me-1">{{this}}</span>{{/each}}
             </div>
 
             <div class="mb-3">
@@ -88,8 +95,8 @@
               <div class="d-flex flex-wrap gap-4 justify-content-start">
                 {{#each achievements}}
                 <div class="text-center">
-                  <img 
-                    src="/images/badges/{{badgeImageName this}}" 
+                  <img
+                    src="/images/badges/{{badgeImageName this}}"
                     alt="{{formatBadgeName this}} badge"
                     class="achievement-badge" />
                   <div class="badge-label">{{formatBadgeName this}}</div>
@@ -99,7 +106,8 @@
             </div>
             {{/if}}
 
-            <div class="align-items-center d-flex justify-content-center mt-4 row text-center">
+            <div
+              class="align-items-center d-flex justify-content-center mt-4 row text-center">
               <div class="col-md-3">
                 <h5>{{ karmaPoints}}</h5>
                 <p class="text-muted">Karma Points</p>
@@ -128,39 +136,38 @@
             </div>
           </div>
 
+          <section class="my-5">
+            <h4 class="fw-semibold mb-3">User Reviews</h4>
 
-  <section class="my-5">
-    <h4 class="fw-semibold mb-3">User Reviews</h4>
-
-    {{#if ratings.length}}
-      <div class="row">
-        {{#each ratings}}
-          <div class="col-md-4 mb-4">
-            <div class="card h-100">
-              <div class="card-body">
-                <h5 class="card-title card-title-strong">
-                  {{this.rater.profile.firstName}} {{this.rater.profile.lastName}}
-                </h5>
-                <h6 class="card-subtitle mb-2 text-muted">
-                  {{this.bookingId.title}}
-                </h6>
-                <p class="card-text">{{this.review}}</p>
+            {{#if ratings.length}}
+            <div class="row">
+              {{#each ratings}}
+              <div class="col-md-4 mb-4">
+                <div class="card h-100">
+                  <div class="card-body">
+                    <h5 class="card-title card-title-strong">
+                      {{this.rater.profile.firstName}}
+                      {{this.rater.profile.lastName}}
+                    </h5>
+                    <h6 class="card-subtitle mb-2 text-muted">
+                      {{this.bookingId.title}}
+                    </h6>
+                    <p class="card-text">{{this.review}}</p>
+                  </div>
+                  <div class="card-footer d-flex justify-content-between">
+                    <small class="text-muted">Score: {{this.score}}/5</small>
+                    <small class="text-muted">
+                      Date: {{formatDate this.bookingId.startTime}}
+                    </small>
+                  </div>
+                </div>
               </div>
-              <div class="card-footer d-flex justify-content-between">
-                <small class="text-muted">Score: {{this.score}}/5</small>
-                <small class="text-muted">
-                  Date: {{formatDate this.bookingId.startTime}}
-                </small>
-              </div>
+              {{/each}}
             </div>
-          </div>
-        {{/each}}
-      </div>
-    {{else}}
-      <p class="text-muted">No reviews yet.</p>
-    {{/if}}
-  </section>
-
+            {{else}}
+            <p class="text-muted">No reviews yet.</p>
+            {{/if}}
+          </section>
 
           <!-- Section: Edit Profile -->
           <div id="section-edit" class="d-none">

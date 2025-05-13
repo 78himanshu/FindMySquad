@@ -4,7 +4,7 @@ import { checkString } from "../utils/helper.js";
 import UserProfile from "../models/userProfile.js";
 import { updateKarmaPoints } from "../utils/karmaHelper.js";
 import { evaluateAchievements } from "../utils/achievementHelper.js";
-import GymSession from "../models/Gym.js";
+// import GymSession from "../models/Gym.js";
 
 import "../models/User.js";
 import fetch from "node-fetch";
@@ -177,33 +177,51 @@ export const getJoinedSessionsByUser = async (userId) => {
 };
 
 export const getUpcomingSessions = async () => {
-  try {
-    const now = new Date();
-    const sessions = await GymSession.find({ startTime: { $gt: now } })
-      .sort({ dateTime: 1 })
-      .lean();
-    const getgymData = await Promise.all(
-      sessions.map(async (session) => {
-        // look up just the avatar field
-        const profile = await UserProfile.findOne(
-          { userId: session.hostedBy },
-          { "profile.avatar": 1, _id: 0 }
-        ).lean();
+  const now = new Date();
 
-        return {
-          ...session,
-          hostAvatarUrl:
+  // 1) Load every session, populate hostedBy → { _id, username }
+  const sessions = await Gym.find({})
+    .populate("hostedBy", "username")
+    .lean();
+
+  // 2) Convert your string date+time into a real Date object
+  const withDates = sessions.map((s) => ({
+    ...s,
+    __startDate: new Date(`${s.date}T${s.startTime}`)
+  }));
+
+  // 3) Filter out past sessions, sort by start, and take the first 15
+  const upcoming = withDates
+    .filter((s) => s.__startDate > now)
+    .sort((a, b) => a.__startDate - b.__startDate)
+    .slice(0, 15);
+
+  // 4) Enrich each session with host profile info
+  const enriched = await Promise.all(
+    upcoming.map(async (session) => {
+      const profile = await UserProfile.findOne(
+        { userId: session.hostedBy._id },
+        { "profile.avatar": 1, "profile.firstName": 1, "profile.lastName": 1 }
+      )
+        .lean();
+
+      return {
+        ...session,
+        host: {
+          _id: session.hostedBy._id,
+          username: session.hostedBy.username,
+          avatarUrl:
             profile?.profile?.avatar || "/images/default-avatar.png",
-        };
-      })
-    );
+          firstName: profile?.profile?.firstName || "",
+          lastName: profile?.profile?.lastName || ""
+        }
+      };
+    })
+  );
 
-    return getgymData;
-  } catch (err) {
-    console.error("Error fetching upcoming gym sessions:", err);
-    return [];
-  }
-};
+  return enriched;
+}
+
 
 export const getHostedSessionsByUser = async (userId) => {
   if (!ObjectId.isValid(userId)) throw "Invalid user ID";

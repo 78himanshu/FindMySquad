@@ -868,3 +868,8 @@ a.disabled {
   font-weight: 900 !important;   /* super-bold */
   color: #000000 !important;     /* pure black */
 }
+
+.required-star {
+  color: red;
+  font-weight: bold;
+}

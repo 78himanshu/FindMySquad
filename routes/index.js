@@ -4,18 +4,9 @@ import hostGamesRoutes from "./hostGamesRoutes.js";
 import joinGameRoutes from "./joinGameRoutes.js";
 import authRoutes from "./authRoutes.js";
 import userProfileRoutes from "./userProfileRoutes.js";
-import esportsRoutes from "./esports.js";
-import jwt from "jsonwebtoken";
-import User from "../models/User.js";
 import gymBuddyRoutes from "./gymBuddyRoutes.js";
 import tournamentRoutes from "./tournamentRoutes.js";
-import {
-  hostGameData,
-  gymBuddyData,
-  userProfileData,
-  joinGameData,
-  authUserData,
-} from "../data/index.js";
+import { hostGameData, gymBuddyData, userProfileData } from "../data/index.js";
 
 const configRoutesFunction = (app) => {
   // Base route - simplified since we're using middleware
@@ -31,9 +22,7 @@ const configRoutesFunction = (app) => {
       }
     }
 
-    // console.log("req,", req.user);
     const topUsers = await userProfileData.getTopKarmaUsers();
-    // console.log("TOP USERS FOR HOMEPAGE:", topUsers);
     const upcomingGames = await hostGameData.getUpcomingGames();
     // console.log("upcomingGames", upcomingGames);
     const upcomingGymSessions = await gymBuddyData.getUpcomingSessions();
@@ -47,6 +36,7 @@ const configRoutesFunction = (app) => {
       topUsers: topUsers,
       upcomingGymSessions,
       profileCompleted,
+
     });
   });
 

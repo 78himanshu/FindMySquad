@@ -10,7 +10,6 @@ import { updateKarmaPoints } from "../utils/karmaHelper.js";
 import { evaluateAchievements } from "../utils/achievementHelper.js";
 import axios from "axios";
 
-
 // Home
 router.get("/", (req, res) => {
   res.render("Gym/gym", {
@@ -26,7 +25,7 @@ router.get("/", (req, res) => {
 router
   .get("/create", requireAuth, (req, res) => {
     res.render("Gym/createSession", {
-      title: "Create Gym Session",
+      title: "",
       layout: "main",
       today: new Date().toISOString().split("T")[0],
       head: `<link rel="stylesheet" href="/css/gym.css">`,
@@ -99,7 +98,8 @@ router
       const parsedSessionDate = new Date(Y, M - 1, D);
 
       // ── keep your padded strings for DB storage ──
-      const paddedStartTime = startTime.length === 5 ? `${startTime}:00` : startTime;
+      const paddedStartTime =
+        startTime.length === 5 ? `${startTime}:00` : startTime;
       const paddedEndTime = endTime.length === 5 ? `${endTime}:00` : endTime;
 
       // parse hours/mins into local‐time Date objects
@@ -118,7 +118,10 @@ router
         throw new Error("Invalid Date or Time format.");
       }
 
-      if (parsedSessionDate < new Date(now.getFullYear(), now.getMonth(), now.getDate())) {
+      if (
+        parsedSessionDate <
+        new Date(now.getFullYear(), now.getMonth(), now.getDate())
+      ) {
         return res
           .status(400)
           .json({ error: "Session date must be in the future." });
@@ -142,8 +145,10 @@ router
       });
 
       const hasClash = existingSessions.some((s) => {
-        const sPaddedStart = s.startTime.length === 5 ? `${s.startTime}:00` : s.startTime;
-        const sPaddedEnd = s.endTime.length === 5 ? `${s.endTime}:00` : s.endTime;
+        const sPaddedStart =
+          s.startTime.length === 5 ? `${s.startTime}:00` : s.startTime;
+        const sPaddedEnd =
+          s.endTime.length === 5 ? `${s.endTime}:00` : s.endTime;
         const existingStart = new Date(`${s.date}T${sPaddedStart}`);
         const existingEnd = new Date(`${s.date}T${sPaddedEnd}`);
         return (
@@ -183,21 +188,6 @@ router
         coordinates: [lng, lat],
       };
 
-
-      // console.log("Creating session with:", {
-      //   title,
-      //   gymName,
-      //   description,
-      //   parsedSessionDate,
-      //   startTime,
-      //   endTime,
-      //   gymlocation,
-      //   experience,
-      //   workoutType,
-      //   hostedBy,
-      //   maxMembers,
-      // });
-
       await gymBuddyData.createGymSession(
         title,
         gymName,
@@ -218,8 +208,6 @@ router
         message: "Session created successfully",
         redirectUrl: "/gymBuddy/mySessions",
       });
-
-      // return res.redirect("/gymBuddy?success=Session created successfully");
     } catch (e) {
       console.error("🔥 Error creating session:", e);
       return res
@@ -227,7 +215,6 @@ router
         .json({ error: e?.message || "Failed to create session" });
     }
   });
-
 
 // find session
 router.get("/find", async (req, res) => {
@@ -292,7 +279,7 @@ router.get("/find", async (req, res) => {
     isLoggedIn: res.locals.isLoggedIn,
     error,
     profileCompleted: req.user?.profileCompleted || false,
-    success
+    success,
   });
 });
 
@@ -475,7 +462,7 @@ router.get("/edit/:id", requireAuth, async (req, res) => {
       .populate("hostedBy", "username")
       .lean();
 
-    console.log("session", session)
+    console.log("session", session);
     if (!session) {
       return res.status(404).render("error", { error: "Session not found" });
     }
@@ -505,7 +492,7 @@ router.get("/edit/:id", requireAuth, async (req, res) => {
         userId: session.hostedBy._id.toString(),
         username: session.hostedBy.username,
       },
-      gym_title: session.title
+      gym_title: session.title,
     });
   } catch (e) {
     console.error("Error loading edit page:", e);
@@ -594,7 +581,6 @@ router.post("/delete/:id", requireAuth, async (req, res) => {
 
     await updateKarmaPoints(session.hostedBy.toString(), -15);
     await evaluateAchievements(session.hostedBy.toString());
-
 
     await Gym.deleteOne({ _id: id });
     res.redirect("/gymBuddy/mySessions");
