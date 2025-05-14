@@ -136,13 +136,44 @@
         }
       });
     }
-    const today = new Date().toISOString().split("T")[0];
+
+  });
+</script>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    // 1) Build “today” in local time (YYYY-MM-DD)
+    const now = new Date();
+    const yyyy = now.getFullYear();
+    const mm = String(now.getMonth() + 1).padStart(2, '0'); // months are 0-indexed
+    const dd = String(now.getDate()).padStart(2, '0');
+    const today = `${yyyy}-${mm}-${dd}`;
+
+    // 2) Apply it to every date input
     document.querySelectorAll('input[type="date"]').forEach(input => {
-      input.setAttribute("min", today);
+      input.setAttribute('min', today);
     });
 
-    document.querySelector("input[name='userTimeZone']").value =
-      Intl.DateTimeFormat().resolvedOptions().timeZone;
+    // 3) For each form, enforce a time-min on same-day picks
+    document.querySelectorAll('form').forEach(form => {
+      const dateInput = form.querySelector('input[type="date"]');
+      const timeInputs = form.querySelectorAll('input[type="time"]');
+      if (!dateInput || timeInputs.length === 0) return;
+
+      const updateMinTimes = () => {
+        const isToday = dateInput.value === today;
+        // if it’s today, no earlier than now; otherwise any time
+        const minTime = isToday
+          ? new Date().toTimeString().slice(0, 5)  // "HH:MM"
+          : '00:00';
+
+        timeInputs.forEach(ti => ti.setAttribute('min', minTime));
+      };
+
+      // run on load + whenever the date changes
+      updateMinTimes();
+      dateInput.addEventListener('change', updateMinTimes);
+    });
   });
 </script>
 

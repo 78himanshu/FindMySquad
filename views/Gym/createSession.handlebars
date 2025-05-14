@@ -1,73 +1,79 @@
 <div class="container my-5">
   <div class="card shadow border-success">
     <div class="card-header bg-success text-white">
-      <h2 class="mb-0">{{#if isEditMode}}Edit Gym Session{{else}}Host a Gym
-        Session{{/if}}</h2>
+      <h2 class="mb-0">
+        {{#if isEditMode}}Edit Gym Session{{else}}Host a Gym Session{{/if}}
+      </h2>
     </div>
     <div class="card-body">
-      <form id="gym-session-form" data-edit="{{#if isEditMode}}true{{else}}false{{/if}}" data-session-id="{{_id}}">
+      <form id="gym-session-form" data-edit="{{#if isEditMode}}true{{else}}false{{/if}}" data-session-id="{{_id}}"
+        action="{{#if isEditMode}}/gym/update/{{_id}}{{else}}/gym/create{{/if}}" method="POST">
+
         <div class="row g-3 mt-3">
           <div class="col-md-6">
             <label for="gym_title">Title:<span class="text-danger">*</span></label>
             <input type="text" id="gym_title" name="gym_title" class="form-control" placeholder="Workout Title"
-              value="{{#if isEditMode}}{{title}}{{/if}}" />
-
+              value="{{#if isEditMode}}{{title}}{{/if}}" required>
           </div>
           <div class="col-md-6">
             <label for="gym">Gym Name:<span class="text-danger">*</span></label>
-            <input type="text" id="gym" name="gym" class="form-control" placeholder="Enter Gym Name" value="{{gym}}">
+            <input type="text" id="gym" name="gym" class="form-control" placeholder="Enter Gym Name" value="{{gym}}"
+              required>
           </div>
         </div>
 
         <div class="mb-3 mt-3">
-          <label for="description" class="form-label">Description <span class="text-danger">*</span></label>
+          <label for="description" class="form-label">
+            Description <span class="text-danger">*</span>
+          </label>
           <textarea id="description" name="description" class="form-control" rows="3"
-            placeholder="Describe your workout session">{{description}}</textarea>
+            placeholder="Describe your workout session" required>{{description}}</textarea>
         </div>
 
         <div class="row g-3">
           <div class="col-md-4">
             <label for="date">Date:<span class="text-danger">*</span></label>
-            <input type="date" id="date" name="date" class="form-control" min="{{today}}" value="{{date}}">
+            <input type="date" id="date" name="date" class="form-control" value="{{date}}" required>
           </div>
           <div class="col-md-4">
             <label for="startTime">Start Time:<span class="text-danger">*</span></label>
-            <input type="time" id="startTime" name="startTime" class="form-control" value="{{startTime}}">
+            <input type="time" id="startTime" name="startTime" class="form-control" value="{{startTime}}" required>
           </div>
           <div class="col-md-4">
             <label for="endTime">End Time:<span class="text-danger">*</span></label>
-            <input type="time" id="endTime" name="endTime" class="form-control" value="{{endTime}}">
+            <input type="time" id="endTime" name="endTime" class="form-control" value="{{endTime}}" required>
           </div>
         </div>
 
         <div class="row g-3 mt-3">
           <div class="col-md-6">
-            <label for="gym-location" class="form-label">Gym Location: <span class="text-danger">*</span></label>
-
+            <label for="gym-location" class="form-label">
+              Gym Location: <span class="text-danger">*</span>
+            </label>
             <input type="text" id="gym-location" name="gymlocation" class="form-control"
-              placeholder="Enter Gym Location" value="{{gymlocation}}">
+              placeholder="Enter Gym Location" value="{{gymlocation}}" required>
           </div>
-
-          <div class="col-md-6 mb-3">
-
-            <label for="maxMembers" class="form-label">How many members do you want? <span
-                class="text-danger">*</span></label>
-            <select id="maxMembers" name="maxMembers" class="form-select">
-              <option value>--Select--</option>
+          <div class="col-md-6">
+            <label for="maxMembers" class="form-label">
+              How many members do you want? <span class="text-danger">*</span>
+            </label>
+            <select id="maxMembers" name="maxMembers" class="form-select" required>
+              <option value="">--Select--</option>
               <option value="1" {{#if (eq maxMembers "1" )}}selected{{/if}}>Buddy (1)</option>
               <option value="2" {{#if (eq maxMembers "2" )}}selected{{/if}}>Trio (2)</option>
               <option value="3" {{#if (eq maxMembers "3" )}}selected{{/if}}>Gang (3)</option>
               <option value="4" {{#if (eq maxMembers "4" )}}selected{{/if}}>Group (4)</option>
             </select>
           </div>
-
         </div>
 
         <div class="row g-3 mt-3">
           <div class="col-md-6">
-            <label for="experience" class="form-label">Experience:<span class="text-danger">*</span></label>
-            <select id="experience" name="experience" class="form-select">
-              <option value>Select Experience</option>
+            <label for="experience" class="form-label">
+              Experience:<span class="text-danger">*</span>
+            </label>
+            <select id="experience" name="experience" class="form-select" required>
+              <option value="">Select Experience</option>
               <option value="newcomer" {{#if (eq experience "newcomer" )}}selected{{/if}}>Newcomer</option>
               <option value="1+ year" {{#if (eq experience "1+ year" )}}selected{{/if}}>1+ Year</option>
               <option value="3+ year" {{#if (eq experience "3+ year" )}}selected{{/if}}>3+ Years</option>
@@ -75,26 +81,27 @@
               <option value="10+ year" {{#if (eq experience "10+ year" )}}selected{{/if}}>10+ Years</option>
             </select>
           </div>
-
           <div class="col-md-6">
-            <label for="workoutType" class="form-label">Workout Type:<span class="text-danger">*</span></label>
-            <select id="workoutType" name="workoutType" class="form-select">
-              <option value>Select Workout Type</option>
+            <label for="workoutType" class="form-label">
+              Workout Type:<span class="text-danger">*</span>
+            </label>
+            <select id="workoutType" name="workoutType" class="form-select" required>
+              <option value="">Select Workout Type</option>
               <option value="Cardio" {{#if (eq workoutType "Cardio" )}}selected{{/if}}>Cardio</option>
               <option value="Body Building" {{#if (eq workoutType "Body Building" )}}selected{{/if}}>Body Building
               </option>
               <option value="Power Lifting" {{#if (eq workoutType "Power Lifting" )}}selected{{/if}}>Power Lifting
               </option>
-              <option value="Calisthenics" {{#if (eq workoutType "Calisthenics" )}}selected{{/if}}>Calisthenics</option>
+              <option value="Calisthenics" {{#if (eq workoutType "Calisthenics" )}}selected{{/if}}>Calisthenics
+              </option>
               <option value="Yoga" {{#if (eq workoutType "Yoga" )}}selected{{/if}}>Yoga</option>
               <option value="Other" {{#if (eq workoutType "Other" )}}selected{{/if}}>Other</option>
             </select>
           </div>
         </div>
 
-
         <div class="mt-3">
-          <input type="text" class="form-control" value="{{user.username}}" readonly
+          <input type="text" class="form-control mb-2" value="{{user.username}}" readonly
             style="color: gray; background-color: #f0f0f0;">
           <input type="hidden" id="hostedBy" name="hostedBy" value="{{user.userId}}">
         </div>
@@ -104,92 +111,82 @@
             {{#if isEditMode}}Update Session{{else}}Host Session{{/if}}
           </button>
         </div>
+
       </form>
     </div>
   </div>
 </div>
 
+{{!-- Load Google Places for location autocomplete --}}
 <script
   src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBP-FJZsXytqUxzesnIEkrkUu4JoB1zO-M&libraries=places"></script>
+
 <script>
   document.addEventListener('DOMContentLoaded', () => {
-    // Initialize Google Places Autocomplete for gym location
-    const input = document.getElementById('gym-location');
-    if (input) {
-      const autocomplete = new google.maps.places.Autocomplete(input, {
-        types: ['geocode'],
-        componentRestrictions: { country: "us" }
-      });
+    // 1. Local "today" for date inputs
+    const now = new Date();
+    const yyyy = now.getFullYear();
+    const mm = String(now.getMonth() + 1).padStart(2, '0');
+    const dd = String(now.getDate()).padStart(2, '0');
+    const localToday = `${yyyy}-${mm}-${dd}`;
 
-      autocomplete.addListener('place_changed', function () {
+    document.querySelectorAll('input[type="date"]').forEach(input => {
+      input.setAttribute('min', localToday);
+    });
+
+    // 2. Min time on same-day to prevent selecting past times
+    const dateInput = document.getElementById('date');
+    const timeInputs = [document.getElementById('startTime'), document.getElementById('endTime')];
+
+    function updateMinTime() {
+      const isToday = dateInput.value === localToday;
+      const minTime = isToday
+        ? new Date().toTimeString().slice(0, 5)
+        : '00:00';
+      timeInputs.forEach(ti => ti.setAttribute('min', minTime));
+    }
+
+    dateInput.addEventListener('change', updateMinTime);
+    updateMinTime();
+
+    // 3. Google Places Autocomplete for gym location
+    const locInput = document.getElementById('gym-location');
+    if (locInput && google?.maps?.places) {
+      const autocomplete = new google.maps.places.Autocomplete(locInput, {
+        types: ['geocode'],
+        componentRestrictions: { country: 'us' }
+      });
+      autocomplete.addListener('place_changed', () => {
         const place = autocomplete.getPlace();
-        if (place && place.formatted_address) {
-          input.value = place.formatted_address;
+        if (place.formatted_address) {
+          locInput.value = place.formatted_address;
         }
       });
     }
-
-    // Set min date to today for all date inputs
-    const today = new Date().toISOString().split("T")[0];
-    document.querySelectorAll('input[type="date"]').forEach(input => {
-      input.setAttribute("min", today);
-    });
-
-    // Set min time if date is today
-    document.querySelectorAll("form").forEach((form) => {
-      const dateInput = form.querySelector('input[type="date"]');
-      const timeInputs = form.querySelectorAll('input[type="time"]');
-      if (!dateInput || timeInputs.length === 0) return;
-
-      function updateMinTimes() {
-        const isToday = dateInput.value === today;
-        const minTime = isToday
-          ? (() => {
-            const now = new Date();
-            return now.toTimeString().slice(0, 5); // "HH:MM"
-          })()
-          : "00:00";
-
-        timeInputs.forEach((ti) => ti.setAttribute("min", minTime));
-      }
-
-      dateInput.addEventListener("change", updateMinTimes);
-      updateMinTimes();
-    });
   });
-</script>
 
-<script>
+  // 4. Toast helper
   function showToast(message, isSuccess = false) {
     const container = document.getElementById('toast-container');
     if (!container) return alert(message);
 
-    // Remove any existing toast
     const old = container.querySelector('.toast');
     if (old) container.removeChild(old);
 
-    // Build the new toast node
     const toast = document.createElement('div');
     toast.className = `toast toast--${isSuccess} show`;
     toast.innerHTML = `
       <span>${message}</span>
       <button class="toast__close">&times;</button>
     `;
-
-    // Close-button handler
-    toast
-      .querySelector('.toast__close')
+    toast.querySelector('.toast__close')
       .addEventListener('click', () => container.removeChild(toast));
 
-    // Append and auto-dismiss
     container.appendChild(toast);
     setTimeout(() => {
-      if (container.contains(toast)) {
-        container.removeChild(toast);
-      }
+      if (container.contains(toast)) container.removeChild(toast);
     }, 5000);
   }
 </script>
-
 
 <script src="/js/createSession.js"></script>
