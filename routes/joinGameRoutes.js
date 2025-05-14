@@ -460,29 +460,4 @@ router.post("/leave/:id", auth, async (req, res) => {
   }
 });
 
-router.get("/fallback-location", auth, async (req, res) => {
-  try {
-    if (req.user?.userId) {
-      const profile = await userProfileData.getProfile(req.user.userId);
-      if (profile && profile.city) {
-        const city = encodeURIComponent(profile.city);
-        const response = await fetch(
-          `https://nominatim.openstreetmap.org/search?format=json&q=${city}`
-        );
-        const data = await response.json();
-        if (data?.[0]) {
-          return res.json({
-            lat: parseFloat(data[0].lat),
-            lng: parseFloat(data[0].lon),
-          });
-        }
-      }
-    }
-    return res.json({ lat: 40.7128, lng: -74.006 });
-  } catch (e) {
-    console.error("Fallback location error:", e);
-    res.json({ lat: 40.7128, lng: -74.006 });
-  }
-});
-
 export default router;

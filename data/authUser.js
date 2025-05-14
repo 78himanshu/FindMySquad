@@ -80,8 +80,6 @@ export const signup = async (username, email, password) => {
     throw "username can contain letters and numbers";
   }
 
-  console.log("trimmedpassword", trimmedpassword);
-
   if (!isValidPassword(trimmedpassword)) {
     throw "Password must be at least 8 characters long, include an uppercase letter, a lowercase letter, a number, and a special character";
   }

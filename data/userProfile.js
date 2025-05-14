@@ -8,7 +8,6 @@ import mongoose from "mongoose";
 import HostGame from "../models/hostGame.js";
 
 export const createProfile = async (userId, data) => {
-  console.log(">>>", userId);
   const existing = await UserProfile.findOne({ userId });
   if (existing) throw "Profile already exists";
   // Validation (can add validateProfileData(data) here if you want)
