@@ -242,13 +242,22 @@ router.get("/find", async (req, res) => {
     queryFilters.workoutType = workoutType;
   }
 
-  const today = new Date();
-
-  const yyyy = today.getFullYear();
-  const mm = String(today.getMonth() + 1).padStart(2, "0");
-  const dd = String(today.getDate()).padStart(2, "0");
+  const now = new Date();
+  const yyyy = now.getFullYear();
+  const mm = String(now.getMonth() + 1).padStart(2, "0");
+  const dd = String(now.getDate()).padStart(2, "0");
   const todayStr = `${yyyy}-${mm}-${dd}`;
-  queryFilters.date = { $gte: todayStr };
+
+  const hh = String(now.getHours()).padStart(2, "0");
+  const mi = String(now.getMinutes()).padStart(2, "0");
+  const ss = String(now.getSeconds()).padStart(2, "0");
+  const nowTimeStr = `${hh}:${mi}:${ss}`;
+
+  // only sessions whose date > today, OR date == today & endTime >= now
+  queryFilters.$or = [
+    { date: { $gt: todayStr } },
+    { date: todayStr, startTime: { $gte: nowTimeStr } }
+  ];
 
   const rawSessions = await Gym.find(queryFilters)
     .populate({ path: "hostedBy", model: "Userlist", select: "username" })
