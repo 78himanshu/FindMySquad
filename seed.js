@@ -49,7 +49,6 @@ const seed = async () => {
     await user4.save();
     await user5.save();
 
-    // Create User Profiles
     await UserProfile.insertMany([
       {
         userId: user1._id,
@@ -81,9 +80,6 @@ const seed = async () => {
           coordinates: [-74.0672, 40.7282],
         },
       },
-    ]);
-
-    await UserProfile.insertMany([
       {
         userId: user3._id,
         profile: { firstName: "Sarah", lastName: "Lee", gender: "Female" },
