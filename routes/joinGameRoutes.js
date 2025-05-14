@@ -44,11 +44,6 @@ router
           
               return distA - distB;
             });
-          }else {
-            // Fallback to user's profile city (as rough text-based match)
-            interestMatchedGames = interestMatchedGames.filter(game =>
-              game.location?.toLowerCase().includes(userProfile.city?.toLowerCase())
-            );
           }
           recommendation = interestMatchedGames;
           // if (cookiecontaininglocation) {
