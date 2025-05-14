@@ -4,6 +4,7 @@
   "description": "CS546 Group 23",
   "main": "app.js",
   "type": "module",
+  "seed": "node seed.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node app.js"
